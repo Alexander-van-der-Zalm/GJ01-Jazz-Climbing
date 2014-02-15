@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Control : MonoBehaviour {
+[System.Serializable]
+public abstract class Control 
+{
+    public string Name;
+    protected ControlScheme scheme;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public Control(ControlScheme scheme)
+    {
+        this.scheme = scheme;
+    }
 }
