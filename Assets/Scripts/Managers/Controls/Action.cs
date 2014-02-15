@@ -31,7 +31,10 @@ public class Action : Control
                     break;
             }
             if (down)
+            {
+                scheme.InputType = key.Type;
                 break;
+            }
         }
         return down;
     }
@@ -55,7 +58,10 @@ public class Action : Control
                     break;
             }
             if (down)
+            {
+                scheme.InputType = key.Type;
                 break;
+            }
         }
         return down;
     }
@@ -79,8 +85,13 @@ public class Action : Control
                     break;
             }
             if (down)
+            {
+                scheme.InputType = key.Type;
                 break;
+            }
         }
+        
+
         return down;
     }
 }

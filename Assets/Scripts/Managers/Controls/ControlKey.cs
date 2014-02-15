@@ -8,6 +8,7 @@ public enum ControlKeyType
 }
 
 // Needs custom inspector
+[System.Serializable]
 public class ControlKey 
 {
     public ControlKeyType Type;
