@@ -19,4 +19,14 @@ public class ControlKey
         Type = type;
         KeyValue = value;
     }
+
+    public static ControlKey XboxButton(XboxCtrlrInput.XboxButton btn)
+    {
+        return new ControlKey(ControlKeyType.Xbox, btn.ToString());
+    }
+
+    public static ControlKey PCKey(KeyCode kc)
+    {
+        return new ControlKey(ControlKeyType.PC, kc.ToString());
+    }
 }

@@ -7,7 +7,7 @@ public class Action : Control
 {
     public List<ControlKey> Keys;// = new List<ControlKey>();
 
-    public Action(ControlScheme scheme):base(scheme)
+    public Action(ControlScheme scheme, string name = "defaultAction"):base(scheme, name)
     {
         Keys = new List<ControlKey>();
     }

@@ -9,13 +9,16 @@ public class ControlScheme : MonoBehaviour
 
     public ControlKeyType InputType = ControlKeyType.PC;
 
+    public Axis Horizontal;
+    public Axis Vertical;
+
     // Expose this
-    public List<Control> Controls;
+    public List<Action> Actions;
 
     public ControlScheme(int controllerID = 1, int playerID = 1)
     {
         this.controllerID = controllerID;
         this.playerID = playerID;
-        Controls = new List<Control>();
+        Actions = new List<Action>();
     }
 }

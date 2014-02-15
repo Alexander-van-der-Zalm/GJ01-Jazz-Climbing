@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using XboxCtrlrInput;
 
+[System.Serializable]
 public class Axis : Control
 {
     public List<AxisKey> AxisKeys;// = new List<ControlKey>();
     private int lastAxis;
 
-    public Axis(ControlScheme scheme)
-        : base(scheme)
+    public Axis(ControlScheme scheme, string name = "defaultAxis")
+        : base(scheme, name)
     {
         AxisKeys = new List<AxisKey>();
     }
