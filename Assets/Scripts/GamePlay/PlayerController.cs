@@ -1,31 +1,44 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(ControlScheme))]
 public class PlayerController : MonoBehaviour
 {
     #region Fields
 
-    public ControlScheme ControlScheme;
+    private ControlScheme ControlScheme;
 
     public enum PlayerActions
     {
         Jump = 0,
         Dash = 1,
         Interact = 2,
-        Slice = 3
+        Slide = 3
     }
 
-    public float JumpMinForce = 300;
-    public float JumpMaxForce = 500;
-    public float JumpMaxHoldTime = 1.0f;
+    [System.Serializable]
+    public class JumpSettingsC
+    {
+        public float JumpMaxHeight = 4.0f;
+        public float JumpMinHeight = 1.0f;
+        public float JumpTimeToApex = 0.44f;
+    }
 
-    public float RunMaxVelocity = 10;
-    public float RunAccelTime = 0.5f;
-    public float RunDeAccelTime = 0.25f;
+    public JumpSettingsC JumpSettings;
+
+    [System.Serializable]
+    public class RunSettingsC
+    {
+        public float RunMaxVelocity = 4;
+        public float RunAccelTime = 0.5f;
+        public float RunDeAccelTime = 0.25f;
+    }
+
+    public RunSettingsC RunSettings;
 
     private bool facingRight = true;
     private bool grounded;
+
+    
 
     #endregion
 
@@ -57,15 +70,17 @@ public class PlayerController : MonoBehaviour
 
     #region FixedUpdate
     
-	void FixedUpdate () 
+	void FixedUpdate ()
     {
+        #region Vars
         // hor: Input & Dir is a mini cached var
         float hor = ControlScheme.Horizontal.Value();
         float dir = rigidbody2D.velocity.x;
 
         // do some precalculaltions 
-        float accel = Time.fixedDeltaTime * RunMaxVelocity;
+        float accel = Time.fixedDeltaTime * RunSettings.RunMaxVelocity;
         float dirNormalized = dir/Mathf.Abs(dir);
+        #endregion
 
         #region Movement
         // Passive
@@ -76,7 +91,7 @@ public class PlayerController : MonoBehaviour
         else if (hor == 0 && dir != 0 || (Mathf.Abs(dir) > 0 && dirNormalized != hor / Mathf.Abs(hor)))
         {
             // Possible to do fraction deaccel if wanted
-            accel *= -dirNormalized / RunDeAccelTime;
+            accel *= -dirNormalized / this.RunSettings.RunDeAccelTime;
 
             // CLAMP: If it ends up going in the other direction after accel, clamp it to 0
             float newXVelocity = dir + accel;
@@ -87,10 +102,10 @@ public class PlayerController : MonoBehaviour
         }
         else
         {//Accel
-            accel *= hor / RunAccelTime;
+            accel *= hor / RunSettings.RunAccelTime;
             //CLAMP
-            if (Mathf.Abs(dir + accel) > RunMaxVelocity)
-                rigidbody2D.velocity = new Vector2(RunMaxVelocity * dirNormalized, rigidbody2D.velocity.y);
+            if (Mathf.Abs(dir + accel) > RunSettings.RunMaxVelocity)
+                rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * dirNormalized, rigidbody2D.velocity.y);
             else
                 rigidbody2D.velocity += new Vector2(accel, 0);
         }
@@ -105,13 +120,84 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         // Jump
-        if (ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
+        if (grounded && ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
         {
             //Start jump charge coroutine
+            ChargedJump();
         }
+
+        grounded = false;
 	}
 
     #endregion
+
+    public void ChargedJump()
+    {
+        StartCoroutine(MarioJump());
+    }
+
+    #region Old
+    //public IEnumerator JumpCharge()
+    //{
+    //    float timeStart = Time.timeSinceLevelLoad;
+    //    float chargeTime = 0;
+
+    //    rigidbody2D.AddForce(new Vector2(0, JumpForce),ForceMode.VelocityChange);
+
+    //    while (chargeTime <= JumpMaxHoldTime && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
+    //    {
+    //        //rigidbody2D.AddForce(new Vector2(0, JumpMaxForce));
+            
+
+    //        //float dt = 1 - (chargeTime / JumpMaxHoldTime);
+    //        //float force = JumpForce * dt;
+    //        rigidbody2D.AddForce(new Vector2(0, JumpAccelForce),ForceMode.Acceleration);
+    //        //Debug.Log("InbetweenJump: dt: " + dt);
+
+    //        chargeTime = Time.timeSinceLevelLoad - timeStart;
+    //        yield return null;
+    //    }
+        
+    //    //if (chargeTime > )
+    //    //{
+    //    //    rigidbody2D.AddForce(new Vector2(0, JumpMaxForce));
+    //    //    Debug.Log("maxJump ");
+    //    //}
+    //    //else
+    //    //{
+    //    //    float dt = chargeTime / JumpMaxHoldTime;
+    //    //    float force = JumpMinForce + (JumpMaxForce - JumpMinForce) * dt;
+    //    //    rigidbody2D.AddForce(new Vector2(0, force));
+    //    //    Debug.Log("InbetweenJump: dt: " +dt);
+    //    //}
+    //}
+    #endregion
+
+    public IEnumerator MarioJump()
+    {
+        float h = JumpSettings.JumpMaxHeight;//height
+        float t = JumpSettings.JumpTimeToApex;//time
+        float hmin = JumpSettings.JumpMinHeight;
+
+        float g = (2*h)/(t*t);
+        float v = Mathf.Sqrt(2*g*h);
+
+        Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
+
+        rigidbody2D.gravityScale = g / Mathf.Abs(Physics2D.gravity.y);
+        rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, v);
+
+        float timeStart = Time.timeSinceLevelLoad;
+        float chargeTime = 0;
+
+        while (chargeTime < t && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
+        {
+            chargeTime = Time.timeSinceLevelLoad - timeStart;
+            yield return null;
+        }
+
+        //rigidbody2D.gravityScale = 5; 
+    }
 
     #region Flip
     private void Flip()
@@ -125,6 +211,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnTriggerStay2D(Collider2D other)
     {
-        Debug.Log("Trigger: "+ other.name);
+        //Debug.Log("Trigger: "+ other.name);
+        grounded = true;
     }
 }
