@@ -14,84 +14,68 @@ public class Action : Control
 
     public bool IsDown()
     {
-        bool down = false;
         foreach (ControlKey key in Keys)
         {
-            switch (key.Type)
-            {
-                case ControlKeyType.PC:
-                    if (Input.GetKey(ControlHelper.ReturnKeyCode(key.KeyValue)))
-                        down = true;
-                    break;
-                case ControlKeyType.Xbox:
-                    if(XCI.GetButton(ControlHelper.ReturnXboxButton(key.KeyValue),scheme.controllerID))
-                        down = true;
-                    break;
-                default:
-                    break;
-            }
-            if (down)
-            {
-                scheme.InputType = key.Type;
-                break;
-            }
+            if (key.CurState)
+                return true;
         }
+        return false;
+    }
+
+    private bool IsCKDown(ControlKey key)
+    {
+        bool down = false;
+        switch (key.Type)
+        {
+            case ControlKeyType.PC:
+                if (Input.GetKey(ControlHelper.ReturnKeyCode(key.KeyValue)))
+                    return true;
+                break;
+            case ControlKeyType.Xbox:
+                if (XCI.GetButton(ControlHelper.ReturnXboxButton(key.KeyValue), scheme.controllerID))
+                    return true;
+                break;
+            default:
+                Debug.LogError("Action: KeyType not recognized. Please implement the inputType");
+                break;
+        }
+
+        if (down)
+            scheme.InputType = key.Type;
+            
         return down;
     }
 
     public bool IsPressed()
     {
-        bool down = false;
         foreach (ControlKey key in Keys)
         {
-            switch (key.Type)
-            {
-                case ControlKeyType.PC:
-                    if (Input.GetKeyDown(ControlHelper.ReturnKeyCode(key.KeyValue)))
-                        down = true;
-                    break;
-                case ControlKeyType.Xbox:
-                    if (XCI.GetButtonDown(ControlHelper.ReturnXboxButton(key.KeyValue), scheme.controllerID))
-                        down = true;
-                    break;
-                default:
-                    break;
-            }
-            if (down)
-            {
-                scheme.InputType = key.Type;
-                break;
-            }
+            if (key.CurState && !key.LastState)
+                return true;
         }
-        return down;
+        return false;
     }
 
     public bool IsReleased()
     {
-        bool down = false;
         foreach (ControlKey key in Keys)
         {
-            switch (key.Type)
-            {
-                case ControlKeyType.PC:
-                    if (Input.GetKeyUp(ControlHelper.ReturnKeyCode(key.KeyValue)))
-                        down = true;
-                    break;
-                case ControlKeyType.Xbox:
-                    if (XCI.GetButtonUp(ControlHelper.ReturnXboxButton(key.KeyValue), scheme.controllerID))
-                        down = true;
-                    break;
-                default:
-                    break;
-            }
-            if (down)
-            {
-                scheme.InputType = key.Type;
-                break;
-            }
+            if (!key.CurState && key.LastState)
+                return true;
         }
-        
-
-        return down;
+        return false;
     }
+
+    public void Update()
+    {
+        foreach (ControlKey key in Keys)
+        {
+            key.LastState   = key.CurState;
+            key.CurState    = IsCKDown(key);
+            
+            if(key.LastState)
+                scheme.InputType = key.Type;
+        }
+    }
+
 }
