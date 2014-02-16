@@ -4,9 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(ControlScheme))]
 public class PlayerController : MonoBehaviour
 {
-    #region Fields
-
-    
+    #region Helper Enums & Classes
 
     public enum PlayerActions
     {
@@ -23,11 +21,11 @@ public class PlayerController : MonoBehaviour
         RunningStopping,
         WallHugging,
         Airborne,
+        Falling,
         Grabbing,
         Sliding
     }
     
-
     [System.Serializable]
     public class JumpSettingsC
     {
@@ -35,8 +33,6 @@ public class PlayerController : MonoBehaviour
         public float JumpMinHeight = 1.0f;
         public float JumpTimeToApex = 0.44f;
     }
-
-    
 
     [System.Serializable]
     public class RunSettingsC
@@ -46,7 +42,9 @@ public class PlayerController : MonoBehaviour
         public float RunDeAccelTime = 0.25f;
     }
 
+    #endregion
 
+    #region Fields
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
 
@@ -57,6 +55,11 @@ public class PlayerController : MonoBehaviour
 
     private bool facingRight = true;
     private bool grounded;
+
+    // Input mini-cache
+    private float HorizontalInput = 0;
+    private float VerticalInput = 0;
+    private bool InputJump = false;
 
     private Transform WallDetector, Grab;
     private Animator animator;
@@ -103,9 +106,10 @@ public class PlayerController : MonoBehaviour
     
 	void FixedUpdate ()
     {
+        SetInputValues();
         #region Vars
         // hor: Input & Dir is a mini cached var
-        float hor = ControlScheme.Horizontal.Value();
+        float hor = HorizontalInput;
         float dir = rigidbody2D.velocity.x;
 
         // do some precalculaltions 
@@ -165,9 +169,9 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         // Jump
-        if (grounded && ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
+        if (grounded && InputJump)
         {
-            JumpNHold();
+            Jump();
         }
 
         Fall();
@@ -175,10 +179,22 @@ public class PlayerController : MonoBehaviour
         ResetAtEndOfUpdate();
 	}
 
+    private void SetInputValues()
+    {
+        HorizontalInput =ControlScheme.Horizontal.Value();
+        VerticalInput= ControlScheme.Vertical.Value();
+        InputJump = ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed();
+
+        // Set Animator floats
+        animator.SetFloat("Horizontal", HorizontalInput);
+        animator.SetFloat("Vertical", VerticalInput);            
+    }
+
     private void ResetAtEndOfUpdate()
     {
         //Reset grounded
         grounded = false;
+        InputJump = false;
     }
 
     #endregion
@@ -187,7 +203,25 @@ public class PlayerController : MonoBehaviour
 
     private void HandleGrabbing()
     {
+        float hor = HorizontalInput;
+        float vert = VerticalInput;
 
+        if (InputJump)
+        {
+            
+            if (hor != 0)
+            {
+                if (hor < 0 && facingRight || hor > 0 && !facingRight)
+                {
+                    rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * hor,0);
+                }
+            }
+            if (vert < 0)
+                Fall(true);
+            else
+                Jump();
+
+        }
     }
 
     #endregion
@@ -198,8 +232,10 @@ public class PlayerController : MonoBehaviour
 
     #region Jump
 
-    public void JumpNHold()
+    public void Jump()
     {
+        animator.SetTrigger("Jump");
+        SetState(PlayerState.Airborne);
         StartCoroutine(MarioJump());
     }
 
@@ -282,11 +318,13 @@ public class PlayerController : MonoBehaviour
 
     #region Fall
 
-    private void Fall()
+    private void Fall(bool falldown = false)
     {
+        
         // Fall gravity
-        if (rigidbody2D.velocity.y < 0)
+        if (rigidbody2D.velocity.y < 0 || falldown)
         {
+            SetState(PlayerState.Falling);
             rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
         }
     }
