@@ -10,7 +10,8 @@ public class PlayerController : MonoBehaviour
     {
         Jump = 0,
         Dash = 1,
-        Interact = 2
+        Interact = 2,
+        Slice = 3
     }
 
     public float JumpMinForce = 300;
@@ -28,6 +29,8 @@ public class PlayerController : MonoBehaviour
 
     private float lastTime = 0;
 
+    private bool canIHasAccel = false;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -36,11 +39,13 @@ public class PlayerController : MonoBehaviour
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickX));
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Horizontal));
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.A,KeyCode.D));
+        ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.LeftArrow, KeyCode.RightArrow));
 
         ControlScheme.Vertical = new Axis(ControlScheme,"Vertical");
         ControlScheme.Vertical.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickY));
         ControlScheme.Vertical.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Vertical));
         ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.W, KeyCode.S));
+        ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.UpArrow, KeyCode.DownArrow));
 
         ControlScheme.Actions.Insert((int)PlayerActions.Jump, new Action(ControlScheme,PlayerActions.Jump.ToString()));
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.PCKey(KeyCode.Space));
@@ -60,27 +65,36 @@ public class PlayerController : MonoBehaviour
         
         float dirNormalized = dir/Mathf.Abs(dir);
 
-        float dt = Time.fixedDeltaTime;
-        float mv = RunMaxVelocity;
-        float t = RunAccelTime;
+        //float dt = Time.fixedDeltaTime;
+        //float mv = RunMaxVelocity;
+        //float t = RunAccelTime;
 
-        float ct = Time.timeSinceLevelLoad;
-        Debug.Log("Velocity: " + rigidbody2D.velocity + " h: " + hor + " d: " + dirNormalized);// +" h: " + horNormalized);
-        Debug.Log("dt: " + dt + " t: " + t + " mv: " + mv + " a: " + dt*mv/t + " dt?:" + (ct-lastTime));
-        lastTime = ct;
-        //DeAccel
-        if (hor == 0 && dir!=0 || (Mathf.Abs(dir) > 0 && dirNormalized != hor / Mathf.Abs(hor)))
+        //Debug.Log("Velocity: " + rigidbody2D.velocity);// + " h: " + hor + " d: " + dirNormalized);// +" h: " + horNormalized);
+        //Debug.Log("dt: " + dt + " t: " + t + " mv: " + mv + " a: " + dt * mv / t + " dt?:" + (ct - lastTime));
+
+
+        // Passive
+        if (hor == 0 && dir == 0)
+        {
+           //// Debug.Log("Passive  ");
+           // if (!canIHasAccel)
+           // {
+           //     canIHasAccel = true;
+           // }
+
+        }//DeAccel
+        else if (hor == 0 && dir != 0 || (Mathf.Abs(dir) > 0 && dirNormalized != hor / Mathf.Abs(hor)))
         {
             // Possible to do fraction deaccel if wanted
             accel *= -dirNormalized / RunDeAccelTime;
-            Debug.Log("DeAccel a: " + accel);
+            //Debug.Log("DeAccel a: " + accel);
 
             // If it ends up going in the other direction after accel, clamp it to 0
             float newXVelocity = dir + accel;
             if (newXVelocity / Mathf.Abs(newXVelocity) != dirNormalized)
             {
                 rigidbody2D.velocity = new Vector2(0, rigidbody2D.velocity.y);
-                Debug.Log("CLAMP 0000");
+                //Debug.Log("CLAMP 0000");
             }
             else
                 rigidbody2D.velocity += new Vector2(accel, 0);
@@ -90,13 +104,33 @@ public class PlayerController : MonoBehaviour
             accel *= hor / RunAccelTime;
             if (Mathf.Abs(dir + accel) > RunMaxVelocity)
             {
-                rigidbody2D.velocity = new Vector2(RunMaxVelocity*dirNormalized, rigidbody2D.velocity.y);
-                Debug.Log("CLAMP MAXXX");
+                rigidbody2D.velocity = new Vector2(RunMaxVelocity * dirNormalized, rigidbody2D.velocity.y);
+
+                //Debug
+
+                if (!canIHasAccel)
+                {
+
+                    float ct = Time.timeSinceLevelLoad;
+                    Debug.Log("CLAMP MAXXX" + (ct - lastTime));
+                    lastTime = ct;
+                    canIHasAccel = true;
+
+                }
             }
             else
+            {
                 rigidbody2D.velocity += new Vector2(accel, 0);
+                //Debug.Log("Accel: " + accel);
+                //Debug
+                if (canIHasAccel)
+                {
+                    lastTime = Time.timeSinceLevelLoad;
+                    canIHasAccel = false;
+                }
+            }
 
-            Debug.Log("Accel a: " + accel);
+            //Debug.Log("Accel a: " + accel);
         }
         
         
@@ -122,6 +156,8 @@ public class PlayerController : MonoBehaviour
         {
             //Start jump charge coroutine
         }
+
+        //Debug.Log("Velocity2: " + rigidbody2D.velocity);
 	}
 
     private void Flip()
