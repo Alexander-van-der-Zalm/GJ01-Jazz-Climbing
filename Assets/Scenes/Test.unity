@@ -89,6 +89,7 @@ GameObject:
   - 95: {fileID: 71675994}
   - 114: {fileID: 71675997}
   - 114: {fileID: 71675996}
+  - 61: {fileID: 71675998}
   m_Layer: 0
   m_Name: jake_placeholder
   m_TagString: Untagged
@@ -104,7 +105,7 @@ BoxCollider2D:
   m_PrefabInternal: {fileID: 1548213608}
   m_GameObject: {fileID: 71675989}
   m_Enabled: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
   m_Size: {x: .680000007, y: 1.24000001}
   m_Center: {x: -.0399999991, y: 1.17999995}
@@ -182,7 +183,7 @@ CircleCollider2D:
   m_PrefabInternal: {fileID: 1548213608}
   m_GameObject: {fileID: 71675989}
   m_Enabled: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
   m_Radius: .5
   m_Center: {x: 0, y: .5}
@@ -222,6 +223,17 @@ MonoBehaviour:
     Name: 
   Vertical:
     Name: 
+--- !u!61 &71675998
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 71675989}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Size: {x: 1.5, y: .25}
+  m_Center: {x: 0, y: -.125}
 --- !u!1 &83139085
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,6 +701,14 @@ Prefab:
       propertyPath: m_Name
       value: jake_placeholder
       objectReference: {fileID: 0}
+    - target: {fileID: 6100000, guid: 476d08f8fef44cc4c835bcab7fc310b9, type: 2}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
+    - target: {fileID: 5800000, guid: 476d08f8fef44cc4c835bcab7fc310b9, type: 2}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 476d08f8fef44cc4c835bcab7fc310b9, type: 2}
   m_RootGameObject: {fileID: 71675989}
