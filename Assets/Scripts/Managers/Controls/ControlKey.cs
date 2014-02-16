@@ -13,6 +13,8 @@ public class ControlKey
 {
     public ControlKeyType Type;
     public string KeyValue;
+    public bool LastState = false;
+    public bool CurState = false;
 
     public ControlKey(ControlKeyType type, string value)
     {

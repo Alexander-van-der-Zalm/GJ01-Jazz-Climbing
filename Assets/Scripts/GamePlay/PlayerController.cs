@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(ControlScheme))]
 public class PlayerController : MonoBehaviour
 {
     #region Fields
@@ -35,6 +36,8 @@ public class PlayerController : MonoBehaviour
 
     public RunSettingsC RunSettings;
 
+    public float FallGravity = 50;
+
     private bool facingRight = true;
     private bool grounded;
 
@@ -47,7 +50,10 @@ public class PlayerController : MonoBehaviour
     // Use this for initialization
 	void Start () 
     {
-        ControlScheme = new ControlScheme();
+        ControlScheme = gameObject.GetComponent<ControlScheme>();
+        if (ControlScheme == null)
+            ControlScheme = gameObject.AddComponent<ControlScheme>();
+
         ControlScheme.Horizontal = new Axis(ControlScheme,"Horizontal");
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickX));
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Horizontal));
@@ -119,11 +125,29 @@ public class PlayerController : MonoBehaviour
             Flip();
         #endregion
 
+
+        if (ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
+        {
+            Debug.Log("Space Pressed");
+        }
+        if (ControlScheme.Actions[(int)PlayerActions.Jump].IsReleased())
+        {
+            Debug.Log("Space Released");
+        }
+
         // Jump
         if (grounded && ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
         {
+            //Debug.Log("JUMP");
             //Start jump charge coroutine
             ChargedJump();
+            
+        }
+
+        // Fall gravity
+        if (rigidbody2D.velocity.y < 0)
+        {
+            rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
         }
 
         grounded = false;
@@ -182,21 +206,23 @@ public class PlayerController : MonoBehaviour
         float g = (2*h)/(t*t);
         float v = Mathf.Sqrt(2*g*h);
 
-        Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
+        //Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
 
         rigidbody2D.gravityScale = g / Mathf.Abs(Physics2D.gravity.y);
         rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, v);
 
         float timeStart = Time.timeSinceLevelLoad;
-        float chargeTime = 0;
+        float flyTime = 0;
 
-        while (chargeTime < t && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
+        //float vearly = Mathf.Sqrt(v*v+2*g(
+
+        while (flyTime < t && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
         {
-            chargeTime = Time.timeSinceLevelLoad - timeStart;
+            flyTime = Time.timeSinceLevelLoad - timeStart;
             yield return null;
         }
 
-        //rigidbody2D.gravityScale = 5; 
+        rigidbody2D.gravityScale = 10; 
     }
 
     #region Flip
