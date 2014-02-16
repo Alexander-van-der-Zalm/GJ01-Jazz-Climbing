@@ -13,6 +13,8 @@ GameObject:
   - 61: {fileID: 6100000}
   - 58: {fileID: 5800000}
   - 95: {fileID: 9500000}
+  - 114: {fileID: 11400000}
+  - 61: {fileID: 6100002}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -27,7 +29,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.98474979, y: .975410104, z: 0}
+  m_LocalPosition: {x: -2.95816016, y: 1.00199997, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -40,7 +42,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: .0500000007
-  m_GravityScale: 1
+  m_GravityScale: 3
   m_FixedAngle: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -53,7 +55,7 @@ CircleCollider2D:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
   m_Radius: .5
   m_Center: {x: 0, y: .5}
@@ -64,10 +66,21 @@ BoxCollider2D:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
   m_Size: {x: .680000007, y: 1.24000001}
   m_Center: {x: -.0399999991, y: 1.17999995}
+--- !u!61 &6100002
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Size: {x: 1.5, y: .25}
+  m_Center: {x: 0, y: -.125}
 --- !u!95 &9500000
 Animator:
   serializedVersion: 2
@@ -82,6 +95,26 @@ Animator:
   m_ApplyRootMotion: 0
   m_AnimatePhysics: 1
   m_HasTransformHierarchy: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 521a07b7406045f42808c2df92d14401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  JumpSettings:
+    JumpMaxHeight: 3
+    JumpMinHeight: 1
+    JumpTimeToApex: .439999998
+  RunSettings:
+    RunMaxVelocity: 4
+    RunAccelTime: .5
+    RunDeAccelTime: .25
+  FallGravity: 50
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1

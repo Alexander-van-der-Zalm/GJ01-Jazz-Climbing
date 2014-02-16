@@ -125,37 +125,23 @@ public class PlayerController : MonoBehaviour
             Flip();
         #endregion
 
-
-        if (ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
-        {
-            Debug.Log("Space Pressed");
-        }
-        if (ControlScheme.Actions[(int)PlayerActions.Jump].IsReleased())
-        {
-            Debug.Log("Space Released");
-        }
-
         // Jump
-        if (grounded && ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
+        if (grounded&&ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
         {
-            //Debug.Log("JUMP");
-            //Start jump charge coroutine
-            ChargedJump();
-            
+            JumpNHold();
         }
 
-        // Fall gravity
-        if (rigidbody2D.velocity.y < 0)
-        {
-            rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
-        }
+        Fall();
 
+        //Reset grounded
         grounded = false;
 	}
 
     #endregion
 
-    public void ChargedJump()
+    #region Jump
+
+    public void JumpNHold()
     {
         StartCoroutine(MarioJump());
     }
@@ -225,6 +211,8 @@ public class PlayerController : MonoBehaviour
         rigidbody2D.gravityScale = 10; 
     }
 
+    #endregion
+
     #region Flip
     private void Flip()
     {
@@ -235,9 +223,30 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region Fall
+
+    private void Fall()
+    {
+        // Fall gravity
+        if (rigidbody2D.velocity.y < 0)
+        {
+            rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
+        }
+    }
+
+    #endregion
+
     public void OnTriggerStay2D(Collider2D other)
     {
-        //Debug.Log("Trigger: "+ other.name);
-        grounded = true;
+        // Only on the right elements
+        //Ray2D ray;
+        //for(int i = 0; i < 5; i++)
+        //{
+        //    //Debug.DrawRay(
+        //    ray = new Ray2D(new Vector2(,);
+
+        //Ray2D ray = new Ray2D(new Vector2(,);
+            grounded = true;  
+        //}
     }
 }
