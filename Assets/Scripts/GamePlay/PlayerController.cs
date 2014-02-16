@@ -16,6 +16,15 @@ public class PlayerController : MonoBehaviour
         Slide = 3
     }
 
+    public enum PlayerState
+    {
+        Running,
+        Airborne,
+        Grabbing,
+        Sliding
+    }
+
+
     [System.Serializable]
     public class JumpSettingsC
     {
@@ -41,15 +50,19 @@ public class PlayerController : MonoBehaviour
     private bool facingRight = true;
     private bool grounded;
 
-    
+    [HideInInspector]
+    public bool CanGrab = false;
 
+    private Transform WallDetector, Grab;
+    private Animator animator;
     #endregion
 
     #region Start
 
     // Use this for initialization
-	void Start () 
+	void Start ()
     {
+        #region Controls
         ControlScheme = gameObject.GetComponent<ControlScheme>();
         if (ControlScheme == null)
             ControlScheme = gameObject.AddComponent<ControlScheme>();
@@ -69,8 +82,15 @@ public class PlayerController : MonoBehaviour
         ControlScheme.Actions.Insert((int)PlayerActions.Jump, new Action(ControlScheme,PlayerActions.Jump.ToString()));
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.PCKey(KeyCode.Space));
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
+        #endregion
 
-	}
+        WallDetector = transform.Find("Wall");
+        Grab = transform.Find("Grab");
+        ChildTrigger2DDelegates grabDels = Grab.gameObject.AddComponent<ChildTrigger2DDelegates>();
+        grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
+        animator = GetComponent<Animator>();
+        //animator.
+    }
 
     #endregion
 
@@ -236,6 +256,18 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    private void OnWallTrigger(Collider2D other)
+    {
+        if (other.tag == "GrabMe")
+        {
+            CanGrab = true;
+            Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
+            transform.position = other.transform.position - Grab.position + transform.position;
+            animator.SetBool("Grab", true);
+            Debug.Log("ACTUALLY FOUND :O");
+        }
+    }
+    
     public void OnTriggerStay2D(Collider2D other)
     {
         // Only on the right elements
