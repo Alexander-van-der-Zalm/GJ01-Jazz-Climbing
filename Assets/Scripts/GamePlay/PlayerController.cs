@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     #region Fields
 
-    private ControlScheme ControlScheme;
+    
 
     public enum PlayerActions
     {
@@ -18,12 +18,15 @@ public class PlayerController : MonoBehaviour
 
     public enum PlayerState
     {
+        Idle,
         Running,
+        RunningStopping,
+        WallHugging,
         Airborne,
         Grabbing,
         Sliding
     }
-
+    
 
     [System.Serializable]
     public class JumpSettingsC
@@ -33,7 +36,7 @@ public class PlayerController : MonoBehaviour
         public float JumpTimeToApex = 0.44f;
     }
 
-    public JumpSettingsC JumpSettings;
+    
 
     [System.Serializable]
     public class RunSettingsC
@@ -43,15 +46,17 @@ public class PlayerController : MonoBehaviour
         public float RunDeAccelTime = 0.25f;
     }
 
+
+    public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
 
     public float FallGravity = 50;
 
+    private ControlScheme ControlScheme;
+    private PlayerState playerState;
+
     private bool facingRight = true;
     private bool grounded;
-
-    [HideInInspector]
-    public bool CanGrab = false;
 
     private Transform WallDetector, Grab;
     private Animator animator;
@@ -108,14 +113,25 @@ public class PlayerController : MonoBehaviour
         float dirNormalized = dir/Mathf.Abs(dir);
         #endregion
 
+        if (playerState == PlayerState.Grabbing)
+        {
+            HandleGrabbing();
+            ResetAtEndOfUpdate();
+            return;
+        }
+
         #region Movement
         // Passive
         if (hor == 0 && dir == 0)
         {
-           //// Debug.Log("Passive  ");
+            if(grounded)
+                SetState(PlayerState.Idle);
         }//DeAccel
         else if (hor == 0 && dir != 0 || (Mathf.Abs(dir) > 0 && dirNormalized != hor / Mathf.Abs(hor)))
         {
+            if(grounded)
+                SetState(PlayerState.Running);
+            
             // Possible to do fraction deaccel if wanted
             accel *= -dirNormalized / this.RunSettings.RunDeAccelTime;
 
@@ -128,6 +144,9 @@ public class PlayerController : MonoBehaviour
         }
         else
         {//Accel
+            if (grounded)
+                SetState(PlayerState.RunningStopping);
+
             accel *= hor / RunSettings.RunAccelTime;
             //CLAMP
             if (Mathf.Abs(dir + accel) > RunSettings.RunMaxVelocity)
@@ -146,16 +165,34 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         // Jump
-        if (grounded&&ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
+        if (grounded && ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
         {
             JumpNHold();
         }
 
         Fall();
 
+        ResetAtEndOfUpdate();
+	}
+
+    private void ResetAtEndOfUpdate()
+    {
         //Reset grounded
         grounded = false;
-	}
+    }
+
+    #endregion
+
+    #region Grabbing
+
+    private void HandleGrabbing()
+    {
+
+    }
+
+    #endregion
+
+    #region WallJump & Slide
 
     #endregion
 
@@ -260,13 +297,48 @@ public class PlayerController : MonoBehaviour
     {
         if (other.tag == "GrabMe")
         {
-            CanGrab = true;
             Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
             transform.position = other.transform.position - Grab.position + transform.position;
-            animator.SetBool("Grab", true);
+            SetState(PlayerState.Grabbing);
             Debug.Log("ACTUALLY FOUND :O");
         }
     }
+
+
+    private void SetState(PlayerState state)
+    {
+        animator.SetBool("Grab", false);
+
+        switch (state)
+        {
+            case PlayerState.Idle:
+
+                break;
+            case PlayerState.Airborne:
+
+                break;
+            case PlayerState.WallHugging:
+
+                break;
+            case PlayerState.Grabbing:
+                animator.SetBool("Grab", true);
+                rigidbody2D.gravityScale = 0;
+                break;
+            case PlayerState.Running:
+
+                break;
+            case PlayerState.Sliding:
+
+                break;
+            default:
+
+                break;
+
+        }
+        playerState = state;
+
+    }
+
     
     public void OnTriggerStay2D(Collider2D other)
     {
