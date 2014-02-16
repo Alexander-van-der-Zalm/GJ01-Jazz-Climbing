@@ -45,13 +45,14 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Fields
+
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
 
     public float FallGravity = 50;
 
     private ControlScheme ControlScheme;
-    private PlayerState playerState;
+    public PlayerState playerState;
 
     private bool facingRight = true;
     private bool grounded;
@@ -61,8 +62,12 @@ public class PlayerController : MonoBehaviour
     private float VerticalInput = 0;
     private bool InputJump = false;
 
+    private int lastGrabbedID = -1;
+    private bool canGrabLastGrabbedId = false;
+
     private Transform WallDetector, Grab;
     private Animator animator;
+
     #endregion
 
     #region Start
@@ -95,7 +100,9 @@ public class PlayerController : MonoBehaviour
         WallDetector = transform.Find("Wall");
         Grab = transform.Find("Grab");
         ChildTrigger2DDelegates grabDels = Grab.gameObject.AddComponent<ChildTrigger2DDelegates>();
-        grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
+        grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
+        //grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
+        grabDels.OnTriggerExit = new TriggerDelegate(LeaveWallTrigger);
         animator = GetComponent<Animator>();
         //animator.
     }
@@ -124,6 +131,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        
         #region Movement
         // Passive
         if (hor == 0 && dir == 0)
@@ -234,6 +242,7 @@ public class PlayerController : MonoBehaviour
 
     public void Jump()
     {
+        Debug.Log("JUMP");
         animator.SetTrigger("Jump");
         SetState(PlayerState.Airborne);
         StartCoroutine(MarioJump());
@@ -331,22 +340,75 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    private void OnWallTrigger(Collider2D other)
+    private void OnWallTriggerEnter(Collider2D other)
     {
+        int id = other.GetInstanceID();
         if (other.tag == "GrabMe")
         {
-            Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
+            Debug.Log("ENTER " + id + " lg: " + lastGrabbedID);
+        }
+
+        if (other.tag == "GrabMe" && id != lastGrabbedID)// || canGrabLastGrabbedId))
+        {
+            //if (lastGrabbedID == id)
+            //    canGrabLastGrabbedId = false;
+
+            Debug.Log("Vel: " + rigidbody2D.velocity);
+            //Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
             transform.position = other.transform.position - Grab.position + transform.position;
+
+            //rigidbody2D.mass = 100000;
+
             SetState(PlayerState.Grabbing);
-            Debug.Log("ACTUALLY FOUND :O");
+            lastGrabbedID = id;
+            Debug.Log("ACTUALLY FOUND :O " + id);
         }
     }
 
+    private void OnWallTrigger(Collider2D other)
+    {
+        int id = other.GetInstanceID();
+
+
+        if (other.tag == "GrabMe")
+        {
+            Debug.Log("STAY " + id + " lg: " + lastGrabbedID);
+        }
+
+        if (other.tag == "GrabMe" && id!=lastGrabbedID)// || canGrabLastGrabbedId))
+        {
+            //if (lastGrabbedID == id)
+            //    canGrabLastGrabbedId = false;
+
+            Debug.Log("Vel: " + rigidbody2D.velocity);
+            //Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
+            transform.position = other.transform.position - Grab.position + transform.position;
+            
+            //rigidbody2D.mass = 100000;
+
+            SetState(PlayerState.Grabbing);
+            lastGrabbedID = id;
+            Debug.Log("ACTUALLY FOUND :O " + id);
+        }
+    }
+
+    private void LeaveWallTrigger(Collider2D other)
+    {
+        int id = other.GetInstanceID();
+        if (other.tag == "GrabMe" )
+            Debug.Log("EXITTT" + lastGrabbedID);
+        if (other.tag == "GrabMe" && lastGrabbedID == id)
+        {
+            //canGrabLastGrabbedId = true;
+            Debug.Log("BYEBYE :O " + id + " lg: " + lastGrabbedID);
+            lastGrabbedID = 0;
+        }
+    }
 
     private void SetState(PlayerState state)
     {
         animator.SetBool("Grab", false);
-
+        rigidbody2D.isKinematic = false;
         switch (state)
         {
             case PlayerState.Idle:
@@ -361,6 +423,8 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Grabbing:
                 animator.SetBool("Grab", true);
                 rigidbody2D.gravityScale = 0;
+                rigidbody2D.velocity = Vector2.zero;
+                rigidbody2D.isKinematic = true;
                 break;
             case PlayerState.Running:
 
@@ -376,7 +440,6 @@ public class PlayerController : MonoBehaviour
         playerState = state;
 
     }
-
     
     public void OnTriggerStay2D(Collider2D other)
     {
