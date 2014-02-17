@@ -56,22 +56,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &100006
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 400006}
-  - 61: {fileID: 6100008}
-  m_Layer: 0
-  m_Name: Wall
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!4 &400000
 Transform:
   m_ObjectHideFlags: 1
@@ -95,7 +79,6 @@ Transform:
   m_Children:
   - {fileID: 400004}
   - {fileID: 400000}
-  - {fileID: 400006}
   m_Father: {fileID: 0}
 --- !u!4 &400004
 Transform:
@@ -105,17 +88,6 @@ Transform:
   m_GameObject: {fileID: 100004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: .490029812, y: 2.01171589, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 400002}
---- !u!4 &400006
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100006}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.36000001, y: 1.19518948, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400002}
@@ -202,8 +174,8 @@ BoxCollider2D:
   m_Enabled: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Size: {x: .889999986, y: .239999995}
-  m_Center: {x: 0, y: -.125}
+  m_Size: {x: .800000012, y: .150000006}
+  m_Center: {x: 0, y: -.075000003}
 --- !u!61 &6100006
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -214,17 +186,6 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Size: {x: .5, y: 1}
-  m_Center: {x: 0, y: 0}
---- !u!61 &6100008
-BoxCollider2D:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100006}
-  m_Enabled: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Size: {x: 1, y: 2}
   m_Center: {x: 0, y: 0}
 --- !u!95 &9500000
 Animator:
@@ -260,11 +221,11 @@ MonoBehaviour:
     RunAccelTime: .400000006
     RunDeAccelTime: .25
   FallGravity: 50
-  SlideGravity: 5
-  SlideInitialVelocity: 2
-  SlideJumpFraction: .5
+  WallSlideGravity: 5
+  WallSlideInitialVelocity: 2
   playerState: 0
-  Grounded: 0
+  facingRight: 1
+  grounded: 0
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -286,7 +247,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 0
   m_SortingLayerID: 583456963
-  m_Sprite: {fileID: 21300000, guid: f2ce14811460b91428037330e875365d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a8d39ea8ba98e6c4ba9b7dd925e1699e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &100100000
 Prefab:

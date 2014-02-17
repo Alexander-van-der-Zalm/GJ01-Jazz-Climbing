@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
         Running,
         RunningStopping,
         WallSliding,
+        WallJump,
         Airborne,
         Falling,
         Grabbing
@@ -49,20 +50,22 @@ public class PlayerController : MonoBehaviour
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
 
-    //public float 
+    // Fall Settings
     public float FallGravity = 50;
-    public float SlideGravity = 5;
-    public float SlideInitialVelocity = 2;
-    [Range(0,1)]
-    public float SlideJumpFraction = 0.5f;
+    //todo maximum fall
+
+    // SlideSettings
+    public float WallSlideGravity = 5;
+    public float WallSlideInitialVelocity = 2;
+    //public float SlideBeforeFall = 0.5f;
+    private float WallJumpLastDirection = 0; 
 
     private ControlScheme ControlScheme;
     public PlayerState playerState;
 
-    private bool facingRight = true;
+    public bool facingRight = true;
 
-    private bool grounded;
-
+    public bool grounded;
     public bool Grounded { get { return grounded; } set { grounded = value; animator.SetBool("Grounded", value); } }
 
     // Input mini-cache
@@ -70,14 +73,13 @@ public class PlayerController : MonoBehaviour
     private float VerticalInput = 0;
     private bool InputJump = false;
 
-    private List<int> lastSlided = new List<int>();
+    // Storage for collided 
     private List<int> floorIds = new List<int>();
-
+    private List<int> lastSlided = new List<int>();
     private List<GameObject> wallInCollision = new List<GameObject>();
-
     private int lastGrabbedID = 0;
 
-    private Transform WallDetector, Grab;
+    private Transform Grab;
     private Animator animator;
     private Vector3 GrabOffset;
 
@@ -110,12 +112,9 @@ public class PlayerController : MonoBehaviour
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
         #endregion
 
-        WallDetector = transform.parent.transform.Find("Wall");
         Grab = transform.parent.transform.Find("Grab");
 
-
         ChildTrigger2DDelegates grabDels = ChildTrigger2DDelegates.AddChildTrigger2D(Grab.gameObject, transform);
-        ChildTrigger2DDelegates wallDels = ChildTrigger2DDelegates.AddChildTrigger2D(WallDetector.gameObject, transform);
 
         grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
         //grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
@@ -168,12 +167,14 @@ public class PlayerController : MonoBehaviour
 
         #region WallJump
 
-        //if (playerState == PlayerState.WallJump)
-        //{
+        if (!Grounded && playerState == PlayerState.WallJump)
+        {
+            if (HorizontalInput == 0 || HorizontalInput != WallJumpLastDirection)
+                SetState(PlayerState.Airborne);
 
-        //    ResetAtEndOfUpdate();
-        //    return;
-        //}
+            ResetAtEndOfUpdate();
+            return;
+        }
 
         #endregion
 
@@ -259,7 +260,6 @@ public class PlayerController : MonoBehaviour
         // Set Animator floats
         animator.SetFloat("Horizontal", HorizontalInput);
         animator.SetFloat("Vertical", VerticalInput);
-
 
         Grounded = floorIds.Count > 0;
     }
@@ -372,7 +372,7 @@ public class PlayerController : MonoBehaviour
             SetState(PlayerState.Idle);
             lastSlided.Clear();
             wallInCollision.Clear();
-            Debug.Log("SLIDING Clear");
+            //Debug.Log("SLIDING Clear");
         }
 
         if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 && HorizontalInput != 0)
@@ -381,7 +381,7 @@ public class PlayerController : MonoBehaviour
             {
                 float relPosSign = Mathf.Sign(col.transform.position.x - transform.position.x);
                 float inputSign = Mathf.Sign(HorizontalInput);
-                Debug.Log(relPosSign + " input " + inputSign + " " + HorizontalInput);
+                //Debug.Log(relPosSign + " input " + inputSign + " " + HorizontalInput);
                 
                 if(relPosSign == inputSign)
                     SetState(PlayerState.WallSliding);
@@ -390,7 +390,7 @@ public class PlayerController : MonoBehaviour
         
         if (playerState == PlayerState.WallSliding && InputJump)
         {
-            Debug.Log("WallJump");
+           
 
             float dir = 1;
             if (facingRight)
@@ -398,11 +398,11 @@ public class PlayerController : MonoBehaviour
 
             rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
-            Jump();
+            WallJump();
 
             lastSlided.Clear();
             wallInCollision.Clear();
-            Debug.Log("SLIDING Clear");
+            //Debug.Log("SLIDING Clear");
         }
 
         if (playerState == PlayerState.WallSliding && HorizontalInput == 0)
@@ -411,6 +411,13 @@ public class PlayerController : MonoBehaviour
         }
 
         return playerState == PlayerState.WallSliding;    
+    }
+
+    private void WallJump()
+    {
+        SetState(PlayerState.WallJump);
+        Debug.Log("WallJump");
+        StartCoroutine(MarioJump());
     }
 
     #endregion
@@ -540,14 +547,15 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Idle:
 
                 break;
+            case PlayerState.WallJump:
             case PlayerState.Airborne:
                 animator.SetTrigger("Jump");
                 break;
             case PlayerState.WallSliding:
                 
                 animator.SetBool("WallSlide", true);
-                SetGravity(SlideGravity);
-                rigidbody2D.velocity = new Vector2(0, -SlideInitialVelocity);
+                SetGravity(WallSlideGravity);
+                rigidbody2D.velocity = new Vector2(0, -WallSlideInitialVelocity);
                 Debug.Log("StartSlide grav: " + rigidbody2D.gravityScale);
                 break;
             case PlayerState.Grabbing:
@@ -564,6 +572,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
         }
+
         playerState = state;
     }
 
