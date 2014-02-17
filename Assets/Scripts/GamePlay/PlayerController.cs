@@ -4,9 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(ControlScheme))]
 public class PlayerController : MonoBehaviour
 {
-    #region Fields
-
-    private ControlScheme ControlScheme;
+    #region Helper Enums & Classes
 
     public enum PlayerActions
     {
@@ -18,13 +16,16 @@ public class PlayerController : MonoBehaviour
 
     public enum PlayerState
     {
+        Idle,
         Running,
+        RunningStopping,
+        WallHugging,
         Airborne,
+        Falling,
         Grabbing,
         Sliding
     }
-
-
+    
     [System.Serializable]
     public class JumpSettingsC
     {
@@ -32,8 +33,6 @@ public class PlayerController : MonoBehaviour
         public float JumpMinHeight = 1.0f;
         public float JumpTimeToApex = 0.44f;
     }
-
-    public JumpSettingsC JumpSettings;
 
     [System.Serializable]
     public class RunSettingsC
@@ -43,24 +42,39 @@ public class PlayerController : MonoBehaviour
         public float RunDeAccelTime = 0.25f;
     }
 
+    #endregion
+
+    #region Fields
+
+    public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
 
     public float FallGravity = 50;
 
+    private ControlScheme ControlScheme;
+    public PlayerState playerState;
+
     private bool facingRight = true;
     private bool grounded;
 
-    [HideInInspector]
-    public bool CanGrab = false;
+    // Input mini-cache
+    private float HorizontalInput = 0;
+    private float VerticalInput = 0;
+    private bool InputJump = false;
+
+    private int lastGrabbedID = -1;
+    private bool canGrabLastGrabbedId = false;
 
     private Transform WallDetector, Grab;
     private Animator animator;
+    private Vector3 GrabOffset;
+
     #endregion
 
     #region Start
 
     // Use this for initialization
-	void Start ()
+	void Awake ()
     {
         #region Controls
         ControlScheme = gameObject.GetComponent<ControlScheme>();
@@ -84,10 +98,19 @@ public class PlayerController : MonoBehaviour
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
         #endregion
 
-        WallDetector = transform.Find("Wall");
-        Grab = transform.Find("Grab");
-        ChildTrigger2DDelegates grabDels = Grab.gameObject.AddComponent<ChildTrigger2DDelegates>();
-        grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
+        WallDetector = transform.parent.transform.Find("Wall");
+        Grab = transform.parent.transform.Find("Grab");
+
+
+        ChildTrigger2DDelegates grabDels = ChildTrigger2DDelegates.AddChildTrigger2D(Grab.gameObject, transform);
+        ChildTrigger2DDelegates wallDels = ChildTrigger2DDelegates.AddChildTrigger2D(WallDetector.gameObject, transform);
+
+        grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
+        //grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
+        grabDels.OnTriggerExit = new TriggerDelegate(LeaveWallTrigger);
+
+        GrabOffset = Grab.position - transform.position;
+
         animator = GetComponent<Animator>();
         //animator.
     }
@@ -98,9 +121,10 @@ public class PlayerController : MonoBehaviour
     
 	void FixedUpdate ()
     {
+        SetInputValues();
         #region Vars
         // hor: Input & Dir is a mini cached var
-        float hor = ControlScheme.Horizontal.Value();
+        float hor = HorizontalInput;
         float dir = rigidbody2D.velocity.x;
 
         // do some precalculaltions 
@@ -108,14 +132,26 @@ public class PlayerController : MonoBehaviour
         float dirNormalized = dir/Mathf.Abs(dir);
         #endregion
 
+        if (playerState == PlayerState.Grabbing)
+        {
+            HandleGrabbing();
+            ResetAtEndOfUpdate();
+            return;
+        }
+
+        
         #region Movement
         // Passive
         if (hor == 0 && dir == 0)
         {
-           //// Debug.Log("Passive  ");
+            if(grounded)
+                SetState(PlayerState.Idle);
         }//DeAccel
         else if (hor == 0 && dir != 0 || (Mathf.Abs(dir) > 0 && dirNormalized != hor / Mathf.Abs(hor)))
         {
+            if(grounded)
+                SetState(PlayerState.Running);
+            
             // Possible to do fraction deaccel if wanted
             accel *= -dirNormalized / this.RunSettings.RunDeAccelTime;
 
@@ -128,6 +164,9 @@ public class PlayerController : MonoBehaviour
         }
         else
         {//Accel
+            if (grounded)
+                SetState(PlayerState.RunningStopping);
+
             accel *= hor / RunSettings.RunAccelTime;
             //CLAMP
             if (Mathf.Abs(dir + accel) > RunSettings.RunMaxVelocity)
@@ -146,23 +185,74 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         // Jump
-        if (grounded&&ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed())
+        if (grounded && InputJump)
         {
-            JumpNHold();
+            Jump();
         }
 
         Fall();
 
+        ResetAtEndOfUpdate();
+	}
+
+    private void SetInputValues()
+    {
+        HorizontalInput =ControlScheme.Horizontal.Value();
+        VerticalInput= ControlScheme.Vertical.Value();
+        InputJump = ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed();
+
+        // Set Animator floats
+        animator.SetFloat("Horizontal", HorizontalInput);
+        animator.SetFloat("Vertical", VerticalInput);            
+    }
+
+    private void ResetAtEndOfUpdate()
+    {
         //Reset grounded
         grounded = false;
-	}
+        InputJump = false;
+    }
+
+    #endregion
+
+    #region Grabbing
+
+    private void HandleGrabbing()
+    {
+        float hor = HorizontalInput;
+        float vert = VerticalInput;
+
+        if (InputJump)
+        {
+            
+            if (hor != 0)
+            {
+                if (hor < 0 && facingRight || hor > 0 && !facingRight)
+                {
+                    rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * hor,0);
+                }
+            }
+            if (vert < 0)
+                Fall(true);
+            else
+                Jump();
+
+        }
+    }
+
+    #endregion
+
+    #region WallJump & Slide
 
     #endregion
 
     #region Jump
 
-    public void JumpNHold()
+    public void Jump()
     {
+        Debug.Log("JUMP");
+        animator.SetTrigger("Jump");
+        SetState(PlayerState.Airborne);
         StartCoroutine(MarioJump());
     }
 
@@ -245,27 +335,118 @@ public class PlayerController : MonoBehaviour
 
     #region Fall
 
-    private void Fall()
+    private void Fall(bool falldown = false)
     {
+        
         // Fall gravity
-        if (rigidbody2D.velocity.y < 0)
+        if (rigidbody2D.velocity.y < 0 || falldown)
         {
+            SetState(PlayerState.Falling);
             rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
         }
     }
 
     #endregion
 
-    private void OnWallTrigger(Collider2D other)
+    private void OnWallTriggerEnter(Collider2D other)
     {
+        int id = other.GetInstanceID();
         if (other.tag == "GrabMe")
         {
-            CanGrab = true;
-            Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
-            transform.position = other.transform.position - Grab.position + transform.position;
-            animator.SetBool("Grab", true);
-            Debug.Log("ACTUALLY FOUND :O");
+            Debug.Log("ENTER " + id + " lg: " + lastGrabbedID);
         }
+
+        if (other.tag == "GrabMe" && id != lastGrabbedID)// || canGrabLastGrabbedId))
+        {
+            //if (lastGrabbedID == id)
+            //    canGrabLastGrabbedId = false;
+
+            Debug.Log("Vel: " + rigidbody2D.velocity);
+            //Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
+            transform.position = other.transform.position - GrabOffset;
+
+            //rigidbody2D.mass = 100000;
+
+            SetState(PlayerState.Grabbing);
+            lastGrabbedID = id;
+            Debug.Log("ACTUALLY FOUND :O " + id);
+        }
+    }
+
+    private void OnWallTrigger(Collider2D other)
+    {
+        int id = other.GetInstanceID();
+
+
+        if (other.tag == "GrabMe")
+        {
+            Debug.Log("STAY " + id + " lg: " + lastGrabbedID);
+        }
+
+        if (other.tag == "GrabMe" && id!=lastGrabbedID)// || canGrabLastGrabbedId))
+        {
+            //if (lastGrabbedID == id)
+            //    canGrabLastGrabbedId = false;
+
+            Debug.Log("Vel: " + rigidbody2D.velocity);
+            //Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
+            transform.position = other.transform.position - Grab.position + transform.position;
+            
+            //rigidbody2D.mass = 100000;
+
+            SetState(PlayerState.Grabbing);
+            lastGrabbedID = id;
+            Debug.Log("ACTUALLY FOUND :O " + id);
+        }
+    }
+
+    private void LeaveWallTrigger(Collider2D other)
+    {
+        int id = other.GetInstanceID();
+        if (other.tag == "GrabMe" )
+            Debug.Log("EXITTT" + lastGrabbedID);
+        if (other.tag == "GrabMe" && lastGrabbedID == id)
+        {
+            //canGrabLastGrabbedId = true;
+            Debug.Log("BYEBYE :O " + id + " lg: " + lastGrabbedID);
+            lastGrabbedID = 0;
+        }
+    }
+
+    private void SetState(PlayerState state)
+    {
+        animator.SetBool("Grab", false);
+        rigidbody2D.isKinematic = false;
+        switch (state)
+        {
+            case PlayerState.Idle:
+
+                break;
+            case PlayerState.Airborne:
+
+                break;
+            case PlayerState.WallHugging:
+
+                break;
+            case PlayerState.Grabbing:
+                animator.SetBool("Grab", true);
+                rigidbody2D.gravityScale = 0;
+                rigidbody2D.velocity = Vector2.zero;
+                rigidbody2D.isKinematic = true;
+                break;
+            case PlayerState.Running:
+
+                break;
+            case PlayerState.Sliding:
+
+                break;
+            default:
+
+                break;
+
+        }
+        playerState = state;
+
     }
     
     public void OnTriggerStay2D(Collider2D other)
