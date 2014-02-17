@@ -31,13 +31,13 @@ public class ChildTrigger2DDelegates : MonoBehaviour
         grabDels.OnTriggerExit = onTriggerExit;
 
         if (child.rigidbody2D == null)
-        {
             child.AddComponent<Rigidbody2D>();
-            child.rigidbody2D.isKinematic = false;
-            child.rigidbody2D.gravityScale = 0;
-            child.rigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
-            child.rigidbody2D.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        }
+
+        child.rigidbody2D.isKinematic = false;
+        child.rigidbody2D.gravityScale = 0;
+        child.rigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
+        child.rigidbody2D.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        child.rigidbody2D.fixedAngle = true;
 
 
         return grabDels;

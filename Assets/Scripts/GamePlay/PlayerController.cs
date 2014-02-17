@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
         Idle,
         Running,
         RunningStopping,
-        WallHugging,
+        WallSliding,
         Airborne,
         Falling,
         Grabbing,
@@ -49,7 +49,10 @@ public class PlayerController : MonoBehaviour
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
 
+    //public float 
     public float FallGravity = 50;
+    public float SlideGravity = 5;
+    public float SlideInitialVelocity = 5;
 
     private ControlScheme ControlScheme;
     public PlayerState playerState;
@@ -140,6 +143,14 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if (!grounded&&playerState == PlayerState.WallSliding)
+        {
+            HandleWallSliding();
+            ResetAtEndOfUpdate();
+            return;
+        }
+
+
         
         #region Movement
         // Passive
@@ -196,6 +207,8 @@ public class PlayerController : MonoBehaviour
         ResetAtEndOfUpdate();
 	}
 
+    
+
     private void SetInputValues()
     {
         HorizontalInput =ControlScheme.Horizontal.Value();
@@ -246,6 +259,12 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region WallJump & Slide
+    
+    private void HandleWallSliding()
+    {
+        if(rigidbody2D.velocity.y < 0)
+            SetGravity(SlideGravity);
+    }
 
     #endregion
 
@@ -344,7 +363,8 @@ public class PlayerController : MonoBehaviour
         if (rigidbody2D.velocity.y < 0 || falldown)
         {
             SetState(PlayerState.Falling);
-            rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
+            SetGravity(FallGravity);
+            //rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
         }
     }
 
@@ -390,7 +410,11 @@ public class PlayerController : MonoBehaviour
     private void SetState(PlayerState state)
     {
         animator.SetBool("Grab", false);
+        animator.SetBool("WallSlide", false);
         rigidbody2D.isKinematic = false;
+
+        //Debug.Log(state);
+
         switch (state)
         {
             case PlayerState.Idle:
@@ -399,8 +423,9 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Airborne:
 
                 break;
-            case PlayerState.WallHugging:
-
+            case PlayerState.WallSliding:
+                animator.SetBool("WallSlide", true);
+                rigidbody2D.velocity = new Vector2(0, -SlideInitialVelocity);
                 break;
             case PlayerState.Grabbing:
                 animator.SetBool("Grab", true);
@@ -420,7 +445,6 @@ public class PlayerController : MonoBehaviour
 
         }
         playerState = state;
-
     }
 
     #endregion
@@ -434,12 +458,21 @@ public class PlayerController : MonoBehaviour
             grounded = true;
         }
 
-        if (!grounded && other.tag == "Wall")
+        if (playerState != PlayerState.WallSliding && !grounded && other.tag == "Wall" && rigidbody2D.velocity.y < 0)
         {
-            SetState(PlayerState.WallHugging);
-            Debug.Log("HUG LE WALL");
+            SetState(PlayerState.WallSliding);
+            //Debug.Log("HUG LE WALL");
         }
        
+    }
+
+    #endregion
+
+    #region Private Helpers
+
+    private void SetGravity(float targetGravity)
+    {
+        rigidbody2D.gravityScale = targetGravity / Mathf.Abs(Physics2D.gravity.y);
     }
 
     #endregion
