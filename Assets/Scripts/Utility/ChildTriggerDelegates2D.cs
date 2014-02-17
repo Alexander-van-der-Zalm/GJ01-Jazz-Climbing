@@ -45,7 +45,7 @@ public class ChildTrigger2DDelegates : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("ENTER " + other.tag);
+        //Debug.Log("ENTER " + other.tag);
 
         if(OnTriggerEnter!=null)
             OnTriggerEnter(other);
@@ -65,7 +65,7 @@ public class ChildTrigger2DDelegates : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log("EXIT " + other.tag);
+        //Debug.Log("EXIT " + other.tag);
 
         if (OnTriggerExit != null) 
             OnTriggerExit(other);

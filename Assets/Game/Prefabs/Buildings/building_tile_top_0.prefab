@@ -9,10 +9,27 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 212: {fileID: 21200000}
-  - 61: {fileID: 6100000}
+  - 60: {fileID: 6000000}
   m_Layer: 0
   m_Name: building_tile_top_0
   m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &100002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 400002}
+  - 58: {fileID: 5800000}
+  - 61: {fileID: 6100000}
+  m_Layer: 0
+  m_Name: GrabMe
+  m_TagString: GrabMe
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26,18 +43,103 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 400002}
   m_Father: {fileID: 0}
---- !u!61 &6100000
-BoxCollider2D:
+--- !u!4 &400002
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -.901494741, y: .508293629, z: .0068359375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 400000}
+--- !u!58 &5800000
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Radius: .300000012
+  m_Center: {x: 0, y: 0}
+--- !u!60 &6000000
+PolygonCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 497b083c553c2034f9aaed96d6281e89, type: 2}
   m_IsTrigger: 0
-  m_Size: {x: 2, y: 2}
+  m_Poly:
+    m_Paths:
+    - - {x: -.879999995, y: .5}
+      - {x: -.893333375, y: .486666679}
+      - {x: -.913333356, y: .456666678}
+      - {x: -.926666677, y: .400000006}
+      - {x: -.926666677, y: .323333353}
+      - {x: -.916666687, y: .290000021}
+      - {x: -.900000036, y: .276666671}
+      - {x: -.780000031, y: .26000002}
+      - {x: -.693333328, y: .25333333}
+      - {x: -.693333328, y: .13000001}
+      - {x: -.686666667, y: .0600000024}
+      - {x: -.666666687, y: .0133333337}
+      - {x: -.650000036, y: 0}
+      - {x: -.616666675, y: -.0199999996}
+      - {x: -.530000031, y: -.0266666673}
+      - {x: -.426666677, y: -.0633333325}
+      - {x: -.366666675, y: -.0833333358}
+      - {x: -.420000017, y: -.0833333358}
+      - {x: -.430000007, y: -.0933333337}
+      - {x: -.430000007, y: -.100000001}
+      - {x: -.416666687, y: -.109999999}
+      - {x: -.316666663, y: -.13000001}
+      - {x: -.323333353, y: -.25}
+      - {x: -.283333331, y: -.306666672}
+      - {x: -.24333334, y: -.356666684}
+      - {x: -.170000002, y: -.393333346}
+      - {x: -.103333339, y: -.409999996}
+      - {x: -.0666666701, y: -.443333358}
+      - {x: -.0666666701, y: -.473333359}
+      - {x: -.0266666673, y: -.530000031}
+      - {x: -.0300000012, y: -.626666665}
+      - {x: -.0233333334, y: -.693333328}
+      - {x: -.0766666681, y: -.75333333}
+      - {x: -.100000001, y: -.75666666}
+      - {x: -.123333335, y: -.780000031}
+      - {x: -.113333337, y: -.840000033}
+      - {x: -.0766666681, y: -.873333335}
+      - {x: -.0300000012, y: -.893333375}
+      - {x: -.00999999978, y: -.893333375}
+      - {x: .13333334, y: -.893333375}
+      - {x: .176666677, y: -.963333368}
+      - {x: .189999998, y: -1}
+      - {x: 1, y: -1}
+      - {x: 1, y: .5}
+      - {x: .150000006, y: .5}
+    - - {x: -.150000006, y: -.436666667}
+      - {x: -.143333331, y: -.453333348}
+      - {x: -.13000001, y: -.453333348}
+      - {x: -.13000001, y: -.443333358}
+      - {x: -.143333331, y: -.430000007}
+      - {x: -.150000006, y: -.430000007}
+--- !u!61 &6100000
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Enabled: 0
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Size: {x: 1, y: 1}
   m_Center: {x: 0, y: 0}
 --- !u!212 &21200000
 SpriteRenderer:
