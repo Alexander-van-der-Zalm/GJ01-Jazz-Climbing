@@ -380,23 +380,23 @@ public class PlayerController : MonoBehaviour
         if (InputJump)
         {
             Debug.Log("WallJump");
-            
+
             float dir = 1;
             if (facingRight)
                 dir = -1;
 
-            float sideVelFraction = SlideJumpFraction;
-            if (HorizontalInput < 0 && facingRight || HorizontalInput > 0 && !facingRight)
-                sideVelFraction = 1;
+            //float sideVelFraction = SlideJumpFraction;
+            //if (HorizontalInput < 0 && facingRight || HorizontalInput > 0 && !facingRight)
+            //    sideVelFraction = 1;
 
-            rigidbody2D.velocity = new Vector2(sideVelFraction * RunSettings.RunMaxVelocity * dir, 0);
+            rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
-            Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
+            //Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
 
-            if (VerticalInput < 0)
-                Fall(true);
-            else
-                Jump();
+            //if (VerticalInput < 0)
+            //    Fall(true);
+            //else
+            Jump();
         }
             
     }
