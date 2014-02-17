@@ -131,7 +131,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_SortingLayerID: 0
-  m_Sprite: {fileID: 21300000, guid: f2ce14811460b91428037330e875365d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a8d39ea8ba98e6c4ba9b7dd925e1699e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!4 &71675992
 Transform:
@@ -208,6 +208,8 @@ MonoBehaviour:
     RunAccelTime: .400000006
     RunDeAccelTime: .25
   FallGravity: 50
+  SlideGravity: 5
+  SlideInitialVelocity: 1.5
   playerState: 0
   grounded: 0
 --- !u!61 &71675997
@@ -6983,6 +6985,19 @@ Prefab:
     - target: {fileID: 400002, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
       propertyPath: m_LocalRotation.w
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 21200000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: a8d39ea8ba98e6c4ba9b7dd925e1699e,
+        type: 3}
+    - target: {fileID: 11400000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: SlideGravity
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: SlideInitialVelocity
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
