@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
         Running,
         RunningStopping,
         WallSliding,
+        WallJump,
         Airborne,
         Falling,
         Grabbing,
@@ -132,12 +133,13 @@ public class PlayerController : MonoBehaviour
         SetInputValues();
         #region Vars
         // hor: Input & Dir is a mini cached var
-        float hor = HorizontalInput;
-        float dir = rigidbody2D.velocity.x;
+        //float hor = HorizontalInput;
+        float velocityX = rigidbody2D.velocity.x;
 
         // do some precalculaltions 
         float accel = Time.fixedDeltaTime * RunSettings.RunMaxVelocity;
-        float dirNormalized = dir/Mathf.Abs(dir);
+        float velocityDirection = Mathf.Sign(velocityX);
+        float horInputDirection = Mathf.Sign(HorizontalInput);
         #endregion
 
         #region Grab
@@ -162,45 +164,62 @@ public class PlayerController : MonoBehaviour
 
         #endregion
 
+        #region WallJump
+
+        //if (playerState == PlayerState.WallJump)
+        //{
+
+        //    ResetAtEndOfUpdate();
+        //    return;
+        //}
+
+        #endregion
+
         #region Movement
 
         // Passive
-        if (hor == 0 && dir == 0)
+        if (HorizontalInput == 0 && velocityX == 0)
         {
             if (Grounded)
             {
                 SetState(PlayerState.Idle);
             }
 
-        }//DeAccel
-        else if (hor == 0 && dir != 0 || (Mathf.Abs(dir) > 0 && dirNormalized != hor / Mathf.Abs(hor)))
+        }//DeAccel if on the ground with no input
+        else if (HorizontalInput == 0 && Grounded && velocityX != 0) //No Input & onground     
         {
-            if(Grounded)
-                SetState(PlayerState.Running);
+            SetState(PlayerState.Running);
 
             Debug.Log("DEACCEL");
-
+            //DeAccel();
             // Possible to do fraction deaccel if wanted
-            accel *= -dirNormalized / this.RunSettings.RunDeAccelTime;
+            accel *= -velocityDirection / this.RunSettings.RunDeAccelTime;
 
             // CLAMP: If it ends up going in the other direction after accel, clamp it to 0
-            float newXVelocity = dir + accel;
-            if (newXVelocity / Mathf.Abs(newXVelocity) != dirNormalized)
+            float newXVelocity = velocityX + accel;
+            if (newXVelocity / Mathf.Abs(newXVelocity) != velocityDirection)
                 rigidbody2D.velocity = new Vector2(0, rigidbody2D.velocity.y);
             else
                 rigidbody2D.velocity += new Vector2(accel, 0);
+
+            
         }
-        else
+        else if (HorizontalInput != 0 && Mathf.Abs(velocityX) > 0 && velocityDirection != HorizontalInput)
+        {
+            Debug.Log("DEACCEL OTHER DIRECTION " + velocityX);
+            DeAccel();
+        }
+        else if(HorizontalInput != 0)
         {//Accel
             if (Grounded)
                 SetState(PlayerState.RunningStopping);
 
             Debug.Log("ACCEL");
 
-            accel *= hor / RunSettings.RunAccelTime;
+            accel *= HorizontalInput / RunSettings.RunAccelTime;
             //CLAMP
-            if (Mathf.Abs(dir + accel) > RunSettings.RunMaxVelocity)
-                rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * dirNormalized, rigidbody2D.velocity.y);
+            if (Mathf.Abs(velocityX + accel) > RunSettings.RunMaxVelocity)
+                rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * velocityDirection, rigidbody2D.velocity.y);
             else
                 rigidbody2D.velocity += new Vector2(accel, 0);
         }
@@ -208,17 +227,21 @@ public class PlayerController : MonoBehaviour
 
         #region Flip sprite direction
         // Face the right direction
-        if (hor > 0 && !facingRight)
+        if (rigidbody2D.velocity.x > 0 && !facingRight)
             Flip();
-        else if(hor < 0 && facingRight)
+        else if (rigidbody2D.velocity.x < 0 && facingRight)
             Flip();
         #endregion
+
+        #region Jump
 
         // Jump
         if (Grounded && InputJump)
         {
             Jump();
         }
+
+        #endregion
 
         Fall();
 
@@ -239,10 +262,35 @@ public class PlayerController : MonoBehaviour
     private void ResetAtEndOfUpdate()
     {
         //Reset grounded
-        if(playerState == PlayerState.Airborne || playerState == PlayerState.Falling || playerState == PlayerState.Grabbing)
+        if (playerState == PlayerState.Airborne || playerState == PlayerState.Falling || playerState == PlayerState.Grabbing || playerState == PlayerState.WallJump)
             Grounded = false;
 
         InputJump = false;
+    }
+
+    #endregion
+
+    #region Movement
+
+    private void DeAccel()
+    {
+        float XVelocity = Mathf.Sign(rigidbody2D.velocity.x);
+        float velXDirS = Mathf.Sign(XVelocity);
+
+        // Possible to do fraction deaccel if wanted
+        float accel = (Time.fixedDeltaTime * RunSettings.RunMaxVelocity * -velXDirS) / this.RunSettings.RunDeAccelTime;
+
+        float newXVelocity = XVelocity + accel;
+        
+        float newVelDirS = Mathf.Sign(newXVelocity);
+        // CLAMP: If it ends up going in the other direction after accel, clamp it to 0
+        if (newVelDirS != velXDirS)
+        {
+            Debug.Log("Clamp");
+            rigidbody2D.velocity = new Vector2(0, rigidbody2D.velocity.y);
+        }
+        else // add to velocity
+            rigidbody2D.velocity += new Vector2(accel, 0);
     }
 
     #endregion
@@ -315,12 +363,16 @@ public class PlayerController : MonoBehaviour
         if (InputJump)
         {
             Debug.Log("WallJump");
-            float sideVelFraction = SlideJumpFraction;
+            
+            float dir = 1;
+            if (facingRight)
+                dir = -1;
 
+            float sideVelFraction = SlideJumpFraction;
             if (HorizontalInput < 0 && facingRight || HorizontalInput > 0 && !facingRight)
                 sideVelFraction = 1;
 
-            rigidbody2D.velocity = new Vector2(sideVelFraction * RunSettings.RunMaxVelocity, 0);
+            rigidbody2D.velocity = new Vector2(sideVelFraction * RunSettings.RunMaxVelocity * dir, 0);
 
             Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
 
@@ -332,13 +384,18 @@ public class PlayerController : MonoBehaviour
             
     }
 
+    public void WallJump()
+    {
+        SetState(PlayerState.WallJump);
+        StartCoroutine(MarioJump());
+    }
+
     #endregion
 
     #region Jump
 
     public void Jump()
-    {
-        animator.SetTrigger("Jump");
+    { 
         SetState(PlayerState.Airborne);
         StartCoroutine(MarioJump());
     }
@@ -389,8 +446,9 @@ public class PlayerController : MonoBehaviour
         float g = (2*h)/(t*t);
         float v = Mathf.Sqrt(2*g*h);
 
+        Debug.Log("JUMP");
         //Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
-        Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
+        //Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
 
         rigidbody2D.gravityScale = g / Mathf.Abs(Physics2D.gravity.y);
         rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, v);
@@ -403,10 +461,10 @@ public class PlayerController : MonoBehaviour
         while (flyTime < t && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
         {
             flyTime = Time.timeSinceLevelLoad - timeStart;
-            Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
+            //Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
             yield return null;
         }
-        Debug.Log("JUMP");
+        //Debug.Log("JUMP");
         if(playerState == PlayerState.Airborne)
             rigidbody2D.gravityScale = 10; 
     }
@@ -456,8 +514,9 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Idle:
 
                 break;
+            case PlayerState.WallJump:
             case PlayerState.Airborne:
-
+                animator.SetTrigger("Jump");
                 break;
             case PlayerState.WallSliding:
                 
@@ -478,6 +537,7 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Sliding:
 
                 break;
+            
             default:
 
                 break;

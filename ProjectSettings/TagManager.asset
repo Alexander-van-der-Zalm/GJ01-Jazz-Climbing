@@ -44,3 +44,31 @@ TagManager:
     userID: 0
     uniqueID: 0
     locked: 0
+  - name: Sky
+    userID: 5
+    uniqueID: 1865538189
+    locked: 0
+  - name: Clouds
+    userID: 7
+    uniqueID: 834408081
+    locked: 0
+  - name: DistantBuildings
+    userID: 1
+    uniqueID: 3759640853
+    locked: 0
+  - name: Level
+    userID: 3
+    uniqueID: 4081136285
+    locked: 0
+  - name: Characters
+    userID: 6
+    uniqueID: 583456963
+    locked: 0
+  - name: Player
+    userID: 2
+    uniqueID: 973281247
+    locked: 0
+  - name: ForeGround
+    userID: 4
+    uniqueID: 1228881561
+    locked: 0
