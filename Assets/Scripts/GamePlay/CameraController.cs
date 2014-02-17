@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
 
     public Transform Target;
     public float followSpeed = 1f;
+    public float HeightOffset = 2f;
 
 	// Use this for initialization
 	void Start () {
@@ -17,7 +18,8 @@ public class CameraController : MonoBehaviour
     {
 	    Vector3 target = Target.position;
         target.z = transform.position.z;
+        target.y += HeightOffset;
 
-        transform.position = Vector3.Lerp(transform.position, target, followSpeed * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, target, followSpeed * Time.deltaTime);// + new Vector3(0,,0);
 	}
 }

@@ -63,6 +63,8 @@ public class PlayerController : MonoBehaviour
     private ControlScheme ControlScheme;
     public PlayerState playerState;
 
+    // Debug
+    public bool DebugStateChanges = false;
     public bool facingRight = true;
 
     public bool grounded;
@@ -170,13 +172,14 @@ public class PlayerController : MonoBehaviour
 
         if (!Grounded && playerState == PlayerState.WallJump)
         {
-            
+            // Exit the walljumpstate if no or opposite direction input
+            // This state ignores 
             if (HorizontalInput == 0 || HorizontalInput != WallJumpLastDirection)
             {
                 SetState(PlayerState.Airborne);
-                Debug.Log("ExitWalljump");
+                //Debug.Log("ExitWalljump");
             }
-            CheckFlip();
+            CheckFlipByVelocity();
             ResetAtEndOfUpdate();
             return;
         }
@@ -245,19 +248,12 @@ public class PlayerController : MonoBehaviour
 
         Fall();
 
-        CheckFlip();
+        CheckFlipByVelocity();
 
         ResetAtEndOfUpdate();
 	}
 
-    private void CheckFlip()
-    {
-        // Face the right direction
-        if (rigidbody2D.velocity.x > 0 && !facingRight)
-            Flip();
-        else if (rigidbody2D.velocity.x < 0 && facingRight)
-            Flip();
-    }
+    
 
     private void SetInputValues()
     {
@@ -342,17 +338,33 @@ public class PlayerController : MonoBehaviour
         if (other.tag == "GrabMe" && id != lastGrabbedID)
         {
             // Grab the object
-            int dir = 1;
-            if (!facingRight)
-                dir = -1;
+            Vector3 relPos = other.transform.position - transform.position;
+            float dir = Mathf.Sign(relPos.x);
+            //if (!facingRight)
+            //    dir = -1;
 
             Vector3 offset = GrabOffset;
             offset.x *= dir;
+            Vector3 newPos = other.transform.position - offset;
 
-            transform.position = other.transform.position - offset;
+            // WIP BUGFIX
+            //Collider2D[] cols = Physics2D.OverlapCircleAll(new Vector2(newPos.x,newPos.y),0.1f);
+            
+            //if (cols.Length>0)
+            //{
+            //    Debug.Log("STOUT");
+            //    GameObject bla = new GameObject();
+            //    bla.transform.position = newPos;
+            //    return;
+            //}
+
+            transform.position = newPos;
 
             SetState(PlayerState.Grabbing);
             lastGrabbedID = id;
+
+            CheckFlipBy(dir);
+
         }
     }
 
@@ -374,33 +386,35 @@ public class PlayerController : MonoBehaviour
 
     private bool WallSliding()
     {
+        // On the floor after sliding
         if (Grounded && playerState == PlayerState.WallSliding)
         {
             //Fall();
             SetState(PlayerState.Idle);
-            lastSlided.Clear();
-            wallInCollision.Clear();
+            //lastSlided.Clear();
+            //wallInCollision.Clear();
             //Debug.Log("SLIDING Clear");
         }
 
+        // Start a new slide 
         if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 && HorizontalInput != 0)
         {
-            Debug.Log("PLZ SLIDE");
+            // Slide only if the input is correct(to the wall)
             foreach (GameObject col in wallInCollision)
             {
                 float relPosSign = Mathf.Sign(col.transform.position.x - transform.position.x);
                 float inputSign = Mathf.Sign(HorizontalInput);
-                //Debug.Log(relPosSign + " input " + inputSign + " " + HorizontalInput);
-                
+                 
+                // inputdir is correct in relation to position differance
                 if(relPosSign == inputSign)
                     SetState(PlayerState.WallSliding);
+
+                CheckFlipBy(relPosSign);
             }
         }
         
         if (playerState == PlayerState.WallSliding && InputJump)
         {
-           
-
             float dir = 1;
             if (facingRight)
                 dir = -1;
@@ -512,6 +526,34 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Flip
+
+    private void CheckFlipByVelocity()
+    {
+        // Face the right direction
+        if (rigidbody2D.velocity.x > 0 && !facingRight)
+            Flip();
+        else if (rigidbody2D.velocity.x < 0 && facingRight)
+            Flip();
+    }
+
+
+    /// <summary>
+    /// dir positive for right
+    /// dir negative for left
+    /// </summary>
+    /// <param name="dir"></param>
+    private void CheckFlipBy(float dir)
+    {
+        dir = Mathf.Sign(dir);
+        if (dir == 0)
+            return;
+
+        if (dir > 0 && !facingRight)
+            Flip();
+        else if (dir < 0 && facingRight)
+            Flip();
+    }
+
     private void Flip()
     {
         facingRight = !facingRight;
@@ -554,8 +596,8 @@ public class PlayerController : MonoBehaviour
         rigidbody2D.isKinematic = false;
 
 
-
-        Debug.Log(state + " vel: " + rigidbody2D.velocity);
+        if(DebugStateChanges)
+            Debug.Log(state + " vel: " + rigidbody2D.velocity);
 
         switch (state)
         {
