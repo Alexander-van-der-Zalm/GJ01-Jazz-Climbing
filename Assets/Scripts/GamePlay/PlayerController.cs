@@ -67,13 +67,14 @@ public class PlayerController : MonoBehaviour
 
     private Transform WallDetector, Grab;
     private Animator animator;
+    private Vector3 GrabOffset;
 
     #endregion
 
     #region Start
 
     // Use this for initialization
-	void Start ()
+	void Awake ()
     {
         #region Controls
         ControlScheme = gameObject.GetComponent<ControlScheme>();
@@ -97,12 +98,19 @@ public class PlayerController : MonoBehaviour
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
         #endregion
 
-        WallDetector = transform.Find("Wall");
-        Grab = transform.Find("Grab");
-        ChildTrigger2DDelegates grabDels = Grab.gameObject.AddComponent<ChildTrigger2DDelegates>();
+        WallDetector = transform.parent.transform.Find("Wall");
+        Grab = transform.parent.transform.Find("Grab");
+
+
+        ChildTrigger2DDelegates grabDels = ChildTrigger2DDelegates.AddChildTrigger2D(Grab.gameObject, transform);
+        ChildTrigger2DDelegates wallDels = ChildTrigger2DDelegates.AddChildTrigger2D(WallDetector.gameObject, transform);
+
         grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
         //grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
         grabDels.OnTriggerExit = new TriggerDelegate(LeaveWallTrigger);
+
+        GrabOffset = Grab.position - transform.position;
+
         animator = GetComponent<Animator>();
         //animator.
     }
@@ -355,7 +363,7 @@ public class PlayerController : MonoBehaviour
 
             Debug.Log("Vel: " + rigidbody2D.velocity);
             //Debug.Log("tr " + transform.position + " o: " + other.transform.position + " g: " + Grab.position);
-            transform.position = other.transform.position - Grab.position + transform.position;
+            transform.position = other.transform.position - GrabOffset;
 
             //rigidbody2D.mass = 100000;
 
