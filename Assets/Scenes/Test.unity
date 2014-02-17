@@ -157,7 +157,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
-  m_Size: {x: .400000006, y: 1.75}
+  m_Size: {x: .600000024, y: 1.75}
   m_Center: {x: 0, y: 1.10000002}
 --- !u!212 &71675991
 SpriteRenderer:
@@ -235,8 +235,8 @@ CircleCollider2D:
   m_Enabled: 1
   m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
-  m_Radius: .200000003
-  m_Center: {x: 0, y: .200000003}
+  m_Radius: .300000012
+  m_Center: {x: 0, y: .300000012}
 --- !u!114 &71675996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -459,6 +459,18 @@ Prefab:
       propertyPath: facingRight
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6100000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: m_Size.x
+      value: .600000024
+      objectReference: {fileID: 0}
+    - target: {fileID: 5800000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: m_Radius
+      value: .300000012
+      objectReference: {fileID: 0}
+    - target: {fileID: 5800000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: m_Center.y
+      value: .300000012
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
   m_RootGameObject: {fileID: 684476201}
@@ -541,6 +553,14 @@ Prefab:
     - target: {fileID: 100000, guid: 7be20d2c871dbf5429b82c3f314eccbf, type: 2}
       propertyPath: m_Name
       value: TestDing
+      objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: 7be20d2c871dbf5429b82c3f314eccbf, type: 2}
+      propertyPath: m_TagString
+      value: Floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 100010, guid: 7be20d2c871dbf5429b82c3f314eccbf, type: 2}
+      propertyPath: m_TagString
+      value: Floor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 7be20d2c871dbf5429b82c3f314eccbf, type: 2}
@@ -2375,7 +2395,7 @@ GameObject:
   - 60: {fileID: 904295075}
   m_Layer: 0
   m_Name: building_tile_top_3
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4548,7 +4568,7 @@ GameObject:
   - 60: {fileID: 1224367279}
   m_Layer: 0
   m_Name: building_tile_top_0
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -159,6 +159,7 @@ public class PlayerController : MonoBehaviour
 
         if (WallSliding())
         {
+            
             ResetAtEndOfUpdate();
             return;
         }
@@ -169,9 +170,13 @@ public class PlayerController : MonoBehaviour
 
         if (!Grounded && playerState == PlayerState.WallJump)
         {
+            
             if (HorizontalInput == 0 || HorizontalInput != WallJumpLastDirection)
+            {
                 SetState(PlayerState.Airborne);
-
+                Debug.Log("ExitWalljump");
+            }
+            CheckFlip();
             ResetAtEndOfUpdate();
             return;
         }
@@ -228,14 +233,6 @@ public class PlayerController : MonoBehaviour
         }
         #endregion
 
-        #region Flip sprite direction
-        // Face the right direction
-        if (rigidbody2D.velocity.x > 0 && !facingRight)
-            Flip();
-        else if (rigidbody2D.velocity.x < 0 && facingRight)
-            Flip();
-        #endregion
-
         #region Jump
 
         // Jump
@@ -248,8 +245,19 @@ public class PlayerController : MonoBehaviour
 
         Fall();
 
+        CheckFlip();
+
         ResetAtEndOfUpdate();
 	}
+
+    private void CheckFlip()
+    {
+        // Face the right direction
+        if (rigidbody2D.velocity.x > 0 && !facingRight)
+            Flip();
+        else if (rigidbody2D.velocity.x < 0 && facingRight)
+            Flip();
+    }
 
     private void SetInputValues()
     {
@@ -377,6 +385,7 @@ public class PlayerController : MonoBehaviour
 
         if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 && HorizontalInput != 0)
         {
+            Debug.Log("PLZ SLIDE");
             foreach (GameObject col in wallInCollision)
             {
                 float relPosSign = Mathf.Sign(col.transform.position.x - transform.position.x);
@@ -416,6 +425,7 @@ public class PlayerController : MonoBehaviour
     private void WallJump()
     {
         SetState(PlayerState.WallJump);
+        WallJumpLastDirection = facingRight ? 1.0f : -1.0f;
         Debug.Log("WallJump");
         StartCoroutine(MarioJump());
     }
@@ -536,11 +546,16 @@ public class PlayerController : MonoBehaviour
 
     private void SetState(PlayerState state)
     {
+        if (state == playerState)
+            return;
+        
         animator.SetBool("Grab", false);
         animator.SetBool("WallSlide", false);
         rigidbody2D.isKinematic = false;
 
-        //Debug.Log(state + " vel: " + rigidbody2D.velocity);
+
+
+        Debug.Log(state + " vel: " + rigidbody2D.velocity);
 
         switch (state)
         {
@@ -552,11 +567,10 @@ public class PlayerController : MonoBehaviour
                 animator.SetTrigger("Jump");
                 break;
             case PlayerState.WallSliding:
-                
                 animator.SetBool("WallSlide", true);
                 SetGravity(WallSlideGravity);
                 rigidbody2D.velocity = new Vector2(0, -WallSlideInitialVelocity);
-                Debug.Log("StartSlide grav: " + rigidbody2D.gravityScale);
+                //Debug.Log("StartSlide grav: " + rigidbody2D.gravityScale);
                 break;
             case PlayerState.Grabbing:
                 animator.SetBool("Grab", true);
@@ -593,7 +607,7 @@ public class PlayerController : MonoBehaviour
         {
             lastSlided.Add(id);
             wallInCollision.Add(other.gameObject);
-            Debug.Log("ENTER Walls: " + lastSlided.Count + " id " + id);
+            //Debug.Log("ENTER Walls: " + lastSlided.Count + " id " + id);
         }
     }
 
@@ -648,7 +662,7 @@ public class PlayerController : MonoBehaviour
         {
             lastSlided.Remove(id);
             wallInCollision.Remove(other.gameObject);
-            Debug.Log("EXIT Walls: " + floorIds.Count);
+            //Debug.Log("EXIT Walls: " + floorIds.Count);
         }
 
         if (other.tag == "Floor" && floorIds.Contains(id))
