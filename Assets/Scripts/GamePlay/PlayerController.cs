@@ -21,11 +21,9 @@ public class PlayerController : MonoBehaviour
         Running,
         RunningStopping,
         WallSliding,
-        WallJump,
         Airborne,
         Falling,
-        Grabbing,
-        Sliding
+        Grabbing
     }
     
     [System.Serializable]
@@ -62,9 +60,10 @@ public class PlayerController : MonoBehaviour
     public PlayerState playerState;
 
     private bool facingRight = true;
-    
-    
-    public bool Grounded;
+
+    private bool grounded;
+
+    public bool Grounded { get { return grounded; } set { grounded = value; animator.SetBool("Grounded", value); } }
 
     // Input mini-cache
     private float HorizontalInput = 0;
@@ -72,6 +71,7 @@ public class PlayerController : MonoBehaviour
     private bool InputJump = false;
 
     private List<int> lastSlided = new List<int>();
+    private List<int> floorIds = new List<int>();
     private int lastGrabbedID = 0;
 
     private Transform WallDetector, Grab;
@@ -190,7 +190,7 @@ public class PlayerController : MonoBehaviour
         {
             SetState(PlayerState.Running);
 
-            Debug.Log("DEACCEL");
+            //Debug.Log("DEACCEL");
             //DeAccel();
             // Possible to do fraction deaccel if wanted
             accel *= -velocityDirection / this.RunSettings.RunDeAccelTime;
@@ -206,7 +206,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (HorizontalInput != 0 && Mathf.Abs(velocityX) > 0 && velocityDirection != HorizontalInput)
         {
-            Debug.Log("DEACCEL OTHER DIRECTION " + velocityX);
+            //Debug.Log("DEACCEL OTHER DIRECTION " + velocityX);
             DeAccel();
         }
         else if(HorizontalInput != 0)
@@ -214,7 +214,7 @@ public class PlayerController : MonoBehaviour
             if (Grounded)
                 SetState(PlayerState.RunningStopping);
 
-            Debug.Log("ACCEL");
+            //Debug.Log("ACCEL");
 
             accel *= HorizontalInput / RunSettings.RunAccelTime;
             //CLAMP
@@ -256,15 +256,19 @@ public class PlayerController : MonoBehaviour
 
         // Set Animator floats
         animator.SetFloat("Horizontal", HorizontalInput);
-        animator.SetFloat("Vertical", VerticalInput);            
+        animator.SetFloat("Vertical", VerticalInput);
+
+
+        Grounded = floorIds.Count > 0;
     }
 
     private void ResetAtEndOfUpdate()
     {
-        //Reset grounded
-        if (playerState == PlayerState.Airborne || playerState == PlayerState.Falling || playerState == PlayerState.Grabbing || playerState == PlayerState.WallJump)
-            Grounded = false;
-
+        ////Reset grounded
+        //if (playerState == PlayerState.Airborne && playerState == PlayerState.Grabbing && playerState == PlayerState.Falling && playerState == PlayerState.WallSliding)
+        //    Grounded = false;
+        
+        animator.SetFloat("Speed", Mathf.Abs(rigidbody2D.velocity.x));
         InputJump = false;
     }
 
@@ -384,12 +388,6 @@ public class PlayerController : MonoBehaviour
             
     }
 
-    public void WallJump()
-    {
-        SetState(PlayerState.WallJump);
-        StartCoroutine(MarioJump());
-    }
-
     #endregion
 
     #region Jump
@@ -485,7 +483,6 @@ public class PlayerController : MonoBehaviour
 
     private void Fall(bool falldown = false)
     {
-        
         // Fall gravity
         if (!Grounded && (rigidbody2D.velocity.y < 0 || falldown))
         {
@@ -494,6 +491,10 @@ public class PlayerController : MonoBehaviour
             SetGravity(FallGravity);
             
             //rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
+        }
+        else if (!Grounded)
+        {
+            SetState(PlayerState.Airborne);
         }
     }
 
@@ -514,7 +515,6 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Idle:
 
                 break;
-            case PlayerState.WallJump:
             case PlayerState.Airborne:
                 animator.SetTrigger("Jump");
                 break;
@@ -534,10 +534,6 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Running:
 
                 break;
-            case PlayerState.Sliding:
-
-                break;
-            
             default:
 
                 break;
@@ -548,40 +544,35 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region Grounded Collider
+    #region Grounded Trigger
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        int id = other.GetInstanceID();
+        if (other.tag == "Floor" && !floorIds.Contains(id))
+        {
+            floorIds.Add(id);
+            Debug.Log("ENTER Floors: " + floorIds.Count + " id " + id);
+        }
+    }
 
     public void OnTriggerStay2D(Collider2D other)
     {
-        if (other.tag == "Floor")
-        {
-            Grounded = true;
-            return;
-        }
-
         int id = GetInstanceID();
 
         if (other.tag == "Wall")
         {
             if (Grounded && lastSlided.Count != 0)
             {
-                //string str = "Before Cleared GR [";
-                //foreach (int i in lastSlided)
-                //    str += i + ",";
-                //str += "] " + playerState;
-                //Debug.Log(str);
-
                 lastSlided.Clear();
+                Debug.Log("SLIDING Clear");
                 return;
             }
 
             if (!lastSlided.Contains(id) && playerState == PlayerState.WallSliding)
             {
                 lastSlided.Add(id);
-                //string str = "After Add WhileSliding [";
-                //foreach (int i in lastSlided)
-                //    str += i + ",";
-                //str += "] " + playerState;
-                //Debug.Log(str);
+                Debug.Log("SLIDING count" + lastSlided.Count);
                 return;
             }
 
@@ -591,7 +582,6 @@ public class PlayerController : MonoBehaviour
                 SetState(PlayerState.WallSliding);
 
                 Debug.Log("NewSlide count" + lastSlided.Count);
-                //Debug.Break();
                 return;
             }
 
@@ -600,17 +590,18 @@ public class PlayerController : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D other)
     {
-        int id = GetInstanceID();
+        int id = other.GetInstanceID();
 
         if (other.tag == "Wall" && lastSlided.Contains(id))
         {
-            string str = "Before Removed Exit [";
-            foreach (int i in lastSlided)
-                str += i + ",";
-            str += "] " + playerState;
-            Debug.Log(str);
             lastSlided.Remove(id);
-            //Debug.Break();
+            Debug.Log("EXIT Walls: " + floorIds.Count);
+        }
+
+        if (other.tag == "Floor" && floorIds.Contains(id))
+        {
+            floorIds.Remove(id);
+            Debug.Log("EXIT Floors: " + floorIds.Count);
         }
     }
 
