@@ -72,6 +72,9 @@ public class PlayerController : MonoBehaviour
 
     private List<int> lastSlided = new List<int>();
     private List<int> floorIds = new List<int>();
+
+    private List<GameObject> wallInCollision = new List<GameObject>();
+
     private int lastGrabbedID = 0;
 
     private Transform WallDetector, Grab;
@@ -364,6 +367,16 @@ public class PlayerController : MonoBehaviour
 
     private void HandleWallSliding()
     {
+        //if (lastSlided.Count > 0 && HorizontalInput != 0)
+        //{
+            
+        //    foreach (GameObject col in wallInCollision)
+        //    {
+        //        if(
+        //        SetState(PlayerState.WallSliding);
+        //    }
+        //}
+        
         if (InputJump)
         {
             Debug.Log("WallJump");
@@ -552,7 +565,7 @@ public class PlayerController : MonoBehaviour
         if (other.tag == "Floor" && !floorIds.Contains(id))
         {
             floorIds.Add(id);
-            Debug.Log("ENTER Floors: " + floorIds.Count + " id " + id);
+            //Debug.Log("ENTER Floors: " + floorIds.Count + " id " + id);
         }
     }
 
@@ -565,6 +578,7 @@ public class PlayerController : MonoBehaviour
             if (Grounded && lastSlided.Count != 0)
             {
                 lastSlided.Clear();
+                wallInCollision.Clear();
                 Debug.Log("SLIDING Clear");
                 return;
             }
@@ -572,6 +586,7 @@ public class PlayerController : MonoBehaviour
             if (!lastSlided.Contains(id) && playerState == PlayerState.WallSliding)
             {
                 lastSlided.Add(id);
+                wallInCollision.Add(other.gameObject);
                 Debug.Log("SLIDING count" + lastSlided.Count);
                 return;
             }
@@ -579,11 +594,20 @@ public class PlayerController : MonoBehaviour
             if (!Grounded && playerState != PlayerState.WallSliding && rigidbody2D.velocity.y < 0 && lastSlided.Count == 0)
             {
                 lastSlided.Add(id);
-                SetState(PlayerState.WallSliding);
+                wallInCollision.Add(other.gameObject);
+
+                float relPosSign = Mathf.Sign(other.transform.position.x - transform.position.x);
+                float inputSign = Mathf.Sign(HorizontalInput);
+                Debug.Log(relPosSign + " input " + inputSign);
+                if(HorizontalInput != 0 && relPosSign == inputSign)
+                    SetState(PlayerState.WallSliding);
 
                 Debug.Log("NewSlide count" + lastSlided.Count);
                 return;
             }
+
+            if (!Grounded && HorizontalInput == 0)
+                Fall();
 
         }
     }
@@ -595,13 +619,14 @@ public class PlayerController : MonoBehaviour
         if (other.tag == "Wall" && lastSlided.Contains(id))
         {
             lastSlided.Remove(id);
-            Debug.Log("EXIT Walls: " + floorIds.Count);
+            wallInCollision.Remove(other.gameObject);
+            //Debug.Log("EXIT Walls: " + floorIds.Count);
         }
 
         if (other.tag == "Floor" && floorIds.Contains(id))
         {
             floorIds.Remove(id);
-            Debug.Log("EXIT Floors: " + floorIds.Count);
+            //Debug.Log("EXIT Floors: " + floorIds.Count);
         }
     }
 
