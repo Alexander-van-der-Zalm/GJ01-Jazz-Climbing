@@ -140,6 +140,8 @@ public class PlayerController : MonoBehaviour
         float dirNormalized = dir/Mathf.Abs(dir);
         #endregion
 
+        #region Grab
+
         if (playerState == PlayerState.Grabbing)
         {
             HandleGrabbing();
@@ -147,16 +149,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (!Grounded&&playerState == PlayerState.WallSliding)
+        #endregion
+
+        #region WallSlide
+
+        if (!Grounded && playerState == PlayerState.WallSliding)
         {
             HandleWallSliding();
             ResetAtEndOfUpdate();
             return;
         }
 
+        #endregion
 
-        
         #region Movement
+
         // Passive
         if (hor == 0 && dir == 0)
         {
@@ -170,7 +177,9 @@ public class PlayerController : MonoBehaviour
         {
             if(Grounded)
                 SetState(PlayerState.Running);
-            
+
+            Debug.Log("DEACCEL");
+
             // Possible to do fraction deaccel if wanted
             accel *= -dirNormalized / this.RunSettings.RunDeAccelTime;
 
@@ -185,6 +194,8 @@ public class PlayerController : MonoBehaviour
         {//Accel
             if (Grounded)
                 SetState(PlayerState.RunningStopping);
+
+            Debug.Log("ACCEL");
 
             accel *= hor / RunSettings.RunAccelTime;
             //CLAMP
@@ -311,6 +322,8 @@ public class PlayerController : MonoBehaviour
 
             rigidbody2D.velocity = new Vector2(sideVelFraction * RunSettings.RunMaxVelocity, 0);
 
+            Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
+
             if (VerticalInput < 0)
                 Fall(true);
             else
@@ -377,7 +390,7 @@ public class PlayerController : MonoBehaviour
         float v = Mathf.Sqrt(2*g*h);
 
         //Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
-        //Debug.Log(rigidbody2D.velocity.x);
+        Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
 
         rigidbody2D.gravityScale = g / Mathf.Abs(Physics2D.gravity.y);
         rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, v);
@@ -390,7 +403,7 @@ public class PlayerController : MonoBehaviour
         while (flyTime < t && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
         {
             flyTime = Time.timeSinceLevelLoad - timeStart;
-            //Debug.Log(rigidbody2D.velocity.x);
+            Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
             yield return null;
         }
         Debug.Log("JUMP");
