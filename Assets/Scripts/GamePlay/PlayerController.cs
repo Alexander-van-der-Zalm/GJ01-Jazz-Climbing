@@ -55,7 +55,9 @@ public class PlayerController : MonoBehaviour
     public PlayerState playerState;
 
     private bool facingRight = true;
-    private bool grounded;
+    
+    
+    public bool grounded;
 
     // Input mini-cache
     private float HorizontalInput = 0;
@@ -208,7 +210,9 @@ public class PlayerController : MonoBehaviour
     private void ResetAtEndOfUpdate()
     {
         //Reset grounded
-        grounded = false;
+        if(playerState == PlayerState.Airborne || playerState == PlayerState.Falling || playerState == PlayerState.Grabbing)
+            grounded = false;
+
         InputJump = false;
     }
 
@@ -346,6 +350,8 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Grab
+
     private void OnWallTriggerEnter(Collider2D other)
     {
         int id = other.GetInstanceID();
@@ -376,6 +382,10 @@ public class PlayerController : MonoBehaviour
             lastGrabbedID = 0;
         }
     }
+
+    #endregion
+
+    #region State Switch
 
     private void SetState(PlayerState state)
     {
@@ -412,18 +422,25 @@ public class PlayerController : MonoBehaviour
         playerState = state;
 
     }
-    
+
+    #endregion
+
+    #region Grounded Collider
+
     public void OnTriggerStay2D(Collider2D other)
     {
-        // Only on the right elements
-        //Ray2D ray;
-        //for(int i = 0; i < 5; i++)
-        //{
-        //    //Debug.DrawRay(
-        //    ray = new Ray2D(new Vector2(,);
+        if (other.tag == "Floor")
+        {
+            grounded = true;
+        }
 
-        //Ray2D ray = new Ray2D(new Vector2(,);
-            grounded = true;  
-        //}
+        if (!grounded && other.tag == "Wall")
+        {
+            SetState(PlayerState.WallHugging);
+            Debug.Log("HUG LE WALL");
+        }
+       
     }
+
+    #endregion
 }
