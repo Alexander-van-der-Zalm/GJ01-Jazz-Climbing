@@ -31,13 +31,13 @@ public class ChildTrigger2DDelegates : MonoBehaviour
         grabDels.OnTriggerExit = onTriggerExit;
 
         if (child.rigidbody2D == null)
-        {
             child.AddComponent<Rigidbody2D>();
-            child.rigidbody2D.isKinematic = false;
-            child.rigidbody2D.gravityScale = 0;
-            child.rigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
-            child.rigidbody2D.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        }
+
+        child.rigidbody2D.isKinematic = false;
+        child.rigidbody2D.gravityScale = 0;
+        child.rigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
+        child.rigidbody2D.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        child.rigidbody2D.fixedAngle = true;
 
 
         return grabDels;
@@ -45,7 +45,7 @@ public class ChildTrigger2DDelegates : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("ENTER " + other.tag);
+        //Debug.Log("ENTER " + other.tag);
 
         if(OnTriggerEnter!=null)
             OnTriggerEnter(other);
@@ -65,7 +65,7 @@ public class ChildTrigger2DDelegates : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log("EXIT " + other.tag);
+        //Debug.Log("EXIT " + other.tag);
 
         if (OnTriggerExit != null) 
             OnTriggerExit(other);

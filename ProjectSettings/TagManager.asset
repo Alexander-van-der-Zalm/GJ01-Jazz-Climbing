@@ -4,6 +4,8 @@
 TagManager:
   tags:
   - GrabMe
+  - Wall
+  - Floor
   - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX

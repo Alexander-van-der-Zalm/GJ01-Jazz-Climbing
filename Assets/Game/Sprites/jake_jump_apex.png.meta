@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7f4e6f0f3716d814ba8ff0dac5d11740
+guid: ee1c8309cff524e409a134cb3fc0f04c
 TextureImporter:
   serializedVersion: 2
   mipmaps:
@@ -20,22 +20,22 @@ TextureImporter:
   grayScaleToAlpha: 0
   generateCubemap: 0
   seamlessCubemap: 0
-  textureFormat: -3
-  maxTextureSize: 4096
+  textureFormat: -1
+  maxTextureSize: 1024
   textureSettings:
-    filterMode: 2
-    aniso: 1
+    filterMode: -1
+    aniso: -1
     mipBias: -1
-    wrapMode: 1
+    wrapMode: -1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 7
+  alignment: 0
   spritePivot: {x: .5, y: .5}
-  spritePixelsToUnits: 300
+  spritePixelsToUnits: 100
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings:

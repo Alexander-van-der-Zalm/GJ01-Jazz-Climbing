@@ -9,16 +9,16 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 212: {fileID: 21200000}
+  - 95: {fileID: 9500000}
+  - 114: {fileID: 11400000}
   - 50: {fileID: 5000000}
   - 61: {fileID: 6100000}
   - 58: {fileID: 5800000}
-  - 95: {fileID: 9500000}
-  - 114: {fileID: 11400000}
   - 61: {fileID: 6100004}
   - 61: {fileID: 6100002}
   m_Layer: 0
   m_Name: PlayerCharacter
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -65,7 +65,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 400006}
   - 61: {fileID: 6100008}
-  - 50: {fileID: 5000004}
   m_Layer: 0
   m_Name: Wall
   m_TagString: Untagged
@@ -105,7 +104,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .471272469, y: 1.98937511, z: 0}
+  m_LocalPosition: {x: .490029812, y: 2.01171589, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400002}
@@ -116,7 +115,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100006}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.2358799, y: 1.19518948, z: 0}
+  m_LocalPosition: {x: 1.36000001, y: 1.19518948, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400002}
@@ -134,7 +133,7 @@ Rigidbody2D:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!50 &5000002
 Rigidbody2D:
   m_ObjectHideFlags: 1
@@ -144,24 +143,9 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: .0500000007
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_FixedAngle: 0
-  m_IsKinematic: 1
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
---- !u!50 &5000004
-Rigidbody2D:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100006}
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: .0500000007
-  m_GravityScale: 1
-  m_FixedAngle: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -171,18 +155,18 @@ CircleCollider2D:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
-  m_Radius: .5
-  m_Center: {x: 0, y: .5}
+  m_Radius: .200000003
+  m_Center: {x: 0, y: .200000003}
 --- !u!58 &5800002
 CircleCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Radius: .300000012
@@ -196,18 +180,18 @@ BoxCollider2D:
   m_Enabled: 1
   m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
-  m_Size: {x: .730000019, y: 1.24000001}
-  m_Center: {x: -.0399999991, y: 1.17999995}
+  m_Size: {x: .400000006, y: 1.75}
+  m_Center: {x: 0, y: 1.10000002}
 --- !u!61 &6100002
 BoxCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Material: {fileID: 6200000, guid: d6a31dd7b4f216c4783934e1452ed2eb, type: 2}
   m_IsTrigger: 0
-  m_Size: {x: .920000017, y: .5}
+  m_Size: {x: .889999986, y: .5}
   m_Center: {x: 0, y: .25}
 --- !u!61 &6100004
 BoxCollider2D:
@@ -226,7 +210,7 @@ BoxCollider2D:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Size: {x: .5, y: 1}
@@ -277,6 +261,7 @@ MonoBehaviour:
     RunDeAccelTime: .25
   FallGravity: 50
   playerState: 0
+  grounded: 0
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1
