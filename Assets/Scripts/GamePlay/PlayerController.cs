@@ -158,9 +158,8 @@ public class PlayerController : MonoBehaviour
 
         #region WallSlide
 
-        if (!Grounded && playerState == PlayerState.WallSliding)
+        if (WallSliding())
         {
-            HandleWallSliding();
             ResetAtEndOfUpdate();
             return;
         }
@@ -365,19 +364,31 @@ public class PlayerController : MonoBehaviour
 
     #region WallJump & Slide
 
-    private void HandleWallSliding()
+    private bool WallSliding()
     {
-        //if (lastSlided.Count > 0 && HorizontalInput != 0)
-        //{
-            
-        //    foreach (GameObject col in wallInCollision)
-        //    {
-        //        if(
-        //        SetState(PlayerState.WallSliding);
-        //    }
-        //}
+        if (Grounded && playerState == PlayerState.WallSliding)
+        {
+            //Fall();
+            SetState(PlayerState.Idle);
+            lastSlided.Clear();
+            wallInCollision.Clear();
+            Debug.Log("SLIDING Clear");
+        }
+
+        if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 && HorizontalInput != 0)
+        {
+            foreach (GameObject col in wallInCollision)
+            {
+                float relPosSign = Mathf.Sign(col.transform.position.x - transform.position.x);
+                float inputSign = Mathf.Sign(HorizontalInput);
+                Debug.Log(relPosSign + " input " + inputSign + " " + HorizontalInput);
+                
+                if(relPosSign == inputSign)
+                    SetState(PlayerState.WallSliding);
+            }
+        }
         
-        if (InputJump)
+        if (playerState == PlayerState.WallSliding && InputJump)
         {
             Debug.Log("WallJump");
 
@@ -385,20 +396,21 @@ public class PlayerController : MonoBehaviour
             if (facingRight)
                 dir = -1;
 
-            //float sideVelFraction = SlideJumpFraction;
-            //if (HorizontalInput < 0 && facingRight || HorizontalInput > 0 && !facingRight)
-            //    sideVelFraction = 1;
-
             rigidbody2D.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
-            //Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
-
-            //if (VerticalInput < 0)
-            //    Fall(true);
-            //else
             Jump();
+
+            lastSlided.Clear();
+            wallInCollision.Clear();
+            Debug.Log("SLIDING Clear");
         }
-            
+
+        if (playerState == PlayerState.WallSliding && HorizontalInput == 0)
+        {
+            Fall();
+        }
+
+        return playerState == PlayerState.WallSliding;    
     }
 
     #endregion
@@ -567,49 +579,56 @@ public class PlayerController : MonoBehaviour
             floorIds.Add(id);
             //Debug.Log("ENTER Floors: " + floorIds.Count + " id " + id);
         }
+
+        if (other.tag == "Wall" && !lastSlided.Contains(id))
+        {
+            lastSlided.Add(id);
+            wallInCollision.Add(other.gameObject);
+            Debug.Log("ENTER Walls: " + lastSlided.Count + " id " + id);
+        }
     }
 
     public void OnTriggerStay2D(Collider2D other)
     {
-        int id = GetInstanceID();
+        //int id = GetInstanceID();
 
-        if (other.tag == "Wall")
-        {
-            if (Grounded && lastSlided.Count != 0)
-            {
-                lastSlided.Clear();
-                wallInCollision.Clear();
-                Debug.Log("SLIDING Clear");
-                return;
-            }
+        //if (other.tag == "Wall")
+        //{
+        //    if (Grounded && lastSlided.Count != 0)
+        //    {
+        //        lastSlided.Clear();
+        //        wallInCollision.Clear();
+        //        Debug.Log("SLIDING Clear");
+        //        return;
+        //    }
 
-            if (!lastSlided.Contains(id) && playerState == PlayerState.WallSliding)
-            {
-                lastSlided.Add(id);
-                wallInCollision.Add(other.gameObject);
-                Debug.Log("SLIDING count" + lastSlided.Count);
-                return;
-            }
+        //    if (!lastSlided.Contains(id) && playerState == PlayerState.WallSliding)
+        //    {
+        //        lastSlided.Add(id);
+        //        wallInCollision.Add(other.gameObject);
+        //        Debug.Log("SLIDING count" + lastSlided.Count);
+        //        return;
+        //    }
 
-            if (!Grounded && playerState != PlayerState.WallSliding && rigidbody2D.velocity.y < 0 && lastSlided.Count == 0)
-            {
-                lastSlided.Add(id);
-                wallInCollision.Add(other.gameObject);
+        //    if (!Grounded && playerState != PlayerState.WallSliding && rigidbody2D.velocity.y < 0 && lastSlided.Count == 0)
+        //    {
+        //        lastSlided.Add(id);
+        //        wallInCollision.Add(other.gameObject);
 
-                float relPosSign = Mathf.Sign(other.transform.position.x - transform.position.x);
-                float inputSign = Mathf.Sign(HorizontalInput);
-                Debug.Log(relPosSign + " input " + inputSign);
-                if(HorizontalInput != 0 && relPosSign == inputSign)
-                    SetState(PlayerState.WallSliding);
+        //        float relPosSign = Mathf.Sign(other.transform.position.x - transform.position.x);
+        //        float inputSign = Mathf.Sign(HorizontalInput);
+        //        Debug.Log(relPosSign + " input " + inputSign);
+        //        if(HorizontalInput != 0 && relPosSign == inputSign)
+        //            SetState(PlayerState.WallSliding);
 
-                Debug.Log("NewSlide count" + lastSlided.Count);
-                return;
-            }
+        //        Debug.Log("NewSlide count" + lastSlided.Count);
+        //        return;
+        //    }
 
-            if (!Grounded && HorizontalInput == 0)
-                Fall();
+        //    if (!Grounded && HorizontalInput == 0)
+        //        Fall();
 
-        }
+        //}
     }
 
     public void OnTriggerExit2D(Collider2D other)
@@ -620,7 +639,7 @@ public class PlayerController : MonoBehaviour
         {
             lastSlided.Remove(id);
             wallInCollision.Remove(other.gameObject);
-            //Debug.Log("EXIT Walls: " + floorIds.Count);
+            Debug.Log("EXIT Walls: " + floorIds.Count);
         }
 
         if (other.tag == "Floor" && floorIds.Contains(id))
