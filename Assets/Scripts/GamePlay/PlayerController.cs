@@ -54,16 +54,24 @@ public class PlayerController : MonoBehaviour
     public float FallGravity = 50;
     public float MaxFallTimeToRespawn = 3.0f;
 
-    // SlideSettings
+    // WallJump/SlideSettings
     public float WallSlideGravity = 5;
     public float WallSlideInitialVelocity = 2;
     //public float SlideBeforeFall = 0.5f;
-    private float WallJumpLastDirection = 0; 
+    private float WallJumpLastDirection = 0;
+
+
+    // GrabSettings
+    [Range(0, 0.5f)]
+    public float GrabMinNegYDist = 0.1f; // Check colliders tbh
+    private Transform Grab;
+    private Vector3 GrabOffset;
+
 
     private ControlScheme ControlScheme;
-    public PlayerState playerState;
 
     // Debug
+    public PlayerState playerState;
     public bool DebugStateChanges = false;
     private bool facingRight = true;
 
@@ -76,14 +84,13 @@ public class PlayerController : MonoBehaviour
     private bool InputJump = false;
 
     // Storage for collided 
-    private List<int> floorIds = new List<int>();
+    //private List<int> floorIds = new List<int>();
+    private List<GameObject> floorsInCollision = new List<GameObject>();
     private List<int> lastSlided = new List<int>();
     private List<GameObject> wallInCollision = new List<GameObject>();
     private int lastGrabbedID = 0;
 
-    private Transform Grab;
     private Animator animator;
-    private Vector3 GrabOffset;
 
     #endregion
 
@@ -118,8 +125,8 @@ public class PlayerController : MonoBehaviour
 
         ChildTrigger2DDelegates grabDels = ChildTrigger2DDelegates.AddChildTrigger2D(Grab.gameObject, transform);
 
-        grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
-        //grabDels.OnTriggerStay = new TriggerDelegate(OnWallTrigger);
+        //grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
+        grabDels.OnTriggerStay = new TriggerDelegate(OnWallTriggerEnter);
         grabDels.OnTriggerExit = new TriggerDelegate(LeaveWallTrigger);
 
         GrabOffset = Grab.position - transform.position;
@@ -265,7 +272,7 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Horizontal", HorizontalInput);
         animator.SetFloat("Vertical", VerticalInput);
 
-        Grounded = floorIds.Count > 0;
+        Grounded = floorsInCollision.Count > 0;
     }
 
     private void ResetAtEndOfUpdate()
@@ -337,6 +344,11 @@ public class PlayerController : MonoBehaviour
 
         if (other.tag == "GrabMe" && id != lastGrabbedID)
         {
+            float yDist = Grab.position.y - other.transform.position.y;
+            Debug.Log(yDist + " Gr " + GrabMinNegYDist + " bool: " + (yDist+GrabMinNegYDist<0));
+            if (yDist + GrabMinNegYDist < 0)
+                return;
+            
             // Grab the object
             Vector3 relPos = other.transform.position - transform.position;
             float dir = Mathf.Sign(relPos.x);
@@ -660,10 +672,11 @@ public class PlayerController : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D other)
     {
         int id = other.GetInstanceID();
-        if (other.tag == "Floor" && !floorIds.Contains(id))
+        if (other.tag == "Floor" && !floorsInCollision.Contains(other.gameObject))//floorIds.Contains(id))
         {
-            floorIds.Add(id);
-            //Debug.Log("ENTER Floors: " + floorIds.Count + " id " + id);
+            //floorIds.Add(id);
+            floorsInCollision.Add(other.gameObject);
+            Debug.Log("ENTER Floors: " + floorsInCollision.Count + " id " + id);
         }
 
         if (other.tag == "Wall" && !lastSlided.Contains(id))
@@ -728,10 +741,11 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("EXIT Walls: " + floorIds.Count);
         }
 
-        if (other.tag == "Floor" && floorIds.Contains(id))
+        if (other.tag == "Floor" && floorsInCollision.Contains(other.gameObject))
         {
-            floorIds.Remove(id);
-            //Debug.Log("EXIT Floors: " + floorIds.Count);
+            //floorIds.Remove(id);
+            floorsInCollision.Remove(other.gameObject);
+            Debug.Log("EXIT Floors: " + floorsInCollision.Count);
         }
     }
 
