@@ -120,7 +120,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 6006781}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.57013559, y: 1.51430488, z: 0}
+  m_LocalPosition: {x: 3.5701375, y: 1.54581904, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -181,7 +181,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 0
   m_SortingLayerID: 583456963
-  m_Sprite: {fileID: 21300006, guid: 84d605552b6e18d41b4bec82bbe5896b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f2ce14811460b91428037330e875365d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!4 &71675992
 Transform:
@@ -261,6 +261,7 @@ MonoBehaviour:
   MaxFallTimeToRespawn: 2
   WallSlideGravity: 5
   WallSlideInitialVelocity: 2
+  GrabMinNegYDist: .123000003
   playerState: 0
   DebugStateChanges: 0
 --- !u!61 &71675997
@@ -430,11 +431,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 400002, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -.346655965
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: .976937294
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
       propertyPath: m_LocalPosition.z
@@ -483,8 +484,12 @@ Prefab:
     - target: {fileID: 21200000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300006, guid: 84d605552b6e18d41b4bec82bbe5896b,
+      objectReference: {fileID: 21300000, guid: f2ce14811460b91428037330e875365d,
         type: 3}
+    - target: {fileID: 11400000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
+      propertyPath: GrabMinNegYDist
+      value: .123000003
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
   m_RootGameObject: {fileID: 684476201}
@@ -1963,7 +1968,7 @@ Transform:
   m_PrefabInternal: {fileID: 174740974}
   m_GameObject: {fileID: 684476201}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -.346655965, y: .976937294, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1255730463}
