@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
         if (playerState == PlayerState.Grabbing)
         {
             HandleGrabbing();
-            ResetAtEndOfUpdate();
+            EndOfUpdate();
             return;
         }
 
@@ -169,7 +169,7 @@ public class PlayerController : MonoBehaviour
         if (WallSliding())
         {
             
-            ResetAtEndOfUpdate();
+            EndOfUpdate();
             return;
         }
 
@@ -187,13 +187,15 @@ public class PlayerController : MonoBehaviour
                 //Debug.Log("ExitWalljump");
             }
             CheckFlipByVelocity();
-            ResetAtEndOfUpdate();
+            EndOfUpdate();
             return;
         }
 
         #endregion
 
         #region Movement
+
+
 
         // Passive
         if (HorizontalInput == 0 && velocityX == 0)
@@ -255,9 +257,11 @@ public class PlayerController : MonoBehaviour
 
         Fall();
 
-        CheckFlipByVelocity();
+        CheckFlipBy(HorizontalInput);
 
-        ResetAtEndOfUpdate();
+        //CheckFlipByVelocity();
+
+        EndOfUpdate();
 	}
 
     private void SetInputValues()
@@ -273,13 +277,14 @@ public class PlayerController : MonoBehaviour
         Grounded = floorsInCollision.Count > 0;
     }
 
-    private void ResetAtEndOfUpdate()
+    private void EndOfUpdate()
     {
         ////Reset grounded
         //if (playerState == PlayerState.Airborne && playerState == PlayerState.Grabbing && playerState == PlayerState.Falling && playerState == PlayerState.WallSliding)
         //    Grounded = false;
-        
-        animator.SetFloat("Speed", Mathf.Abs(rigidbody2D.velocity.x));
+        animator.SetFloat("VelocityX", rigidbody2D.velocity.x);
+        animator.SetFloat("VelocityY", rigidbody2D.velocity.y);
+        animator.SetFloat("Speed", Mathf.Abs(rigidbody2D.velocity.x)/RunSettings.RunMaxVelocity);
         InputJump = false;
     }
 
@@ -555,9 +560,10 @@ public class PlayerController : MonoBehaviour
     /// <param name="dir"></param>
     private void CheckFlipBy(float dir)
     {
-        dir = Mathf.Sign(dir);
         if (dir == 0)
             return;
+        dir = Mathf.Sign(dir);
+        
 
         if (dir > 0 && !facingRight)
             Flip();
