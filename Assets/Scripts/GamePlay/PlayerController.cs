@@ -260,8 +260,6 @@ public class PlayerController : MonoBehaviour
         ResetAtEndOfUpdate();
 	}
 
-    
-
     private void SetInputValues()
     {
         HorizontalInput =ControlScheme.Horizontal.Value();
@@ -398,8 +396,9 @@ public class PlayerController : MonoBehaviour
 
     private bool WallSliding()
     {
-        // On the floor after sliding
-        if (Grounded && playerState == PlayerState.WallSliding)
+        // During sliding:
+        // On the floor - Or - No More slide space
+        if (playerState == PlayerState.WallSliding && (Grounded || lastSlided.Count == 0))
         {
             //Fall();
             SetState(PlayerState.Idle);
