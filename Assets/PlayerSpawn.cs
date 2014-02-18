@@ -6,7 +6,7 @@ public class PlayerSpawn : Singleton<PlayerSpawn>
     private Transform player;
     public float CameraHeightOffset = 5;
 	// Use this for initialization
-	void Awake () 
+	void Start () 
     {
         player = GameObject.Find("PlayerCharacter").transform;
         Debug.Log(player.name);

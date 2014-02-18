@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour
 
     // Fall Settings
     public float FallGravity = 50;
-    //todo maximum fall
+    public float MaxFallTimeToRespawn = 3.0f;
 
     // SlideSettings
     public float WallSlideGravity = 5;
@@ -65,10 +65,10 @@ public class PlayerController : MonoBehaviour
 
     // Debug
     public bool DebugStateChanges = false;
-    public bool facingRight = true;
+    private bool facingRight = true;
 
-    public bool grounded;
-    public bool Grounded { get { return grounded; } set { grounded = value; animator.SetBool("Grounded", value); } }
+    private bool grounded;
+    public bool Grounded { get { return grounded; } private set { grounded = value; animator.SetBool("Grounded", value); } }
 
     // Input mini-cache
     private float HorizontalInput = 0;
@@ -582,6 +582,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private IEnumerator RespawnWhenFallingTooLong()
+    {
+        float time = Time.timeSinceLevelLoad;
+        playerState = PlayerState.Falling;
+        while (playerState == PlayerState.Falling)
+        {
+            float dt = Time.timeSinceLevelLoad - time;
+            if ((dt) > MaxFallTimeToRespawn)
+            {
+                PlayerSpawn.Respawn();
+            }
+            yield return null;
+        }
+    }
+
+
     #endregion
 
     #region State Switch
@@ -607,6 +623,11 @@ public class PlayerController : MonoBehaviour
             case PlayerState.WallJump:
             case PlayerState.Airborne:
                 animator.SetTrigger("Jump");
+                break;
+
+            case PlayerState.Falling:
+                Debug.Log("HOI");
+                StartCoroutine(RespawnWhenFallingTooLong());
                 break;
             case PlayerState.WallSliding:
                 animator.SetBool("WallSlide", true);
