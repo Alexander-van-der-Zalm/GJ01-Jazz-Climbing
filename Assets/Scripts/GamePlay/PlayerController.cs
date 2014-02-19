@@ -151,6 +151,7 @@ public class PlayerController : MonoBehaviour
         float accel = Time.fixedDeltaTime * RunSettings.RunMaxVelocity;
         float velocityDirection = Mathf.Sign(velocityX);
         float horInputDirection = Mathf.Sign(HorizontalInput);
+
         #endregion
 
         #region Grab

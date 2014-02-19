@@ -20,7 +20,7 @@ public class PlayerSpawn : Singleton<PlayerSpawn>
         Vector3 pos = Instance.transform.position;
         Instance.player.position = pos;
         pos.y+=Instance.CameraHeightOffset;
-        pos.z = Camera.mainCamera.transform.position.z;
-        Camera.mainCamera.transform.position = pos;
+        pos.z = Camera.main.transform.position.z;
+        Camera.main.transform.position = pos;
     }
 }
