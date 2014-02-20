@@ -1347,32 +1347,6 @@ MonoBehaviour:
   Target: {fileID: 71675992}
   followSpeed: 1.39999998
   HeightOffset: 2
---- !u!1 &127340753
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 127340755}
-  m_Layer: 0
-  m_Name: BuildingTileSet0
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &127340755
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 127340753}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.03802681, y: -12.106204, z: .0290527344}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1953042426}
 --- !u!1 &144949030
 GameObject:
   m_ObjectHideFlags: 0
@@ -15290,6 +15264,48 @@ SpriteRenderer:
   m_SortingLayerID: 4081136285
   m_Sprite: {fileID: 21300002, guid: e90ba97250ef6ee4e80eaf6e51abedca, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1 &1799409698
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1799409700}
+  - 114: {fileID: 1799409699}
+  m_Layer: 0
+  m_Name: TestObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1799409699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1799409698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 251f7e4778e2c8d4bb2997fa79f73fa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockWidth: 3
+  BlockHeight: 6
+  TileSet: {fileID: 0}
+  Seed: -1
+--- !u!4 &1799409700
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1799409698}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.8902111, y: 16.3293591, z: -.00122070312}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
 --- !u!1 &1815317610
 GameObject:
   m_ObjectHideFlags: 0
@@ -16069,8 +16085,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9.03802681, y: 12.106204, z: -.0290527344}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 127340755}
+  m_Children: []
   m_Father: {fileID: 0}
 --- !u!114 &1953042427
 MonoBehaviour:
@@ -16121,8 +16136,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TileSet: {fileID: 1953042427}
   SpawnLocation: {x: 10, y: 12, z: -1}
-  BlockHeight: 4
-  BlockWidth: 4
+  BlockHeight: 6
+  BlockWidth: 3
   Seed: -1
 --- !u!1 &1953804763
 GameObject:
