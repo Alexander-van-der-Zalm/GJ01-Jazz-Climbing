@@ -48,7 +48,7 @@ TagManager:
   - name: Sky
     userID: 5
     uniqueID: 1865538189
-    locked: 0
+    locked: 1
   - name: Clouds
     userID: 7
     uniqueID: 834408081
