@@ -5,24 +5,17 @@ using UnityEditor;
 [CustomEditor(typeof(SpawnBlock))]
 public class SpawnBlockEditor : Editor 
 {
-    int oldHeight;
-    int oldWidth;
-    string originalName;
 
     public override void OnInspectorGUI()
     {
         SpawnBlock sb = target as SpawnBlock;
         
-        if(GUILayout.Button("Create New Block"))
-            CreateNewBlock(sb);
+        
 
         DrawDefaultInspector();
 
-        if(GUI.changed)//sb.BlockHeight != oldHeight || sb.BlockWidth != oldWidth)
+        if(GUI.changed||GUILayout.Button("Generate New Block Elements"))
             CreateNewBlock(sb);
-
-        oldHeight = sb.BlockHeight;
-        oldWidth = sb.BlockWidth;
     }
 
     private void CreateNewBlock(SpawnBlock sb)
