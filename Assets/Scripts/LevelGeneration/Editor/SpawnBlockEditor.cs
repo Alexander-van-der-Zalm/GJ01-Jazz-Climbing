@@ -18,9 +18,8 @@ public class SpawnBlockEditor : Editor
 
         DrawDefaultInspector();
 
-        if(sb.BlockHeight != oldHeight || sb.BlockWidth != oldWidth)
+        if(GUI.changed)//sb.BlockHeight != oldHeight || sb.BlockWidth != oldWidth)
             CreateNewBlock(sb);
-
 
         oldHeight = sb.BlockHeight;
         oldWidth = sb.BlockWidth;
