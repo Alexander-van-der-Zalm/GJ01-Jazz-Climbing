@@ -8,33 +8,41 @@ public class SpawnBlock : MonoBehaviour
     public TileSet TileSet;
     public int Seed = -1;
 
-    private Vector3 MidOffset;
-    
+    [HideInInspector]
+    public GameObject SpawnedBlock;
+
     // Use this for initialization
 	void Start () 
     {
-        LevelGenerator.CreateSimpleLevelBlock(TileSet, transform.position, BlockHeight, BlockWidth, Seed);
+        //LevelGenerator.CreateSimpleLevelBlock(TileSet, transform.position, BlockHeight, BlockWidth, Seed);
 	}
 
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(1, 1, 1,1);
-        Vector3 size = Vector3.zero;
-        
-        if (TileSet != null)
-        {
-            size = TileSet.TileSize * new Vector3(BlockWidth, BlockHeight);
-            MidOffset = 0.5f*size;
-            size.y -= 1f;
-        }
-
-        //Gizmos.DrawWireCube(transform.position, Vector3.one);
-        Gizmos.DrawWireCube(transform.position + MidOffset, size);
+        DrawGizmo();
     }
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = new Color(1, 1, 1, 1);
-        Gizmos.DrawWireCube(transform.position, Vector3.one);
+        Gizmos.color = new Color(1, 0, 1, 1);
+        DrawGizmo();
+    }
+
+    private void DrawGizmo()
+    {
+        Vector3 size = Vector3.zero;
+        Vector3 MidOffset = Vector3.zero;
+
+        if (TileSet != null)
+        {
+            size = TileSet.TileSize * new Vector3(BlockWidth, BlockHeight);
+
+            MidOffset = 0.5f * size;
+            size.y -= 0.5f;
+        }
+        Vector3 offset = new Vector3(0, -0.25f, 0);
+        //Gizmos.DrawWireCube(transform.position, Vector3.one);
+        Gizmos.DrawWireCube(transform.position + MidOffset + offset, size);
     }
 }

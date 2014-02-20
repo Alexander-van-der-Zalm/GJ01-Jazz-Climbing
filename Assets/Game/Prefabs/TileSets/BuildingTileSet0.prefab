@@ -1,14 +1,77 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 400000}
+  - 114: {fileID: 11400000}
+  m_Layer: 0
+  m_Name: BuildingTileSet0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &400000
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.8902111, y: 16.3293591, z: -.00122070312}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7afb7a63de09a5a40a7522b832133c11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: BuildingTileSet0
+  TileSize: 2
+  TopCorners:
+  - {fileID: 100000, guid: 368acdbdcc89aae479c495ee708cac19, type: 2}
+  - {fileID: 100000, guid: a49d8c06833b5a440bee4e6b4c388e3e, type: 2}
+  BottomCorners:
+  - {fileID: 100000, guid: b60e74beaca27464299456429e433e7c, type: 2}
+  - {fileID: 100000, guid: 52fb55c887ab3ab4996153855a053ca1, type: 2}
+  Sides:
+  - {fileID: 100000, guid: 15982e17df6e74f4ea39c6b733a83b11, type: 2}
+  - {fileID: 100000, guid: 4626d98cf3d6ed14cb0aede1394177f5, type: 2}
+  - {fileID: 100000, guid: 0347aacfa95e05a4892261c4a7a2adf5, type: 2}
+  - {fileID: 100000, guid: 737e7f1ad3cf6934c8638e2bae28abdc, type: 2}
+  Tops:
+  - {fileID: 100000, guid: 950d15fb7025d134a89e9c15fa61ea06, type: 2}
+  - {fileID: 100000, guid: c3adcfed94279bf4d9bb34c304a6c29a, type: 2}
+  - {fileID: 100000, guid: 2f66cb46d514b2240bdb8bf5df8eca5e, type: 2}
+  Bottoms:
+  - {fileID: 100000, guid: 419630b59e8fc064fa13fa9401bccf44, type: 2}
+  - {fileID: 100000, guid: 15bb9a80bd8a41346ad65263ba0b3359, type: 2}
+  - {fileID: 100000, guid: 85bddb39b7f642041a210598d12da2cf, type: 2}
+  Fills:
+  - {fileID: 100000, guid: 8f1231ea1234fad419de4b8838a58db7, type: 2}
+  - {fileID: 100000, guid: 70706212e1cd9c14a8536b081fe5e946, type: 2}
+  - {fileID: 100000, guid: e8def2defc67e0440be24bc0204ff0ac, type: 2}
 --- !u!1001 &100100000
 Prefab:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 0}
+  m_RootGameObject: {fileID: 100000}
   m_IsPrefabParent: 1
   m_IsExploded: 1

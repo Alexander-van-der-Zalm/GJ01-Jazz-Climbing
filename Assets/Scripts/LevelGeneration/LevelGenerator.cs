@@ -22,7 +22,7 @@ public class LevelGenerator : MonoBehaviour
 	
 	}
 
-    public static void CreateSimpleLevelBlock(TileSet tileSet, Vector3 botLeftCorner, int blockHeight, int blockWidth, int seed = -1)
+    public static GameObject CreateSimpleLevelBlock(TileSet tileSet, Vector3 botLeftCorner, int blockHeight, int blockWidth, int seed = -1)
     {
         // Random?
         if (seed >= 0)
@@ -77,7 +77,10 @@ public class LevelGenerator : MonoBehaviour
         }
 
         parent.transform.position = botLeftCorner;
+
+        return parent;
     }
+
     private static GameObject LeftMiddleRight(int min, int max, int index, List<GameObject> Side, List<GameObject> Middle)
     {
         // BotCorner left
@@ -88,7 +91,6 @@ public class LevelGenerator : MonoBehaviour
         else if (index == max)
         {
             GameObject toFlip = RandomGameObjectFromList(Side);
-            Debug.Log(toFlip.name+ " "+ toFlip.transform.localScale);
             Vector3 localScale = toFlip.transform.localScale;
             localScale.x *= -1;
             toFlip.transform.localScale = localScale;
