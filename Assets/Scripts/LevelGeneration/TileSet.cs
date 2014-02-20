@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class TileSet : MonoBehaviour 
 {
     public string Name = "TileSet";
+    public int TileSize = 2;
     public List<GameObject> TopCorners      = new List<GameObject>();
     public List<GameObject> BottomCorners   = new List<GameObject>();
     public List<GameObject> Sides           = new List<GameObject>();
