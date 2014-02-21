@@ -647,18 +647,21 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("HOI");
                 StartCoroutine(RespawnWhenFallingTooLong());
                 break;
+
             case PlayerState.WallSliding:
                 animator.SetBool("WallSlide", true);
                 SetGravity(WallSlideGravity);
                 rigidbody2D.velocity = new Vector2(0, -WallSlideInitialVelocity);
                 //Debug.Log("StartSlide grav: " + rigidbody2D.gravityScale);
                 break;
+
             case PlayerState.Grabbing:
                 animator.SetBool("Grab", true);
                 rigidbody2D.gravityScale = 0;
                 rigidbody2D.velocity = Vector2.zero;
                 rigidbody2D.isKinematic = true;
                 break;
+
             case PlayerState.Running:
 
                 break;
