@@ -71,11 +71,11 @@ public class AudioManager : Singleton<AudioManager>
     /// Plays directly at the cameras audioSource
     /// </summary>
     /// <param name="sample"></param>
-    public static void Play(AudioSample sample)
+    public static AudioSourceContainer Play(AudioSample sample)
     {
         // There should only be one audioListener (Usually main camera)
         Transform audioListenerTransform = GameObject.FindObjectOfType<AudioListener>().transform;
-        Play(sample, audioListenerTransform);
+        return Play(sample, audioListenerTransform);
     }
 
     /// <summary>
@@ -83,24 +83,24 @@ public class AudioManager : Singleton<AudioManager>
     /// </summary>
     /// <param name="sample"></param>
     /// <param name="transform"></param>
-    public static void Play(AudioSample sample, Transform transform)
+    public static AudioSourceContainer Play(AudioSample sample, Transform transform)
     {
-        GameObject soundObject = RegisterAndCreateAudioSourceContainer(sample);
+        AudioSourceContainer soundObject = RegisterAndCreateAudioSourceContainer(sample);
         soundObject.transform.parent = transform;
         soundObject.transform.position = transform.position;
 
-        Play(soundObject);
+        return Play(soundObject);
     }
 
-    public static void Play(AudioSample sample, Vector3 position)
+    public static AudioSourceContainer Play(AudioSample sample, Vector3 position)
     {
-        GameObject soundObject = RegisterAndCreateAudioSourceContainer(sample);
+        AudioSourceContainer soundObject = RegisterAndCreateAudioSourceContainer(sample);
         soundObject.transform.position = position;
         
-        Play(soundObject);
+        return Play(soundObject);
     }
 
-    public static void Play(AudioClip clip, AudioLayer layer = AudioLayer.None, AudioSample.AudioSettings settings = null) 
+    public static AudioSourceContainer Play(AudioClip clip, AudioLayer layer = AudioLayer.None, AudioSample.AudioSettings settings = null) 
     {
         AudioSample sample = new AudioSample();
         sample.Clip = clip;
@@ -109,13 +109,13 @@ public class AudioManager : Singleton<AudioManager>
 
         // There should only be one audioListener (Usually main camera)
         Transform audioListenerTransform = GameObject.FindObjectOfType<AudioListener>().transform;
-        Play(sample, audioListenerTransform);
+        return Play(sample, audioListenerTransform);
     }
 
-    private static void Play(GameObject go)
+    private static AudioSourceContainer Play(AudioSourceContainer audioSource)
     {
-        AudioSource audioSource = go.GetComponent<AudioSource>();
-        audioSource.Play();
+        audioSource.AudioSource.Play();
+        return audioSource;
     }
    
 
@@ -186,12 +186,16 @@ public class AudioManager : Singleton<AudioManager>
 
     #region Add
 
-    private static GameObject RegisterAndCreateAudioSourceContainer(AudioSample sample)
+    private static AudioSourceContainer RegisterAndCreateAudioSourceContainer(AudioSample sample)
     {
         GameObject soundObject = AudioSourceContainer.CreateContainer(sample);
+        
+        AudioSourceContainer cont = soundObject.GetComponent<AudioSourceContainer>();
+
         //Register
-        Instance.AddAudioSource(soundObject.GetComponent<AudioSourceContainer>());
-        return soundObject;
+        Instance.AddAudioSource(cont);
+        
+        return cont;
     }
 
     private void AddAudioSource(AudioSourceContainer source)

@@ -12,7 +12,8 @@ public class PlayerController : MonoBehaviour
         Jump = 0,
         Dash = 1,
         Interact = 2,
-        Slide = 3
+        Slide = 3,
+        PlayInstrument = 4
     }
 
     public enum PlayerState
