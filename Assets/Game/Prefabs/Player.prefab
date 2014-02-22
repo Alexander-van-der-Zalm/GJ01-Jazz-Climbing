@@ -235,7 +235,7 @@ MonoBehaviour:
   FallGravity: 50
   MaxFallTimeToRespawn: 1.5
   WallSlideGravity: 5
-  WallSlideInitialVelocity: 2 
+  WallSlideInitialVelocity: 2
   GrabMinNegYDist: .100000001
   playerState: 0
   DebugStateChanges: 0
