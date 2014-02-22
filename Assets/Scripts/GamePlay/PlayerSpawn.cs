@@ -23,4 +23,21 @@ public class PlayerSpawn : Singleton<PlayerSpawn>
         pos.z = Camera.main.transform.position.z;
         Camera.main.transform.position = pos;
     }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 1, 0, 1);
+        DrawGizmo();
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(0, 1, 1, 1);
+        DrawGizmo();
+    }
+
+    private void DrawGizmo()
+    {
+        Gizmos.DrawWireSphere(transform.position, 2);
+    }
 }
