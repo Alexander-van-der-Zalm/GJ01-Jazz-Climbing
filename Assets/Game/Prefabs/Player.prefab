@@ -75,11 +75,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-<<<<<<< HEAD
-  m_LocalPosition: {x: -1.87576425, y: 0, z: 0}
-=======
   m_LocalPosition: {x: -23.5416641, y: 28.6313038, z: 0}
->>>>>>> be3163a8fa0fef25b13d69af53747f293998423a
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400004}
@@ -239,12 +235,8 @@ MonoBehaviour:
   FallGravity: 50
   MaxFallTimeToRespawn: 1.5
   WallSlideGravity: 5
-  WallSlideInitialVelocity: 2
-<<<<<<< HEAD
-  GrabMinNegYDist: .123000003
-=======
+  WallSlideInitialVelocity: 2 
   GrabMinNegYDist: .100000001
->>>>>>> be3163a8fa0fef25b13d69af53747f293998423a
   playerState: 0
   DebugStateChanges: 0
 --- !u!212 &21200000
