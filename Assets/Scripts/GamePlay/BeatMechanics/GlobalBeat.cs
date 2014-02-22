@@ -3,16 +3,34 @@ using System.Collections;
 
 public class GlobalBeat : Singleton<GlobalBeat> 
 {
+    public int BPM;
+    public int Measure;
+    public int Accent;
 
-	// Use this for initialization
-	void Start () 
+    public float InMeasure;
+
+    private float StartTime;
+
+    public static void StartBeat()
     {
-	    
-	}
-	
-	// Update is called once per frame
-	void Update () 
+        Instance.StartTime = Time.realtimeSinceStartup;
+    }
+
+    public static float ProgressInMeasure()
     {
-	    
-	}
+        float dt = Time.realtimeSinceStartup - Instance.StartTime;
+        dt *= Instance.BPM / 60;
+        return dt % Instance.Measure;
+    }
+
+    void Start()
+    {
+        GlobalBeat.StartBeat();
+    }
+
+
+    void Update()
+    {
+        InMeasure = GlobalBeat.ProgressInMeasure();
+    }
 }
