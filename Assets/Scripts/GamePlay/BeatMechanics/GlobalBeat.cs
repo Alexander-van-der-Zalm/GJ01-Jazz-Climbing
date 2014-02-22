@@ -6,6 +6,7 @@ public class GlobalBeat : Singleton<GlobalBeat>
     public int BPM;
     public int Measure;
     public int Accent;
+    public string CurrentZoneName = "";
 
     public float InMeasure;
     public float SecDistanceToAccent;
@@ -14,10 +15,16 @@ public class GlobalBeat : Singleton<GlobalBeat>
     private float StartTime;
     private bool started = false;
 
-    public static void StartBeat()
+    public static bool StartBeat(string currentZoneName = "")
     {
+        if (Instance.started && Instance.CurrentZoneName == currentZoneName)
+            return false;
+        
         Instance.started = true;
         Instance.StartTime = Time.realtimeSinceStartup;
+        Instance.CurrentZoneName = currentZoneName;
+
+        return true;
     }
 
     public static float ProgressInMeasure()
@@ -59,11 +66,12 @@ public class GlobalBeat : Singleton<GlobalBeat>
         //GlobalBeat.StartBeat();
     }
 
-
     void Update()
     {
         InMeasure = GlobalBeat.ProgressInMeasure();
         SecDistanceToAccent = GlobalBeat.SecondsFromAccent();
         SecDisToBeat = GlobalBeat.SecondsFromBeat();
     }
+
+
 }
