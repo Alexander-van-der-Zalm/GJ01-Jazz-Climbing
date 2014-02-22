@@ -249,7 +249,12 @@ MonoBehaviour:
     RunAccelTime: .400000006
     RunDeAccelTime: .25
   FallGravity: 50
+  MaxFallTimeToRespawn: 3
+  WallSlideGravity: 5
+  WallSlideInitialVelocity: 2
+  GrabMinNegYDist: .100000001
   playerState: 0
+  DebugStateChanges: 0
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1
