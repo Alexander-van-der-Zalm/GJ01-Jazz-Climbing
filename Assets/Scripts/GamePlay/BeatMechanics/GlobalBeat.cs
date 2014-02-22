@@ -8,29 +8,62 @@ public class GlobalBeat : Singleton<GlobalBeat>
     public int Accent;
 
     public float InMeasure;
+    public float SecDistanceToAccent;
+    public float SecDisToBeat;
 
     private float StartTime;
+    private bool started = false;
 
     public static void StartBeat()
     {
+        Instance.started = true;
         Instance.StartTime = Time.realtimeSinceStartup;
     }
 
     public static float ProgressInMeasure()
     {
+        float dt = InBeat();
+
+        // How far into the measure?
+        return dt % Instance.Measure;
+    }
+
+    public static float SecondsFromAccent()
+    {
+        float dt = InBeat();
+        float cur = dt % Instance.Accent;
+
+        return Mathf.Min(cur, Instance.Accent-cur);
+    }
+
+    public static float SecondsFromBeat()
+    {
+        float dt = InBeat();
+        float cur = dt % 1;
+
+        return Mathf.Min(cur, 1 - cur);
+    }
+
+    private static float InBeat()
+    {
+        if (!Instance.started)
+            return 0;
+        
         float dt = Time.realtimeSinceStartup - Instance.StartTime;
         dt *= Instance.BPM / 60;
-        return dt % Instance.Measure;
+        return dt;
     }
 
     void Start()
     {
-        GlobalBeat.StartBeat();
+        //GlobalBeat.StartBeat();
     }
 
 
     void Update()
     {
         InMeasure = GlobalBeat.ProgressInMeasure();
+        SecDistanceToAccent = GlobalBeat.SecondsFromAccent();
+        SecDisToBeat = GlobalBeat.SecondsFromBeat();
     }
 }

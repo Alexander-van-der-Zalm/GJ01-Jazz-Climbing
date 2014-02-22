@@ -13,35 +13,30 @@ public class AudioLayerManagerEditor : EditorPlus
     public override void OnInspectorGUI()
     {
         AudioLayerManager manager = target as AudioLayerManager;
-        SerializedObject soManager = new SerializedObject(manager);
-        
+
         int count = manager.audioLayerSettings.Count;
+        if (count == 0)
+            manager.Init();
 
         if(SavedFoldout("Description"))
             EditorGUILayout.TextArea(description);
+        
         for (int i = 0; i < count; i++)
         {
             AudioLayerSettings settings = manager.audioLayerSettings[i]; 
-            GUIContent name = new GUIContent("AudioLayer: " + settings.Layer.ToString(), settingsNameTooltip);
+            GUIContent name = new GUIContent("AudioLayer: " + settings.Layer.ToString() + " Clips: " + settings.ClipsPlaying.ToString(), settingsNameTooltip);
 
             if (SavedFoldout(name, i))
             {
                 EditorGUI.indentLevel++;
                 {
-                    SerializedProperty prop = soManager.FindProperty(string.Format("AudioLayerSettings.Array.data[{0}]", i));
-                    prop.Next(true);
-                    prop.Next(true);
-                    EditorGUILayout.PropertyField(prop);
-                    prop.Next(true);
-                    EditorGUILayout.PropertyField(prop);
-                    prop.Next(true);
-                    EditorGUILayout.PropertyField(prop);
-                    
+                    settings.Volume = EditorGUILayout.Slider("Volume: ",settings.Volume, 0, 1);
+                    settings.Mute = EditorGUILayout.Toggle("Mute: ", settings.Mute);
+                    settings.MaxClips = EditorGUILayout.IntField("MaxClips: ", settings.MaxClips);
                 }
                 EditorGUI.indentLevel--;
             }
         }
-        soManager.ApplyModifiedProperties();
         
     }
 }

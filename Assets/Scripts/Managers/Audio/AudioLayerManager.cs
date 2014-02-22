@@ -14,22 +14,22 @@ public enum AudioLayer
     // etc.
 }
 
-[ExecuteInEditMode]
 [Serializable]
 public class AudioLayerManager : Singleton<AudioLayerManager> 
 {
     [SerializeField]
     public List<AudioLayerSettings> audioLayerSettings= new List<AudioLayerSettings>();
 
-    public void Start()
+    public void Init()
     {
-        // Possibly buggy
         // Instantiates the list based on the enum
         IEnumerable<AudioLayer> values = Enum.GetValues(typeof(AudioLayer)).Cast<AudioLayer>();
         if (audioLayerSettings.Count < values.Count())
         {
-            foreach(AudioLayer audioLayer in values)
+            foreach (AudioLayer audioLayer in values)
+            {
                 audioLayerSettings.Add(new AudioLayerSettings(audioLayer));
+            }
         }
     }
 
