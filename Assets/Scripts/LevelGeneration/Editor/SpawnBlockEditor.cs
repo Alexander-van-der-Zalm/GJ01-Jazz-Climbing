@@ -9,8 +9,6 @@ public class SpawnBlockEditor : Editor
     public override void OnInspectorGUI()
     {
         SpawnBlock sb = target as SpawnBlock;
-        
-        
 
         DrawDefaultInspector();
 
