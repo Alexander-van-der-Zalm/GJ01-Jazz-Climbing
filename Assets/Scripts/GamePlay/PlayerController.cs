@@ -152,6 +152,8 @@ public class PlayerController : MonoBehaviour
         float velocityDirection = Mathf.Sign(velocityX);
         float horInputDirection = Mathf.Sign(HorizontalInput);
 
+        //animator.
+
         #endregion
 
         #region Grab

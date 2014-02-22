@@ -33,9 +33,10 @@ public class AudioSourceContainer  : MonoBehaviour
     public static GameObject CreateContainer(AudioSample sample)
     {
         GameObject soundObject = new GameObject();
-        soundObject.name = "AudioSourceObject";
+        soundObject.name = "AudioSourceObject " + sample.Name;
         AudioSourceContainer container = soundObject.AddComponent<AudioSourceContainer>();
         container.AudioSource = soundObject.AddComponent<AudioSource>();
+        container.Name = sample.Name;
 
         container.SetSettingsFromSample(sample);
 

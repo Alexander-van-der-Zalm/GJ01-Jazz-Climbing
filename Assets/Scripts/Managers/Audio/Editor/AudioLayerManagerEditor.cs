@@ -28,6 +28,7 @@ public class AudioLayerManagerEditor : EditorPlus
 
             if (SavedFoldout(name, i))
             {
+                EditorGUI.BeginChangeCheck();
                 EditorGUI.indentLevel++;
                 {
                     settings.Volume = EditorGUILayout.Slider("Volume: ",settings.Volume, 0, 1);
@@ -35,8 +36,12 @@ public class AudioLayerManagerEditor : EditorPlus
                     settings.MaxClips = EditorGUILayout.IntField("MaxClips: ", settings.MaxClips);
                 }
                 EditorGUI.indentLevel--;
+                if (EditorGUI.EndChangeCheck())
+                {
+                    AudioManager.Mute(settings.Layer);
+                    AudioManager.UpdateVolume(settings.Layer);
+                }
             }
         }
-        
     }
 }

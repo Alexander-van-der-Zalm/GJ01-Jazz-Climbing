@@ -131,20 +131,56 @@ public class AudioManager : Singleton<AudioManager>
 
     #region Mute
 
+    public static void Mute(AudioLayer layer)
+    {
+        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(layer);
+        List<AudioSourceContainer> containers = Instance.FindSources(layer);
+        foreach (AudioSourceContainer cont in containers)
+        {
+            cont.AudioSource.mute = settings.Mute;
+        }
+    }
+
     #endregion
 
     #region Seek
 
     #endregion
 
+    //public static void UpdateAllLayerSettings(AudioLayer layer)
+    //{
+    //    Mute(layer);
+    //    UpdateVolume(layer);
+    //}
+
+    public static void UpdateVolume(AudioLayer layer)
+    {
+        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(layer);
+        List<AudioSourceContainer> containers = Instance.FindSources(layer);
+        foreach (AudioSourceContainer cont in containers)
+        {
+            cont.UpdateVolume();
+        }
+    }
+
     public static void Pause() { }
     public static void Resume() { }
     public static void Seek() { }
     public static void Transition() { }
-    public static void ChangeVolume() { }
+    
+    public static void ChangeVolume() 
+    { 
+
+    }
+
     public static void Lerp(AudioSample clip1, AudioSample clip2, float t) { }
 
     //private 
+    public static AudioSample FindSampleFromCurrentLibrary(string name)
+    {
+        return Instance.AudioLibrary.Samples.Where(t => t.Name == name).First();
+    }
+
 
     #region Audio Source Management
 
@@ -154,6 +190,7 @@ public class AudioManager : Singleton<AudioManager>
     {
         GameObject soundObject = AudioSourceContainer.CreateContainer(sample);
         //Register
+        Instance.AddAudioSource(soundObject.GetComponent<AudioSourceContainer>());
         return soundObject;
     }
 
