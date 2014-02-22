@@ -74,7 +74,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -23.5416641, y: 28.6313038, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400004}
@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   JumpSettings:
-    JumpMaxHeight: 3
+    JumpMaxHeight: 4
     JumpMinHeight: 1
     JumpTimeToApex: .439999998
   RunSettings:
@@ -221,11 +221,12 @@ MonoBehaviour:
     RunAccelTime: .400000006
     RunDeAccelTime: .25
   FallGravity: 50
+  MaxFallTimeToRespawn: 1.5
   WallSlideGravity: 5
   WallSlideInitialVelocity: 2
+  GrabMinNegYDist: .100000001
   playerState: 0
-  facingRight: 1
-  grounded: 0
+  DebugStateChanges: 0
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1
