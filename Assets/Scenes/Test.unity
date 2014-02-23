@@ -640,7 +640,7 @@ Transform:
   m_PrefabInternal: {fileID: 1680648683}
   m_GameObject: {fileID: 39511733}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.24151134, y: 24.0022297, z: .00146484375}
+  m_LocalPosition: {x: 11.642046, y: 24.0022297, z: .00146484375}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -6039,8 +6039,8 @@ MonoBehaviour:
     Volume: 1
   - SampleName: sax2
     BeatTarget: 0
-    range: .100000001
-    IsCritical: 1
+    range: .75
+    IsCritical: 0
     Volume: 1
   - SampleName: sax1
     BeatTarget: 0
@@ -16504,7 +16504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fde0245ae684bd34e8dd731fc30f973e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InstrumentInHand: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+  InstrumentInHand: {fileID: 235669731}
   InstrumentsInCollection: []
 --- !u!1 &692755001
 GameObject:
@@ -26852,6 +26852,14 @@ Prefab:
     - target: {fileID: 400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
       propertyPath: m_LocalRotation.w
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[1].IsCritical
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[1].range
+      value: .75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
@@ -41034,7 +41042,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 6.24151134
+      value: 11.642046
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: m_LocalPosition.y

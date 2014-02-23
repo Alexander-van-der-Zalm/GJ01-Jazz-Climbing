@@ -678,7 +678,6 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case PlayerState.Falling:
-                Debug.Log("HOI");
                 StartCoroutine(RespawnWhenFallingTooLong());
                 break;
 

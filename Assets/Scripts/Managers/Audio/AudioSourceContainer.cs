@@ -9,8 +9,8 @@ public class AudioSourceContainer  : MonoBehaviour
 
     public string Name;
     
-    [HideInInspector]
-    public bool DestroyMe = false;
+    //[HideInInspector]
+    //public bool DestroyMe = false;
 
     // Changed = new volume
     public AudioSource AudioSource { get { return audioSource; } private set { audioSource = value; } } 
@@ -79,9 +79,11 @@ public class AudioSourceContainer  : MonoBehaviour
         AudioSource.volume = VolumeModifier * layerSettings.Volume;
     }
 
-    public void Destroy()
-    {
-        DestroyMe = true;
-        GameObject.DestroyImmediate(AudioSource);
-    }
+    //public void OnDestroy()
+    //{
+    //    DestroyMe = true;
+    //    Debug.Log("DESTROY");
+    //    GameObject.DestroyImmediate(AudioSource.gameObject);
+    //    GameObject.DestroyImmediate(AudioSource);
+    //}
 }

@@ -213,13 +213,29 @@ public class AudioManager : Singleton<AudioManager>
     private IEnumerator AddAudioSourceCR(AudioSourceContainer source)
     {
         Instance.AudioSources.Add(source);
-        
-        // Keep Running till it is destroyed
-        while(!source.DestroyMe)
-            yield return null;
 
+        float TimeStopped = 0;
+
+        // Keep Running till it has stopped for one second
+        while (TimeStopped < 0.5f)
+        {
+            if (source.AudioSource.time == 0)
+                TimeStopped += Time.deltaTime;
+            else
+                TimeStopped = 0;
+            
+            yield return null;
+        }
+
+        Debug.Log("DESTROY Object");
+
+        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(source.Layer);
+        
         Instance.AudioSources.Remove(source);
-        source = null;
+        GameObject.DestroyImmediate(source.gameObject);
+        settings.ClipsPlaying--;
+
+        //source = null;
     }
 
     #endregion
