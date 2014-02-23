@@ -191,9 +191,11 @@ public class AudioManager : Singleton<AudioManager>
         GameObject soundObject = AudioSourceContainer.CreateContainer(sample);
         
         AudioSourceContainer cont = soundObject.GetComponent<AudioSourceContainer>();
-
+        AudioLayerSettings audioLayerSettings = AudioLayerManager.GetAudioLayerSettings(sample.Layer);
+       
         //Register
         Instance.AddAudioSource(cont);
+        audioLayerSettings.ClipsPlaying++;
         
         return cont;
     }

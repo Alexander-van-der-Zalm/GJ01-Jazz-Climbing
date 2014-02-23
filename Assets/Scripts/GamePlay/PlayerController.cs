@@ -44,27 +44,47 @@ public class PlayerController : MonoBehaviour
         public float RunDeAccelTime = 0.25f;
     }
 
+    [System.Serializable]
+    public class WallSlideSettingsC
+    {
+        public float WallSlideGravity = 4;
+        public float WallSlideInitialVelocity = 0.5f;
+        public float SlideBeforeFall = 0.25f;
+    }
+
+    [System.Serializable]
+    public class FallSettingsC
+    {
+        // Fall Settings
+        public float FallGravity = 50;
+        public float MaxFallTimeToRespawn = 3.0f;
+    }
+
+    [System.Serializable]
+    public class OtherSettingsC
+    {
+        [Range(0, 0.5f)]
+        public float GrabMinNegYDist = 0.1f; // Check colliders tbh
+    }
+
     #endregion
 
     #region Fields
 
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
+    public WallSlideSettingsC WallSlideSettings;
+    public FallSettingsC FallSettings;
+    public OtherSettingsC OtherSettings;
 
-    // Fall Settings
-    public float FallGravity = 50;
-    public float MaxFallTimeToRespawn = 3.0f;
+    
 
     // WallJump/SlideSettings
-    public float WallSlideGravity = 5;
-    public float WallSlideInitialVelocity = 2;
-    //public float SlideBeforeFall = 0.5f;
     private float WallJumpLastDirection = 0;
 
 
     // GrabSettings
-    [Range(0, 0.5f)]
-    public float GrabMinNegYDist = 0.1f; // Check colliders tbh
+
     private Transform Grab;
     private Vector3 GrabOffset;
 
@@ -352,8 +372,8 @@ public class PlayerController : MonoBehaviour
         if (other.tag == "GrabMe" && id != lastGrabbedID)
         {
             float yDist = Grab.position.y - other.transform.position.y;
-            Debug.Log(yDist + " Gr " + GrabMinNegYDist + " bool: " + (yDist+GrabMinNegYDist<0));
-            if (yDist + GrabMinNegYDist < 0)
+            //Debug.Log(yDist + " Gr " + OtherSettings.GrabMinNegYDist + " bool: " + (yDist + OtherSettings.GrabMinNegYDist < 0));
+            if (yDist + OtherSettings.GrabMinNegYDist < 0)
                 return;
             
             // Grab the object
@@ -593,7 +613,7 @@ public class PlayerController : MonoBehaviour
         {
             //Debug.Log("FALLING " + falldown + " " + playerState);
             SetState(PlayerState.Falling);
-            SetGravity(FallGravity);
+            SetGravity(FallSettings.FallGravity);
             
             //rigidbody2D.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
         }
@@ -610,7 +630,7 @@ public class PlayerController : MonoBehaviour
         while (playerState == PlayerState.Falling)
         {
             float dt = Time.timeSinceLevelLoad - time;
-            if ((dt) > MaxFallTimeToRespawn)
+            if ((dt) > FallSettings.MaxFallTimeToRespawn)
             {
                 PlayerSpawn.Respawn();
             }
@@ -653,8 +673,8 @@ public class PlayerController : MonoBehaviour
 
             case PlayerState.WallSliding:
                 animator.SetBool("WallSlide", true);
-                SetGravity(WallSlideGravity);
-                rigidbody2D.velocity = new Vector2(0, -WallSlideInitialVelocity);
+                SetGravity(WallSlideSettings.WallSlideGravity);
+                rigidbody2D.velocity = new Vector2(0, -WallSlideSettings.WallSlideInitialVelocity);
                 //Debug.Log("StartSlide grav: " + rigidbody2D.gravityScale);
                 break;
 
