@@ -125,6 +125,7 @@ public class PlayerController : MonoBehaviour
         if (ControlScheme == null)
             ControlScheme = gameObject.AddComponent<ControlScheme>();
 
+        // Make this a nice function
         ControlScheme.Horizontal = new Axis(ControlScheme,"Horizontal");
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickX));
         ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Horizontal));
@@ -137,9 +138,15 @@ public class PlayerController : MonoBehaviour
         ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.S, KeyCode.W));
         ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.DownArrow, KeyCode.UpArrow));
 
+        // Make this into a nice function
         ControlScheme.Actions.Insert((int)PlayerActions.Jump, new Action(ControlScheme,PlayerActions.Jump.ToString()));
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.PCKey(KeyCode.Space));
         ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
+
+        ControlScheme.Actions.Insert((int)PlayerActions.PlayInstrument, new Action(ControlScheme, PlayerActions.PlayInstrument.ToString()));
+        ControlScheme.Actions[(int)PlayerActions.PlayInstrument].Keys.Add(ControlKey.PCKey(KeyCode.E));
+        ControlScheme.Actions[(int)PlayerActions.PlayInstrument].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.B));
+
         #endregion
 
         Grab = transform.parent.transform.Find("Grab");
