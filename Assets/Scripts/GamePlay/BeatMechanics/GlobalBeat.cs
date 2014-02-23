@@ -17,7 +17,7 @@ public class GlobalBeat : Singleton<GlobalBeat>
     private bool doingXF = false;
     private AudioSample oldSample;
 
-    public static bool StartBeat(string currentZoneName, AudioSample sample, float crossFadeTime)
+    public static bool StartBeat(string currentZoneName, AudioSample sample, float crossFadeDurationInMeasures)
     {
         if (Instance.started && Instance.CurrentZoneName == currentZoneName)
             return false;
@@ -30,7 +30,7 @@ public class GlobalBeat : Singleton<GlobalBeat>
         if (Instance.started && !Instance.doingXF)
         {
             // CrossFade
-            Instance.StartCoroutine(Instance.CrossFadeOnBeat(currentZoneName, sample, crossFadeTime));
+            Instance.StartCoroutine(Instance.CrossFadeOnBeat(currentZoneName, sample, crossFadeDurationInMeasures));
         }
         else if(!Instance.doingXF)
         {
@@ -50,7 +50,7 @@ public class GlobalBeat : Singleton<GlobalBeat>
         Instance.oldSample = sample;
     }
 
-    private IEnumerator CrossFadeOnBeat(string currentZoneName, AudioSample sample, float crossFadeTime)
+    private IEnumerator CrossFadeOnBeat(string currentZoneName, AudioSample sample, float crossFadeDurationInMeasures)
     {
         
         int beatInMeasure = (int)Mathf.Round(ProgressInMeasure());
@@ -76,7 +76,8 @@ public class GlobalBeat : Singleton<GlobalBeat>
         }
 
         //Debug.Log("XF " + beatInMeasure + " " + dist + " old samp " + Instance.oldSample.Clip.name + " samp " + sample.Clip.name);
-
+        float crossFadeTime = (crossFadeDurationInMeasures * Measure) / (BPM / 60);
+        Debug.Log("XFT " + crossFadeTime);
         AudioManager.CrossFade(Instance.oldSample, sample, crossFadeTime);
         Instance.doingXF = false;
         BeatStarted(currentZoneName, sample);

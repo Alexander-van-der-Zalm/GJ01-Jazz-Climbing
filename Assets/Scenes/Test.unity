@@ -633,7 +633,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Drum2
   AudioSampleName: BGM_drum2
-  CrossFadeTime: 3
+  CrossFadeTime: 1
 --- !u!4 &39511735
 Transform:
   m_ObjectHideFlags: 0
@@ -29500,7 +29500,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Drum1
   AudioSampleName: BGM_drum1
-  CrossFadeTime: 3
+  CrossFadeTime: 1
 --- !u!4 &1155465494
 Transform:
   m_ObjectHideFlags: 0
@@ -35028,7 +35028,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: CrossFadeTime
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
@@ -41263,7 +41263,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: CrossFadeTime
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}

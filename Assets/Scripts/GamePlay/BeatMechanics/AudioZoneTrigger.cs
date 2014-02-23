@@ -6,7 +6,7 @@ public class AudioZoneTrigger : MonoBehaviour
 {
     public string Name;
     public string AudioSampleName;
-    public float CrossFadeTime = 1.0f;
+    public float CrossFadeTimeInMeasure = 1.0f;
     private AudioSample Sample;
     private float Radius;
     
@@ -23,7 +23,7 @@ public class AudioZoneTrigger : MonoBehaviour
         if (other.tag != "Player" || Sample == null)
             return;
 
-        GlobalBeat.StartBeat(Name, Sample, CrossFadeTime);
+        GlobalBeat.StartBeat(Name, Sample, CrossFadeTimeInMeasure);
          //   AudioManager.Play(Sample);
     }
 

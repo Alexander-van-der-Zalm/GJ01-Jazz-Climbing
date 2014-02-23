@@ -184,8 +184,8 @@ public class AudioManager : Singleton<AudioManager>
 
             con1.VolumeModifier = Mathf.Max((1 - t),0) * v1;
             con2.VolumeModifier = Mathf.Min(t,1)* v2;
-            
-            //Debug.Log(t);
+
+            //Debug.Log(con1.AudioSource.volume + " " + con2.AudioSource.volume);
 
             dt = Time.timeSinceLevelLoad - startTime;
             yield return null;
@@ -195,11 +195,39 @@ public class AudioManager : Singleton<AudioManager>
         con2.VolumeModifier = v2;
         con1.VolumeModifier = v1;
         con1.AudioSource.mute = true;
-        
+
+        MuteAndDestroyAfter(con1, 5.0f);
+
         //con1.AudioSource.volume = 0;
 
         //con1.AudioSource.Stop();
     }
+
+    private static void MuteAndDestroyAfter(AudioSourceContainer source, float time)
+    {
+        Instance.StartCoroutine(MuteAndDestroyAfterCR(source, time));
+    }
+
+    private static IEnumerator MuteAndDestroyAfterCR(AudioSourceContainer source, float time)
+    {
+        source.AudioSource.mute = true;
+        float dt = 0;
+
+        Debug.Log("MuteAndDestroyAfterCR");
+
+        while (dt < time && source.AudioSource.mute)
+        {
+            dt += Time.deltaTime;
+            yield return null;
+        }
+
+        if (source.AudioSource.mute)
+            Instance.Destroy(source);
+        
+        yield break;
+    }
+
+
 
     private static void ResumeUnmuteEtc(AudioSourceContainer con1)
     {
@@ -297,6 +325,9 @@ public class AudioManager : Singleton<AudioManager>
         // Keep Running till it has stopped for one second
         while (TimeStopped < 0.5f)
         {
+            if (source == null)
+                yield break;
+
             if (source.AudioSource.time == 0)
                 TimeStopped += Time.deltaTime;
             else
@@ -305,15 +336,23 @@ public class AudioManager : Singleton<AudioManager>
             yield return null;
         }
 
-        Debug.Log("DESTROY " + source.gameObject.name);
+        Instance.Destroy(source);
+        //source = null;
+    }
 
-        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(source.Layer);
+    #endregion
+
+    #region Remove
+
+    private void Destroy(AudioSourceContainer source)
+    {
+        Debug.Log("DESTROY " + source.gameObject.name);
         
+        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(source.Layer);
+
         Instance.AudioSources.Remove(source);
         GameObject.DestroyImmediate(source.gameObject);
         settings.ClipsPlaying--;
-
-        //source = null;
     }
 
     #endregion
