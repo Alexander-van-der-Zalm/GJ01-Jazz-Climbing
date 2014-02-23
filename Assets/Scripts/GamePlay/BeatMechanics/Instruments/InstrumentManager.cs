@@ -8,6 +8,7 @@ public class InstrumentManager : MonoBehaviour
     public Instrument InstrumentInHand;
     public List<Instrument> InstrumentsInCollection;
     private ControlScheme controlScheme;
+    private Transform player;
 
 	// Use this for initialization
 	void Start () 
@@ -17,6 +18,7 @@ public class InstrumentManager : MonoBehaviour
         InstrumentInHand.gameObject.SetActive(true);
         InstrumentInHand.transform.position = transform.position;
         InstrumentInHand.transform.parent = transform;
+        player = transform.parent.Find("PlayerCharacter");
 	}
 	
 	// Update is called once per frame
@@ -26,5 +28,9 @@ public class InstrumentManager : MonoBehaviour
         {
             InstrumentInHand.ActivateInstrument();
         }
+
+        Vector3 scale = transform.localScale;
+        scale.x = player.localScale.x;
+        transform.localScale = scale;
 	}
 }

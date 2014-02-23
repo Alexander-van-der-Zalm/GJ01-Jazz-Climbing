@@ -284,7 +284,7 @@ public class Instrument : MonoBehaviour
         List<FlyingNote> notes = new List<FlyingNote>();
         for (int i = 0; i < NoteSettings.NotesPerPulse; i++)
         {
-            Vector2 dir = Vector2.right * Mathf.Sign(transform.localScale.x);
+            Vector2 dir = Vector2.right * Mathf.Sign(transform.parent.transform.localScale.x);
             notes.Add(NoteSettings.Note.CreateNote(transform.position, dir, (int)Settings.Damage));
         }
     }
