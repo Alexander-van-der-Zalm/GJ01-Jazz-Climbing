@@ -13,7 +13,10 @@ public class InstrumentManager : MonoBehaviour
 	void Start () 
     {
         controlScheme = ControlManager.Instance.ControlSchemes[0];
-        InstrumentInHand = InstrumentsInCollection.First();
+        InstrumentInHand = ((GameObject)GameObject.Instantiate(InstrumentsInCollection.First().gameObject)).GetComponent<Instrument>();
+        InstrumentInHand.gameObject.SetActive(true);
+        InstrumentInHand.transform.position = transform.position;
+        InstrumentInHand.transform.parent = transform;
 	}
 	
 	// Update is called once per frame

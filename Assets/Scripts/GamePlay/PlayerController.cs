@@ -154,7 +154,8 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         Grab = transform.parent.transform.Find("Grab");
-
+        Transform Instrument = transform.parent.transform.Find("InstrumentLocation");
+        ChildTrigger2DDelegates instrumentDels = ChildTrigger2DDelegates.AddChildTrigger2D(Instrument.gameObject, transform);
         ChildTrigger2DDelegates grabDels = ChildTrigger2DDelegates.AddChildTrigger2D(Grab.gameObject, transform);
 
         //grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
