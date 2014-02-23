@@ -2,19 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum JazzClimbingPlayerActions
+{
+    Jump = 0,
+    Dash = 1,
+    Interact = 2,
+    Slide = 3,
+    PlayInstrument = 4
+}
+
 [RequireComponent(typeof(ControlScheme))]
 public class PlayerController : MonoBehaviour
 {
     #region Helper Enums & Classes
-
-    public enum JazzClimbingPlayerActions
-    {
-        Jump = 0,
-        Dash = 1,
-        Interact = 2,
-        Slide = 3,
-        PlayInstrument = 4
-    }
 
     public enum PlayerState
     {
