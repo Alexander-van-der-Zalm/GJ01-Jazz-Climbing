@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class Instrument : MonoBehaviour 
 {
-    public enum ActivationMode
+    public enum InstrumentActivationMode
     {
         DurationSoundClip,
         SinglePress,
@@ -18,14 +18,29 @@ public class Instrument : MonoBehaviour
     public float CriticalModifier;
     public int Cost;
     public bool AClipForEveryBeat;
-    public ActivateDel ActivateDelegate;
+    public InstrumentActivationMode ActivationMode;
+    //public delegate void ActivateDel();
+    //public ActivateDel ActivateDelegate;
+
 
     private InstrumentClip lastInstrumentClip;
 
-    private void ActivateDurationSoundClip()
+    public void ActivateInstrument()
     {
-
+        AudioSourceContainer audioContainer = Activate();
+        switch (ActivationMode)
+        {
+            case InstrumentActivationMode.DurationSoundClip:
+                ActivateDurationSoundClip(audioContainer);
+                break;
+            default:
+                Debug.Log("Sorry not Implemented yet");
+                break;
+        }
     }
+
+
+    #region SoundActivate
 
     private AudioSourceContainer Activate()
     {
@@ -53,6 +68,8 @@ public class Instrument : MonoBehaviour
         AudioSample sample = AudioManager.FindSampleFromCurrentLibrary(clip.SampleName);
         AudioSourceContainer container = AudioManager.Play(sample);
 
+        lastInstrumentClip = clip;
+
         return container;
     }
 
@@ -67,16 +84,24 @@ public class Instrument : MonoBehaviour
         return clips;
     }
 
+    #endregion
+
+    #region Duration Activate
+
     private IEnumerator ActivateDurationSoundClipCR()
     {
         // Not implemented
         yield return null;
     }
 
-    public delegate void ActivateDel();
+    private void ActivateDurationSoundClip(AudioSourceContainer audioContainer)
+    {
 
+    }
 
-	// Use this for initialization
+    #endregion
+
+    // Use this for initialization
 	void Start () 
     {
 	    
@@ -87,4 +112,9 @@ public class Instrument : MonoBehaviour
     {
 	
 	}
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log("Collision");
+    }
 }
