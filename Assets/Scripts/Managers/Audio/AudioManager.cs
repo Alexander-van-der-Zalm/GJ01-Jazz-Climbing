@@ -153,6 +153,84 @@ public class AudioManager : Singleton<AudioManager>
     //    UpdateVolume(layer);
     //}
 
+    #region CrossFade
+
+    public static void CrossFade(AudioSample sampleFrom, AudioSample sampleTO, float duration)
+    {
+        Instance.StartCoroutine(crossFadeCR(sampleFrom, sampleTO, duration));
+    }
+
+    private static IEnumerator crossFadeCR(AudioSample sampleFrom, AudioSample sampleTO, float duration)
+    {
+        float dt = 0;
+        AudioSourceContainer con1 = FindOrPlay(sampleFrom);
+        AudioSourceContainer con2 = FindOrPlay(sampleTO);
+
+        float v1 = con1.VolumeModifier;//con1.AudioSource.volume;
+        float v2 = con2.VolumeModifier;//con2.AudioSource.volume;
+
+        ResumeUnmuteEtc(con1);
+        ResumeUnmuteEtc(con2);
+        
+        con2.AudioSource.Play();
+
+        Debug.Log("XF in AM: " + con1.VolumeModifier + "," + con2.VolumeModifier + " dur " + duration + " dt " + dt + " " + con1.gameObject.GetInstanceID() + ", " + con2.gameObject.GetInstanceID());
+
+        float startTime = Time.timeSinceLevelLoad;
+
+        while (dt < duration)
+        {
+            float t = dt / duration;
+
+            con1.VolumeModifier = Mathf.Max((1 - t),0) * v1;
+            con2.VolumeModifier = Mathf.Min(t,1)* v2;
+            
+            //Debug.Log(t);
+
+            dt = Time.timeSinceLevelLoad - startTime;
+            yield return null;
+        }
+
+        Debug.Log("XF FIN in AM: " + con1.VolumeModifier + "," + con2.VolumeModifier + " dur " + duration + " dt " + dt);
+        con2.VolumeModifier = v2;
+        con1.VolumeModifier = v1;
+        con1.AudioSource.mute = true;
+        
+        //con1.AudioSource.volume = 0;
+
+        //con1.AudioSource.Stop();
+    }
+
+    private static void ResumeUnmuteEtc(AudioSourceContainer con1)
+    {
+        if (!con1.AudioSource.isPlaying)
+            con1.AudioSource.Play();
+
+        con1.AudioSource.mute = false;
+    }
+
+    #endregion
+
+    private static AudioSourceContainer FindOrPlay(AudioSample sample)//, Transform tr = null, Vector3 pos = null)
+    {
+        List<AudioSourceContainer> conts = Instance.FindSources(sample);
+        AudioSourceContainer cont;
+
+        if (conts.Count > 0)
+        {
+            cont = conts.First();
+            Debug.Log("FOUND");
+        }
+        else
+        {
+            cont = Play(sample);
+            
+            Debug.Log("PLAY");
+        }
+
+        return cont;
+    }
+
     public static void UpdateVolume(AudioLayer layer)
     {
         AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(layer);
@@ -173,7 +251,7 @@ public class AudioManager : Singleton<AudioManager>
 
     }
 
-    public static void Lerp(AudioSample clip1, AudioSample clip2, float t) { }
+    //public static void Lerp(AudioSample clip1, AudioSample clip2, float t) { }
 
     //private 
     public static AudioSample FindSampleFromCurrentLibrary(string name)
@@ -184,7 +262,7 @@ public class AudioManager : Singleton<AudioManager>
 
     #region Audio Source Management
 
-    #region Add
+    #region Add & Destroy Coroutine
 
     private static AudioSourceContainer RegisterAndCreateAudioSourceContainer(AudioSample sample)
     {
@@ -227,7 +305,7 @@ public class AudioManager : Singleton<AudioManager>
             yield return null;
         }
 
-        Debug.Log("DESTROY Object");
+        Debug.Log("DESTROY " + source.gameObject.name);
 
         AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(source.Layer);
         
@@ -250,7 +328,7 @@ public class AudioManager : Singleton<AudioManager>
 
     private List<AudioSourceContainer> FindSources(AudioLayer layer) { return AudioSources.Where(a => a.Layer == layer).ToList(); }
     private List<AudioSourceContainer> FindSources(AudioClip clip) { return AudioSources.Where(a => a.AudioSource.clip == clip).ToList(); }
-    //private List<AudioSourceContainer> FindSources(AudioSample sample) { return AudioSources.Where(a => a.Sample == sample).ToList(); }
+    private List<AudioSourceContainer> FindSources(AudioSample sample) { return AudioSources.Where(a => a.Sample == sample).ToList(); }
 
     #endregion
 }

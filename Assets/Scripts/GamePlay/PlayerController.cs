@@ -551,7 +551,7 @@ public class PlayerController : MonoBehaviour
         float g = (2*h)/(t*t);
         float v = Mathf.Sqrt(2*g*h);
 
-        Debug.Log("JUMP");
+        //Debug.Log("JUMP");
         //Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
         //Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
 
@@ -718,7 +718,7 @@ public class PlayerController : MonoBehaviour
         {
             //floorIds.Add(id);
             floorsInCollision.Add(other.gameObject);
-            Debug.Log("ENTER Floors: " + floorsInCollision.Count + " id " + id);
+            //Debug.Log("ENTER Floors: " + floorsInCollision.Count + " id " + id);
         }
 
         if (other.tag == "Wall" && !lastSlided.Contains(id))
@@ -787,7 +787,7 @@ public class PlayerController : MonoBehaviour
         {
             //floorIds.Remove(id);
             floorsInCollision.Remove(other.gameObject);
-            Debug.Log("EXIT Floors: " + floorsInCollision.Count);
+            //Debug.Log("EXIT Floors: " + floorsInCollision.Count);
         }
     }
 

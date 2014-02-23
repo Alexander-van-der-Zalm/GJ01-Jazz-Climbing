@@ -613,7 +613,7 @@ GameObject:
   - 114: {fileID: 39511734}
   - 58: {fileID: 39511736}
   m_Layer: 0
-  m_Name: AudioZoneTrigger
+  m_Name: AudioZoneTrigger_Drum2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -631,8 +631,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e9c785331f400541b1d66483a586c49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: Placeholder
-  AudioSampleName: drum
+  Name: Drum2
+  AudioSampleName: BGM_drum2
+  CrossFadeTime: 3
 --- !u!4 &39511735
 Transform:
   m_ObjectHideFlags: 0
@@ -640,7 +641,7 @@ Transform:
   m_PrefabInternal: {fileID: 1680648683}
   m_GameObject: {fileID: 39511733}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.642046, y: 24.0022297, z: .00146484375}
+  m_LocalPosition: {x: 4.90589619, y: 24.0022297, z: .00146484375}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -4228,8 +4229,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Samples:
-  - Name: drum
-    Clip: {fileID: 8300000, guid: 938b9bff68f244946bec256c4db67c8b, type: 3}
+  - Name: BGM_drum1
+    Clip: {fileID: 8300000, guid: c50c6b98ae0784449a3ac92dada7ae75, type: 3}
     Layer: 1
     Settings:
       Volume: 1
@@ -4245,7 +4246,7 @@ MonoBehaviour:
       MaxDistance: 500
       Pan2D: 1
   - Name: sax1
-    Clip: {fileID: 8300000, guid: 2ac872901fa35c643ac26bab98bd3881, type: 3}
+    Clip: {fileID: 8300000, guid: 38428db7fa8521f4392efe00c19d2920, type: 3}
     Layer: 2
     Settings:
       Volume: 1
@@ -4261,11 +4262,27 @@ MonoBehaviour:
       MaxDistance: 500
       Pan2D: 1
   - Name: sax2
-    Clip: {fileID: 8300000, guid: dbe1649144ec83f44ae736a2da437c83, type: 3}
+    Clip: {fileID: 8300000, guid: b84762271335fea4c811a336ed51c26e, type: 3}
     Layer: 2
     Settings:
       Volume: 1
       Loop: 0
+      Priority: 128
+      Pitch: 1
+      BypassEffects: 0
+      BypassListenerEffects: 0
+      BypassReverbZones: 0
+      DopplerLevel: 1
+      PanLevel: 1
+      Spread: 0
+      MaxDistance: 500
+      Pan2D: 1
+  - Name: BGM_drum2
+    Clip: {fileID: 8300000, guid: 3136bd0b95519344dad73dbc3b97913a, type: 3}
+    Layer: 1
+    Settings:
+      Volume: 1
+      Loop: 1
       Priority: 128
       Pitch: 1
       BypassEffects: 0
@@ -6034,19 +6051,24 @@ MonoBehaviour:
   Sounds:
   - SampleName: sax1
     BeatTarget: 0
-    range: .200000003
+    range: 1
     IsCritical: 0
-    Volume: 1
+    Volume: .75
   - SampleName: sax2
-    BeatTarget: 0
-    range: .75
-    IsCritical: 0
-    Volume: 1
-  - SampleName: sax1
     BeatTarget: 0
     range: 1
     IsCritical: 0
     Volume: .75
+  - SampleName: sax2
+    BeatTarget: 0
+    range: .100000001
+    IsCritical: 1
+    Volume: 1
+  - SampleName: sax1
+    BeatTarget: 0
+    range: .100000001
+    IsCritical: 1
+    Volume: 1
   Damage: 0
   CriticalModifier: 0
   Cost: 0
@@ -26825,6 +26847,10 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1102187056}
     m_Modifications:
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.size
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -26859,7 +26885,51 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
       propertyPath: Sounds.Array.data[1].range
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[0].range
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[2].SampleName
+      value: sax2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[2].Volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[2].range
+      value: .100000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[3].SampleName
+      value: sax1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[3].range
+      value: .100000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[3].Volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[1].Volume
       value: .75
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[0].Volume
+      value: .75
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[3].IsCritical
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[2].IsCritical
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
@@ -29387,6 +29457,61 @@ SpriteRenderer:
   m_SortingLayerID: 4081136285
   m_Sprite: {fileID: 21300008, guid: d3952fc2bf55bc84987efac8123d09e7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1 &1155465491
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+  m_PrefabInternal: {fileID: 1381238174}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1155465494}
+  - 114: {fileID: 1155465493}
+  - 58: {fileID: 1155465492}
+  m_Layer: 0
+  m_Name: AudioZoneTrigger_Drum1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!58 &1155465492
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 5800000, guid: 9b32179d52cffb849b88cd967267bb69,
+    type: 2}
+  m_PrefabInternal: {fileID: 1381238174}
+  m_GameObject: {fileID: 1155465491}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Radius: 3
+  m_Center: {x: 0, y: 0}
+--- !u!114 &1155465493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69,
+    type: 2}
+  m_PrefabInternal: {fileID: 1381238174}
+  m_GameObject: {fileID: 1155465491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e9c785331f400541b1d66483a586c49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Drum1
+  AudioSampleName: BGM_drum1
+  CrossFadeTime: 3
+--- !u!4 &1155465494
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+  m_PrefabInternal: {fileID: 1381238174}
+  m_GameObject: {fileID: 1155465491}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.9116392, y: 26.6049385, z: .00146484375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
 --- !u!1 &1156369109
 GameObject:
   m_ObjectHideFlags: 0
@@ -34854,6 +34979,62 @@ SpriteRenderer:
   m_SortingLayerID: 4081136285
   m_Sprite: {fileID: 21300004, guid: 817b2c4b04fb57b46a0b969ec094d970, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1001 &1381238174
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 15.9116392
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 26.6049385
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: .00146484375
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_Name
+      value: AudioZoneTrigger_Drum1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: AudioSampleName
+      value: BGM_drum1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: Name
+      value: Drum1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: CrossFadeTime
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+  m_RootGameObject: {fileID: 1155465491}
+  m_IsPrefabParent: 0
+  m_IsExploded: 1
 --- !u!1 &1384809192
 GameObject:
   m_ObjectHideFlags: 0
@@ -41042,7 +41223,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 11.642046
+      value: 4.90589619
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: m_LocalPosition.y
@@ -41067,6 +41248,22 @@ Prefab:
     - target: {fileID: 400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
       propertyPath: m_LocalRotation.w
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: m_Name
+      value: AudioZoneTrigger_Drum2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: AudioSampleName
+      value: BGM_drum2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: Name
+      value: Drum2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}
+      propertyPath: CrossFadeTime
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9b32179d52cffb849b88cd967267bb69, type: 2}

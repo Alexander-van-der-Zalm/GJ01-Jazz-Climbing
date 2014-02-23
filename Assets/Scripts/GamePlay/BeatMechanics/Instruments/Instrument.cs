@@ -49,7 +49,9 @@ public class Instrument : MonoBehaviour
     {
         int beat = (int)Mathf.Round(GlobalBeat.ProgressInMeasure());
         float dist = GlobalBeat.SecondsFromBeat();
-        
+
+        Debug.Log("Range: " + dist);
+
         // Clips in range
         // Filter out the farther ones?
         List<InstrumentClip> clips = Sounds.Where(c => dist < c.range).ToList();
@@ -57,7 +59,7 @@ public class Instrument : MonoBehaviour
         if (AClipForEveryBeat)
             clips = clips.Where(c => c.BeatTarget == beat).ToList();
 
-        Debug.Log("bf crits: " + dist + " " + clips.Count);
+        
 
         // Check for criticals (else just return the same list)
         //clips = ReturnCritsIfCritical(clips);
@@ -112,6 +114,9 @@ public class Instrument : MonoBehaviour
         lastInstrumentClip = clip;
         LastSampleName = clip.SampleName;
         isPlaying = true;
+
+        container.VolumeModifier = clip.Volume;
+        //cont
 
         return container;
     }

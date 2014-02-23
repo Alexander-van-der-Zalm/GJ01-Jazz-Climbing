@@ -14,7 +14,6 @@ public class InstrumentManager : MonoBehaviour
     {
         controlScheme = ControlManager.Instance.ControlSchemes[0];
         InstrumentInHand = InstrumentsInCollection.First();
-
 	}
 	
 	// Update is called once per frame

@@ -26,6 +26,9 @@ public class AudioSourceContainer  : MonoBehaviour
     [RangeAttribute(0, 1)]
     private float volumeModifier = 1;
 
+    [HideInInspector]
+    public AudioSample Sample;
+
     #endregion
 
     #region Constructors
@@ -37,6 +40,7 @@ public class AudioSourceContainer  : MonoBehaviour
         AudioSourceContainer container = soundObject.AddComponent<AudioSourceContainer>();
         container.AudioSource = soundObject.AddComponent<AudioSource>();
         container.Name = sample.Name;
+        container.Sample = sample;
 
         container.SetSettingsFromSample(sample);
 
