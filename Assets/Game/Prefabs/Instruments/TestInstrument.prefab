@@ -41,24 +41,33 @@ MonoBehaviour:
   Sounds:
   - SampleName: sax1
     BeatTarget: 0
-    range: .200000003
+    range: 1
     IsCritical: 0
-    Volume: 1
+    Volume: .75
+    MinDuration: 1.20000005
+  - SampleName: sax2
+    BeatTarget: 0
+    range: 1
+    IsCritical: 0
+    Volume: .75
+    MinDuration: 1.20000005
   - SampleName: sax2
     BeatTarget: 0
     range: .100000001
     IsCritical: 1
     Volume: 1
+    MinDuration: 1.20000005
   - SampleName: sax1
     BeatTarget: 0
-    range: 1
-    IsCritical: 0
-    Volume: .75
+    range: .100000001
+    IsCritical: 1
+    Volume: 1
+    MinDuration: 1.20000005
   Damage: 0
   CriticalModifier: 0
   Cost: 0
   AClipForEveryBeat: 0
-  ActivationMode: 0
+  ActivationMode: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

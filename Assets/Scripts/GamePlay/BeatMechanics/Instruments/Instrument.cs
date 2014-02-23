@@ -8,8 +8,17 @@ public class Instrument : MonoBehaviour
     public enum InstrumentActivationMode
     {
         DurationSoundClip,
-        SinglePress,
+        DurationMinimumFromInstrumentClip,
+        SinglePressOverride,
+        //SinglePressOverrideCD,
         MultiplePresses
+    }
+
+    private enum TimingType
+    {
+        Critical,
+        Normal,
+        Low
     }
 
 
@@ -26,9 +35,13 @@ public class Instrument : MonoBehaviour
     private InstrumentClip lastInstrumentClip;
 
     private bool isPlaying = false;
+    private TimingType timingType;
 
     public void ActivateInstrument()
     {
+        if (isPlaying)
+            return;
+
         InstrumentClip clip = GetInstrumentClip();
 
         switch (ActivationMode)
@@ -36,14 +49,19 @@ public class Instrument : MonoBehaviour
             case InstrumentActivationMode.DurationSoundClip:
                 ActivateDurationSoundClip(clip);
                 break;
+            case InstrumentActivationMode.DurationMinimumFromInstrumentClip:
+                ActivateDurationInstrumentClip(clip);
+                break;
+            case InstrumentActivationMode.SinglePressOverride:
+                ActivateSingleOverride(clip);
+                break;
             default:
                 Debug.Log("Sorry not Implemented yet");
                 break;
         }
     }
 
-
-    #region SoundActivate
+    #region GetInstrumentClip
 
     private InstrumentClip GetInstrumentClip()
     {
@@ -60,9 +78,8 @@ public class Instrument : MonoBehaviour
             clips = clips.Where(c => c.BeatTarget == beat).ToList();
 
         
-
         // Check for criticals (else just return the same list)
-        //clips = ReturnCritsIfCritical(clips);
+        clips = ReturnCritsIfCritical(clips);
 
 
         // Play a different clip than the last one if its possible
@@ -75,6 +92,12 @@ public class Instrument : MonoBehaviour
 
         // Find a random clip from the list
         InstrumentClip clip = clips[Random.Range(0, clips.Count)];
+
+        if (clip.IsCritical)
+            timingType = TimingType.Critical;
+        else
+            timingType = TimingType.Normal;
+        //No low yet
 
         return clip;
     }
@@ -100,6 +123,10 @@ public class Instrument : MonoBehaviour
         return clips;
     }
 
+#endregion
+
+    #region PlayCLip
+
 
     private AudioSourceContainer PlayClip(InstrumentClip clip)
     {
@@ -124,26 +151,73 @@ public class Instrument : MonoBehaviour
     
     #endregion
 
-    #region Duration Activate
+    #region Activate Single Override
+
+    private void ActivateSingleOverride(InstrumentClip clip)
+    {
+        // Find & StopClip
+        if (lastInstrumentClip != null)
+        {
+            AudioSample sample = AudioManager.FindSampleFromCurrentLibrary(lastInstrumentClip.SampleName);
+            AudioManager.Stop(sample);
+        }
+
+        AudioSourceContainer container = PlayClip(clip);
+        isPlaying = false;
+    }
+
+    #endregion
+
+    #region Duration Minimum InstrumentClip
+
+    private void ActivateDurationInstrumentClip(InstrumentClip clip)
+    {
+        StartCoroutine(ActivateDurationInstrumentClipCR(clip));
+    }
+
+    private IEnumerator ActivateDurationInstrumentClipCR(InstrumentClip clip)
+    {
+        //if (isPlaying)
+        //    yield break;
+
+        AudioSourceContainer container = PlayClip(clip);
+
+        float dt = 0;
+
+        while (dt < clip.MinDuration)
+        {
+            dt += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("New Clip Possible");
+        isPlaying = false;
+    }
+
+    #endregion
+
+    #region Duration SoundClip
+
+    private void ActivateDurationSoundClip(InstrumentClip clip)
+    {
+        StartCoroutine(ActivateDurationSoundClipCR(clip));
+    }
 
     private IEnumerator ActivateDurationSoundClipCR(InstrumentClip clip)
     {
-        if (isPlaying)
-            yield break;
+        //if (isPlaying)
+        //    yield break;
         
         AudioSourceContainer container = PlayClip(clip);
 
         while (container.AudioSource.isPlaying)
             yield return null;
 
-        Debug.Log("Not Playing");
+        //Debug.Log("Not Playing");
         isPlaying = false;
     }
 
-    private void ActivateDurationSoundClip(InstrumentClip clip)
-    {
-        StartCoroutine(ActivateDurationSoundClipCR(clip));
-    }
+   
 
     #endregion
 

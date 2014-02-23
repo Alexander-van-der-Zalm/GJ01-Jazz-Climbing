@@ -44,7 +44,7 @@ public class AudioManager : Singleton<AudioManager>
     public static void Stop() { Stop(Instance.AudioSources); }
     public static void Stop(int AudioSourceID) { Stop(Instance.FindSource(AudioSourceID)); }
     public static void Stop(AudioLayer layer) { Stop(Instance.FindSources(layer)); }
-    //public static void Stop(AudioSample sample) { Stop(Instance.FindSources(sample)); }
+    public static void Stop(AudioSample sample) { Stop(Instance.FindSources(sample)); }
     public static void Stop(AudioClip clip) { Stop(Instance.FindSources(clip)); }
    
     public static void Stop(List<AudioSourceContainer> sources) 
@@ -342,21 +342,6 @@ public class AudioManager : Singleton<AudioManager>
 
     #endregion
 
-    #region Remove
-
-    private void Destroy(AudioSourceContainer source)
-    {
-        Debug.Log("DESTROY " + source.gameObject.name);
-        
-        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(source.Layer);
-
-        Instance.AudioSources.Remove(source);
-        GameObject.DestroyImmediate(source.gameObject);
-        settings.ClipsPlaying--;
-    }
-
-    #endregion
-
     // AudioSources    
     // Find by lambda:
     // - ID (s)
@@ -370,4 +355,21 @@ public class AudioManager : Singleton<AudioManager>
     private List<AudioSourceContainer> FindSources(AudioSample sample) { return AudioSources.Where(a => a.Sample == sample).ToList(); }
 
     #endregion
+
+
+    #region Remove
+
+    private void Destroy(AudioSourceContainer source)
+    {
+        //Debug.Log("DESTROY " + source.gameObject.name);
+
+        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(source.Layer);
+
+        Instance.AudioSources.Remove(source);
+        GameObject.DestroyImmediate(source.gameObject);
+        settings.ClipsPlaying--;
+    }
+
+    #endregion
+
 }

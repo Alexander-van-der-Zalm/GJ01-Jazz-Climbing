@@ -9,4 +9,5 @@ public class InstrumentClip
     public float range;
     public bool IsCritical;
     public float Volume;
+    public float MinDuration;
 }
