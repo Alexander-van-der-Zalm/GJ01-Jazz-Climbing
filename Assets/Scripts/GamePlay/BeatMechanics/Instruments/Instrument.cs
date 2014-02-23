@@ -3,8 +3,10 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Instrument : MonoBehaviour 
+public class Instrument : MonoBehaviour
 {
+    #region Enums
+
     public enum InstrumentActivationMode
     {
         DurationSoundClip,
@@ -21,6 +23,9 @@ public class Instrument : MonoBehaviour
         Low
     }
 
+    #endregion
+
+    #region fields
 
     public List<InstrumentClip> Sounds;
     public float Damage;
@@ -36,6 +41,10 @@ public class Instrument : MonoBehaviour
 
     private bool isPlaying = false;
     private TimingType timingType;
+
+    #endregion
+
+    #region Main Activate
 
     public void ActivateInstrument()
     {
@@ -60,6 +69,8 @@ public class Instrument : MonoBehaviour
                 break;
         }
     }
+
+    #endregion
 
     #region GetInstrumentClip
 
@@ -220,6 +231,13 @@ public class Instrument : MonoBehaviour
    
 
     #endregion
+
+    #region Instantiate Instrument
+
+
+
+    #endregion
+
 
     // Use this for initialization
 	void Start () 
