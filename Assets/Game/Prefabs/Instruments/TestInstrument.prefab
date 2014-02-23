@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 114: {fileID: 11400000}
+  - 60: {fileID: 6000000}
   m_Layer: 0
   m_Name: TestInstrument
   m_TagString: Untagged
@@ -23,10 +24,27 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: .160146713, y: -3.81469727e-06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!60 &6000000
+PolygonCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Poly:
+    m_Paths:
+    - - {x: 3.27231312, y: 1.41960907}
+      - {x: 4.21471119, y: .859754562}
+      - {x: 4.25784302, y: -.307998657}
+      - {x: 3.42400646, y: -.852796555}
+      - {x: .0554571152, y: -.31593895}
+      - {x: .0495014191, y: .392471313}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -38,6 +56,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce34e1cb1196a9749ac4206569346f3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Settings:
+    Damage: 5
+    CriticalModifier: 3
+    Cost: 20
+  NoteSettings:
+    Note: {fileID: 0}
+    NotesPerPulse: 100
+    InitialVelocity: 30
+    RandomVelocityOffset: 0
+    ConeAngle: 30
   Sounds:
   - SampleName: sax1
     BeatTarget: 0
@@ -63,11 +91,9 @@ MonoBehaviour:
     IsCritical: 1
     Volume: 1
     MinDuration: 1.20000005
-  Damage: 0
-  CriticalModifier: 0
-  Cost: 0
   AClipForEveryBeat: 0
   ActivationMode: 1
+  CollisionMode: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

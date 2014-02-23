@@ -5,6 +5,6 @@ PhysicsMaterial2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Bouuncy
-  friction: .400000006
-  bounciness: 0
+  m_Name: Bouncy_1
+  friction: 0
+  bounciness: .781000018

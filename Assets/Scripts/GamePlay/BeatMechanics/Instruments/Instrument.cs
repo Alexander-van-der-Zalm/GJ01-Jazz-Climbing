@@ -16,6 +16,12 @@ public class Instrument : MonoBehaviour
         MultiplePresses
     }
 
+    public enum InstrumentCollisionMode
+    {
+        Direct,
+        PulsingOnVolume
+    }
+
     private enum TimingType
     {
         Critical,
@@ -25,16 +31,37 @@ public class Instrument : MonoBehaviour
 
     #endregion
 
+    [System.Serializable]
+    public class FlyingNoteSettings
+    {
+        public FlyingNote Note;
+        [Range(0,100)]
+        public int NotesPerPulse;
+        [Range(0,200)]
+        public float InitialVelocity;
+        [Range(0,100)]
+        public float RandomVelocityOffset;
+        [Range(0,180)]
+        public float ConeAngle;
+    }
+
+    [System.Serializable]
+    public class InstrumentSettings
+    {
+        public float Damage;
+        public float CriticalModifier;
+        public int Cost;
+    }
+
     #region fields
 
+    public InstrumentSettings Settings;
+    public FlyingNoteSettings NoteSettings;
+
     public List<InstrumentClip> Sounds;
-    public float Damage;
-    public float CriticalModifier;
-    public int Cost;
     public bool AClipForEveryBeat;
     public InstrumentActivationMode ActivationMode;
-    //public delegate void ActivateDel();
-    //public ActivateDel ActivateDelegate;
+    public InstrumentCollisionMode CollisionMode;
 
     private string LastSampleName;
     private InstrumentClip lastInstrumentClip;
@@ -65,7 +92,19 @@ public class Instrument : MonoBehaviour
                 ActivateSingleOverride(clip);
                 break;
             default:
-                Debug.Log("Sorry not Implemented yet");
+                Debug.Log("Sorry " + CollisionMode.ToString() + "not Implemented yet");
+                break;
+        }
+
+        Debug.Log("x");
+
+        switch (CollisionMode)
+        {
+            case InstrumentCollisionMode.Direct:
+                GenerateDirectNote();
+                break;
+            default:
+                Debug.Log("Sorry " + CollisionMode.ToString() + "not Implemented yet");
                 break;
         }
     }
@@ -234,13 +273,26 @@ public class Instrument : MonoBehaviour
 
     #region Instantiate Instrument
 
-
+    
 
     #endregion
 
+    #region Generate Direct Note
+
+    private void GenerateDirectNote()
+    {
+        List<FlyingNote> notes = new List<FlyingNote>();
+        for (int i = 0; i < NoteSettings.NotesPerPulse; i++)
+        {
+            Vector2 dir = Vector2.right * Mathf.Sign(transform.localScale.x);
+            notes.Add(NoteSettings.Note.CreateNote(transform.position, dir, (int)Settings.Damage));
+        }
+    }
+
+    #endregion
 
     // Use this for initialization
-	void Start () 
+    void Start() 
     {
 	    
 	}
