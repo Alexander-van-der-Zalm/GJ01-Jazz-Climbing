@@ -65,11 +65,12 @@ public class Instrument : MonoBehaviour
 
         // Play a different clip than the last one if its possible
         List<InstrumentClip> alternatives = clips.Where(c => c.SampleName != LastSampleName).ToList();//.Where(c => c != lastInstrumentClip).ToList();
-        if (alternatives.Count > 1)
+        if (alternatives.Count > 0)
             clips = alternatives;
 
-        Debug.Log("alternatives: " + dist + " " + clips.Count + " " + LastSampleName);
-        //DebugList
+        //Debug.Log("alternatives: " + alternatives.Count + " " + LastSampleName + " " + dist + " ");
+        //DebugList<string>(alternatives.Select(c => c.SampleName).ToList());
+
         // Find a random clip from the list
         InstrumentClip clip = clips[Random.Range(0, clips.Count)];
 
@@ -81,7 +82,7 @@ public class Instrument : MonoBehaviour
         int i = 0;
         foreach (T t in list)
         {
-            Debug.Log(i + " " + t.ToString());
+            Debug.Log(i + "st in list: " + t.ToString());
             i++;
         }
     }
@@ -106,6 +107,8 @@ public class Instrument : MonoBehaviour
         // Seperate the play from the clip
         AudioSourceContainer container = AudioManager.Play(sample);
 
+        Debug.Log("Play " + sample.Name);
+
         lastInstrumentClip = clip;
         LastSampleName = clip.SampleName;
         isPlaying = true;
@@ -128,7 +131,7 @@ public class Instrument : MonoBehaviour
         while (container.AudioSource.isPlaying)
             yield return null;
 
-        //GameObject.DestroyImmediate(container.gameObject);
+        Debug.Log("Not Playing");
         isPlaying = false;
     }
 
