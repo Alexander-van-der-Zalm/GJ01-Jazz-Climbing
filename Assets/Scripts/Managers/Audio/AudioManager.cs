@@ -174,7 +174,7 @@ public class AudioManager : Singleton<AudioManager>
         
         con2.AudioSource.Play();
 
-        Debug.Log("XF in AM: " + con1.VolumeModifier + "," + con2.VolumeModifier + " dur " + duration + " dt " + dt + " " + con1.gameObject.GetInstanceID() + ", " + con2.gameObject.GetInstanceID());
+        //Debug.Log("XF in AM: " + con1.VolumeModifier + "," + con2.VolumeModifier + " dur " + duration + " dt " + dt + " " + con1.gameObject.GetInstanceID() + ", " + con2.gameObject.GetInstanceID());
 
         float startTime = Time.timeSinceLevelLoad;
 
@@ -191,7 +191,7 @@ public class AudioManager : Singleton<AudioManager>
             yield return null;
         }
 
-        Debug.Log("XF FIN in AM: " + con1.VolumeModifier + "," + con2.VolumeModifier + " dur " + duration + " dt " + dt);
+        //Debug.Log("XF FIN in AM: " + con1.VolumeModifier + "," + con2.VolumeModifier + " dur " + duration + " dt " + dt);
         con2.VolumeModifier = v2;
         con1.VolumeModifier = v1;
         con1.AudioSource.mute = true;
@@ -213,7 +213,7 @@ public class AudioManager : Singleton<AudioManager>
         source.AudioSource.mute = true;
         float dt = 0;
 
-        Debug.Log("MuteAndDestroyAfterCR");
+        //Debug.Log("MuteAndDestroyAfterCR");
 
         while (dt < time && source.AudioSource.mute)
         {
@@ -247,13 +247,13 @@ public class AudioManager : Singleton<AudioManager>
         if (conts.Count > 0)
         {
             cont = conts.First();
-            Debug.Log("FOUND");
+            //Debug.Log("FOUND");
         }
         else
         {
             cont = Play(sample);
             
-            Debug.Log("PLAY");
+            //Debug.Log("PLAY");
         }
 
         return cont;
