@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741dceeb58be95646a4a2073a7f2e426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: 0
+  Gravity: .100000001
   Bouncy: .781000018
   InitialVelocity: 5
   LifeTime: 5

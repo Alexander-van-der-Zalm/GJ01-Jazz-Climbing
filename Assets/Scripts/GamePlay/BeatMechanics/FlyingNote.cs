@@ -47,10 +47,10 @@ public class FlyingNote : MonoBehaviour
 
         //Debug.Log(direction.normalized * (InitialVelocity + additionalVelocity));
         Vector2 vel = direction.normalized * (InitialVelocity + additionalVelocity);
-        Debug.Log(vel);
+        //Debug.Log(vel);
         go.rigidbody2D.velocity = vel;
 
-        Debug.Log(go.rigidbody2D.velocity);
+        //Debug.Log(go.rigidbody2D.velocity);
 
         return note;
     }

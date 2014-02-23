@@ -285,6 +285,7 @@ public class Instrument : MonoBehaviour
         for (int i = 0; i < NoteSettings.NotesPerPulse; i++)
         {
             Vector2 dir = Vector2.right * Mathf.Sign(transform.parent.transform.localScale.x);
+            //dir += Vector2.up * Random.Range(-1, 1) * 0.25f;
             notes.Add(NoteSettings.Note.CreateNote(transform.position, dir, (int)Settings.Damage));
         }
     }
