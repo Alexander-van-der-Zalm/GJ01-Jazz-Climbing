@@ -13,7 +13,9 @@ public class ControlKey
 {
     public ControlKeyType Type;
     public string KeyValue;
+    [HideInInspector]
     public bool LastState = false;
+     [HideInInspector]
     public bool CurState = false;
 
     public ControlKey(ControlKeyType type, string value)

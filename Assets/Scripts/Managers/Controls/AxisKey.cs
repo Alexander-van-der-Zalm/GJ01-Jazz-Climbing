@@ -3,11 +3,12 @@ using System.Collections;
 using XboxCtrlrInput;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class AxisKey
 {
     public ControlKeyType Type;
-    private List<string> keys = new List<string>();
-    private XboxAxisType xboxAxisType;
+    public List<string> keys = new List<string>();
+    public XboxAxisType xboxAxisType;
     //private HorVert horVert;
 
     public enum HorVert

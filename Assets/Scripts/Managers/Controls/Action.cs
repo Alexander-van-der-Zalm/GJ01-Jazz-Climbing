@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using XboxCtrlrInput;
 
+[System.Serializable]
 public class Action : Control 
 {
     public List<ControlKey> Keys;// = new List<ControlKey>();

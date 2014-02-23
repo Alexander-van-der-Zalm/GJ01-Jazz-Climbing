@@ -14,7 +14,8 @@ public class CreateManagerMenu
                 GameObject.DestroyImmediate(manager);
 
         manager = new GameObject();
-        manager.name = "Manager";
+        manager.name = "GlobalManager";
+        manager.AddComponent<ControlManager>();
         manager.AddComponent<AudioManager>();
         manager.AddComponent<AudioLibrary>();
     }

@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     #region Helper Enums & Classes
 
-    public enum PlayerActions
+    public enum JazzClimbingPlayerActions
     {
         Jump = 0,
         Dash = 1,
@@ -121,35 +121,35 @@ public class PlayerController : MonoBehaviour
 	void Awake ()
     {
         #region Controls
-        ControlScheme = gameObject.GetComponent<ControlScheme>();
-        if (ControlScheme == null)
-            ControlScheme = gameObject.AddComponent<ControlScheme>();
+        //ControlScheme = gameObject.GetComponent<ControlScheme>();
+        //if (ControlScheme == null)
+        //    ControlScheme = gameObject.AddComponent<ControlScheme>();
+        ControlScheme = ControlScheme.CreateScheme<JazzClimbingPlayerActions>();
         
-        ControlScheme.SetActionsFromEnum<PlayerActions>();
+        //// Make this a nice function
+        //ControlScheme.Horizontal = new Axis(ControlScheme,"Horizontal");
+        //ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickX));
+        //ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Horizontal));
+        //ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.A,KeyCode.D));
+        //ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.LeftArrow, KeyCode.RightArrow));
 
-        // Make this a nice function
-        ControlScheme.Horizontal = new Axis(ControlScheme,"Horizontal");
-        ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickX));
-        ControlScheme.Horizontal.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Horizontal));
-        ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.A,KeyCode.D));
-        ControlScheme.Horizontal.AxisKeys.Add(AxisKey.PC(KeyCode.LeftArrow, KeyCode.RightArrow));
+        //ControlScheme.Vertical = new Axis(ControlScheme,"Vertical");
+        //ControlScheme.Vertical.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickY));
+        //ControlScheme.Vertical.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Vertical));
+        //ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.S, KeyCode.W));
+        //ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.DownArrow, KeyCode.UpArrow));
 
-        ControlScheme.Vertical = new Axis(ControlScheme,"Vertical");
-        ControlScheme.Vertical.AxisKeys.Add(AxisKey.XboxAxis(XboxCtrlrInput.XboxAxis.LeftStickY));
-        ControlScheme.Vertical.AxisKeys.Add(AxisKey.XboxDpad(AxisKey.HorVert.Vertical));
-        ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.S, KeyCode.W));
-        ControlScheme.Vertical.AxisKeys.Add(AxisKey.PC(KeyCode.DownArrow, KeyCode.UpArrow));
-
-        
 
         // Make this into a nice function
-        //ControlScheme.Actions[(int)PlayerActions.Jump] = new Action(ControlScheme,PlayerActions.Jump.ToString());
-        ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.PCKey(KeyCode.Space));
-        ControlScheme.Actions[(int)PlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
+        ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].Keys.Add(ControlKey.PCKey(KeyCode.Space));
+        ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.A));
 
-        //ControlScheme.Actions[(int)PlayerActions.PlayInstrument] = new Action(ControlScheme, PlayerActions.PlayInstrument.ToString());
-        ControlScheme.Actions[(int)PlayerActions.PlayInstrument].Keys.Add(ControlKey.PCKey(KeyCode.E));
-        ControlScheme.Actions[(int)PlayerActions.PlayInstrument].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.B));
+        ControlScheme.Actions[(int)JazzClimbingPlayerActions.PlayInstrument].Keys.Add(ControlKey.PCKey(KeyCode.E));
+        ControlScheme.Actions[(int)JazzClimbingPlayerActions.PlayInstrument].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.B));
+
+        ControlManager.Instance.ControlSchemes[0] = ControlScheme;
+
+        DontDestroyOnLoad(ControlManager.Instance);
 
         #endregion
 
@@ -303,7 +303,7 @@ public class PlayerController : MonoBehaviour
     {
         HorizontalInput =ControlScheme.Horizontal.Value();
         VerticalInput= ControlScheme.Vertical.Value();
-        InputJump = ControlScheme.Actions[(int)PlayerActions.Jump].IsPressed();
+        InputJump = ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].IsPressed();
 
         // Set Animator floats
         animator.SetFloat("Horizontal", HorizontalInput);
@@ -563,7 +563,7 @@ public class PlayerController : MonoBehaviour
 
         //float vearly = Mathf.Sqrt(v*v+2*g(
 
-        while (flyTime < t && ControlScheme.Actions[(int)PlayerActions.Jump].IsDown())
+        while (flyTime < t && ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].IsDown())
         {
             flyTime = Time.timeSinceLevelLoad - timeStart;
             //Debug.Log(rigidbody2D.velocity + " " + playerState + " g: " + Grounded);
