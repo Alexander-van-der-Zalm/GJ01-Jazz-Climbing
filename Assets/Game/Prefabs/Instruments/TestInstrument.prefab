@@ -62,7 +62,7 @@ MonoBehaviour:
     Cost: 20
   NoteSettings:
     Note: {fileID: 0}
-    NotesPerPulse: 100
+    NotesPerPulse: 5
     InitialVelocity: 30
     RandomVelocityOffset: 0
     ConeAngle: 30

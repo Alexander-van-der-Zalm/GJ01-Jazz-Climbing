@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &400000
 Transform:
   m_ObjectHideFlags: 1
@@ -67,9 +67,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741dceeb58be95646a4a2073a7f2e426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: 5
+  Gravity: 0
   Bouncy: .781000018
-  InitialVelocity: 0
+  InitialVelocity: 5
+  LifeTime: 5
   Damage: 0
 --- !u!212 &21200000
 SpriteRenderer:
@@ -92,7 +93,7 @@ SpriteRenderer:
   m_SortingLayer: 7
   m_SortingOrder: 0
   m_SortingLayerID: 1228881561
-  m_Sprite: {fileID: 21300000, guid: 5b7d239348f843e4bb77bf42692e275f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 21da4a24254f8844193b0056003d2af4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &100100000
 Prefab:

@@ -32,8 +32,9 @@ public class FlyingNote : MonoBehaviour
             return;
         }
         timeAlive += Time.deltaTime;
+        //if(rigidbody2D.velocity == Vector2.zero)
 
-        Debug.Log(rigidbody2D.velocity + " " + (LifeTime - timeAlive));
+        //Debug.Log(rigidbody2D.velocity + " " + (LifeTime - timeAlive));
     }
 
     public FlyingNote CreateNote(Vector3 origin, Vector2 direction, int Damage, float additionalVelocity = 0)
@@ -44,9 +45,12 @@ public class FlyingNote : MonoBehaviour
         FlyingNote note = go.GetComponent<FlyingNote>();
         note.Damage = Damage;
 
-        Debug.Log(direction.normalized * (InitialVelocity + additionalVelocity));
+        //Debug.Log(direction.normalized * (InitialVelocity + additionalVelocity));
+        Vector2 vel = direction.normalized * (InitialVelocity + additionalVelocity);
+        Debug.Log(vel);
+        go.rigidbody2D.velocity = vel;
 
-        rigidbody2D.velocity = direction.normalized * (InitialVelocity + additionalVelocity);
+        Debug.Log(go.rigidbody2D.velocity);
 
         return note;
     }
