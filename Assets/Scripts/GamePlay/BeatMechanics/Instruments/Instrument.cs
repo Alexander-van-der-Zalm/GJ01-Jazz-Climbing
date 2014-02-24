@@ -43,6 +43,8 @@ public class Instrument : MonoBehaviour
         public float RandomVelocityOffset;
         [Range(0,180)]
         public float ConeAngle;
+        [Range(-180,180)]
+        public float OffsetAngle;
     }
 
     [System.Serializable]
@@ -281,16 +283,29 @@ public class Instrument : MonoBehaviour
 
     private void GenerateDirectNote()
     {
-        List<FlyingNote> notes = new List<FlyingNote>();
+        Vector2 baseDir = Vector2.right * Mathf.Sign(transform.parent.transform.localScale.x);
+
         for (int i = 0; i < NoteSettings.NotesPerPulse; i++)
         {
-            Vector2 dir = Vector2.right * Mathf.Sign(transform.parent.transform.localScale.x);
-            //dir += Vector2.up * Random.Range(-1, 1) * 0.25f;
-            notes.Add(NoteSettings.Note.CreateNote(transform.position, dir, (int)Settings.Damage));
+            // Calculate a random vector direction based on the angles in NoteSettings
+            Vector2 noteDir = GetRandomAngleFromSettings(baseDir);
+
+            NoteSettings.Note.CreateNote(transform.position, noteDir, (int)Settings.Damage);
         }
     }
 
     #endregion
+
+    private Vector2 GetRandomAngleFromSettings(Vector2 baseDirection)
+    {
+        // Calculate the a random Angle in the range from the noteSettings
+        float angle = NoteSettings.OffsetAngle + NoteSettings.ConeAngle * Random.Range(-1.0f, 1.0f);
+
+        // Rotate the baseDirection
+        Vector3 noteDir = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1)) * new Vector3(baseDirection.x, baseDirection.y, 0);
+
+        return (Vector2)noteDir;
+    }
 
     // Use this for initialization
     void Start() 
@@ -306,6 +321,6 @@ public class Instrument : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Collision");
+        //Debug.Log("Collision");
     }
 }
