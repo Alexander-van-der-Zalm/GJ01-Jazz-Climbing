@@ -28,6 +28,7 @@ public class FlyingNote : MonoBehaviour
     {
         if (timeAlive >= LifeTime)
         {
+            Debug.Log("Destroy");
             GameObject.DestroyImmediate(this);
             return;
         }
