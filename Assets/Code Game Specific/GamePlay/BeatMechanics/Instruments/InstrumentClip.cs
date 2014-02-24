@@ -6,7 +6,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class InstrumentClip 
 {
-    [AudioLibrarySampleNames]
+    [AudioManagerLibrarySample]
     public string SampleName;
     public int BeatTarget;
     public float range;

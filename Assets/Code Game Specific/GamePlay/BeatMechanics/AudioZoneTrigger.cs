@@ -5,6 +5,7 @@ using System.Collections;
 public class AudioZoneTrigger : MonoBehaviour 
 {
     public string Name;
+    [AudioManagerLibrarySample]
     public string AudioSampleName;
     public float CrossFadeTimeInMeasure = 1.0f;
     private AudioSample Sample;

@@ -17,10 +17,10 @@ TagManager:
   Builtin Layer 6: 
   Builtin Layer 7: 
   User Layer 8: Tiles
-  User Layer 9: FlyingNotes
+  User Layer 9: Player_FlyingNotes
   User Layer 10: Player
   User Layer 11: NPC
-  User Layer 12: 
+  User Layer 12: NPC_FlyingNotes
   User Layer 13: 
   User Layer 14: 
   User Layer 15: 

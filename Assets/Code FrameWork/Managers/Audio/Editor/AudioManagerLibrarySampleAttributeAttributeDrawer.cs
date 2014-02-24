@@ -2,13 +2,13 @@
 using UnityEditor;
 using System.Collections;
 
-[CustomPropertyDrawer(typeof(AudioLibrarySampleNamesAttribute))]
+[CustomPropertyDrawer(typeof(AudioManagerLibrarySampleAttribute))]
 public class AudioLibrarySampleNamesAttributeDrawer : PropertyDrawer 
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         //base.OnGUI(position, property, label);
-        var attrib = attribute as AudioLibrarySampleNamesAttribute;
+        var attrib = attribute as AudioManagerLibrarySampleAttribute;
 
         int index = attrib.list.IndexOf(property.stringValue);
 
@@ -16,6 +16,7 @@ public class AudioLibrarySampleNamesAttributeDrawer : PropertyDrawer
 
         index = EditorGUI.Popup(position, label.text, index, attrib.list.ToArray());
 
+        //property.v
         property.stringValue = attrib.list[index];
     }
 }

@@ -177,7 +177,6 @@ public class Instrument : MonoBehaviour
 
     #region PlayCLip
 
-
     private AudioSourceContainer PlayClip(InstrumentClip clip)
     {
         // Find & PlayClip
@@ -198,7 +197,6 @@ public class Instrument : MonoBehaviour
         return container;
     }
 
-    
     #endregion
 
     #region Activate Single Override
