@@ -17269,6 +17269,22 @@ Prefab:
       propertyPath: NoteSettings.ConeAngle
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[0].TestPopup
+      value: BGM_drum1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[1].TestPopup
+      value: BGM_drum1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[2].TestPopup
+      value: BGM_drum1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Sounds.Array.data[3].TestPopup
+      value: BGM_drum1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
   m_RootGameObject: {fileID: 235669729}

@@ -98,8 +98,6 @@ public class Instrument : MonoBehaviour
                 break;
         }
 
-        Debug.Log("x");
-
         switch (CollisionMode)
         {
             case InstrumentCollisionMode.Direct:
@@ -188,7 +186,7 @@ public class Instrument : MonoBehaviour
         // Seperate the play from the clip
         AudioSourceContainer container = AudioManager.Play(sample);
 
-        Debug.Log("Play " + sample.Name);
+        //Debug.Log("Play " + sample.Name);
 
         lastInstrumentClip = clip;
         LastSampleName = clip.SampleName;
@@ -242,7 +240,7 @@ public class Instrument : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("New Clip Possible");
+        //Debug.Log("New Clip Possible");
         isPlaying = false;
     }
 
