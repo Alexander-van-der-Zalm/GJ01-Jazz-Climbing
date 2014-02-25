@@ -279,7 +279,7 @@ public class Instrument : MonoBehaviour
 
     private void GenerateDirectNote()
     {
-        Vector2 baseDir = Vector2.right * Mathf.Sign(transform.parent.transform.localScale.x);
+        float baseDir = Mathf.Sign(transform.parent.transform.localScale.x);
 
         for (int i = 0; i < NoteSettings.NotesPerPulse; i++)
         {
@@ -292,13 +292,14 @@ public class Instrument : MonoBehaviour
 
     #endregion
 
-    private Vector2 GetRandomAngleFromSettings(Vector2 baseDirection)
+    private Vector2 GetRandomAngleFromSettings(float baseDirection)
     {
         // Calculate the a random Angle in the range from the noteSettings
         float angle = NoteSettings.OffsetAngle + NoteSettings.ConeAngle * Random.Range(-1.0f, 1.0f);
 
         // Rotate the baseDirection
-        Vector3 noteDir = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1)) * new Vector3(baseDirection.x, baseDirection.y, 0);
+        Vector3 noteDir = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1)) * Vector3.right;
+        noteDir.x *= baseDirection;
 
         return (Vector2)noteDir;
     }

@@ -234,7 +234,9 @@ public class AudioManager : Singleton<AudioManager>
         if (!con1.AudioSource.isPlaying)
             con1.AudioSource.Play();
 
-        con1.AudioSource.mute = false;
+        AudioLayerSettings settings = AudioLayerManager.GetAudioLayerSettings(con1.Layer);
+        if(!settings.Mute)
+            con1.AudioSource.mute = false;
     }
 
     #endregion
