@@ -5,11 +5,11 @@ public class Particle : ManagedObject
 {
     public float LifeTime;
 
-	// Use this for initialization
-	void Start () 
+    // Use this for initialization
+    void Start()
     {
         StartCoroutine(DeactivateAfterLifeTime());
-	}
+    }
 
     private IEnumerator DeactivateAfterLifeTime()
     {
@@ -25,15 +25,10 @@ public class Particle : ManagedObject
 
         gameObject.SetActive(false);
     }
-	
-	// Update is called once per frame
-	void Update () 
-    {
-	
-	}
 
-    public void Create()
+    // Update is called once per frame
+    void Update()
     {
-        GameObject go = Create(gameObject);
+
     }
 }

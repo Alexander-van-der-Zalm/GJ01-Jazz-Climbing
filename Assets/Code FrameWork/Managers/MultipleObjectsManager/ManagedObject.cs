@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using UnityEditor;
 
 public class ManagedObject : MonoBehaviour
 {
@@ -40,19 +41,14 @@ public class ManagedObject : MonoBehaviour
     /// deactivates and destroys in a smart manner 
     /// instead of just creating and destroying objects.
     /// </summary>
-    protected GameObject Create(GameObject go)
+    public GameObject Create()
     {
         CheckManager(this.GetType());
-        Debug.Log(manager + "  a  " + this.GetType());
-        //managedObject = 
-        //ID = managedObject.GetInstanceID();
-        //Debug.Log(ID);
-        ManagedObject obj = manager.GetManagedObject(go);
-        Debug.Log(obj.manager);
-        obj.manager = manager;
-        
-        
-        return obj.gameObject;
+        //Debug.Log(go.GetInstanceID() + "  asdf  " + gameObject.GetInstanceID());
+
+        //PrefabUtility.InstantiatePrefab
+
+        return manager.GetManagedObject(gameObject).gameObject;
     }
 
     /// <summary>
