@@ -13,9 +13,12 @@ public class Particle : ManagedObject
         
         public bool Collides;
         public float Radius;
-        [Range(0,1.0f)]
-        public float Bounciness;
-        public float Friction;
+        public PhysicsMaterial2D Material;
+
+        public float Mass;
+        public bool FixedAngle;
+        public float LinearDrag;
+        public float AngularDrag = 0.05f;
     }
 
     protected delegate void OnCollisionDelegate(Collision2D other);
@@ -63,19 +66,19 @@ public class Particle : ManagedObject
             if (collider2D == null)
             {
                 CircleCollider2D cc2d = transform.GetOrAddComponent<CircleCollider2D>();
-                cc2d.radius = PhysicsSettings.Radius; 
+                cc2d.radius = PhysicsSettings.Radius;
+
+                if( PhysicsSettings.Material!=null)
+                    collider2D.sharedMaterial = PhysicsSettings.Material;
             }
-            
-            //if (collider2D.sharedMaterial.bounciness != PhysicsSettings.Bounciness || collider2D.sharedMaterial.friction != PhysicsSettings.Friction)
-            //{
-            //PhysicsMaterial2D mat = Object.Instantiate(PhysicsMaterial2D("newMat");
-            Debug.Log(collider2D.sharedMaterial);
-            //    mat.bounciness = PhysicsSettings.Bounciness;
-            //    mat.friction = PhysicsSettings.Friction;
-            //    collider2D.enabled = false;
-            //    collider2D.sharedMaterial = mat;
-            //    collider2D.enabled = true;
-            //}
+            if (rigidbody2D == null)
+            {
+                transform.GetOrAddComponent<Rigidbody2D>();
+            }
+
+            rigidbody2D.fixedAngle = PhysicsSettings.FixedAngle;
+            rigidbody2D.drag = PhysicsSettings.LinearDrag;
+            rigidbody2D.angularDrag = PhysicsSettings.AngularDrag;
         }
         return base.Create();
     }

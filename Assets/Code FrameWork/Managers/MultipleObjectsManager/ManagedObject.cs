@@ -1,11 +1,18 @@
 ﻿using UnityEngine;
+//using UnityEditor;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Collections;
-using UnityEditor;
+using System.Collections.Generic;
+
 
 public class ManagedObject : MonoBehaviour
 {
+    [HideInInspector, SerializeField]
     private MultipleObjectsManager manager;
+    [HideInInspector,SerializeField]
+    private int ID;
 
     protected virtual void OnEnable()
     {
@@ -25,7 +32,10 @@ public class ManagedObject : MonoBehaviour
     private void CheckManager(Type t)
     {
         if (manager == null)
+        {
             manager = ObjectCEO.GetManager(t);
+            Debug.Log("New manager");
+        }
     }
 
     /// <summary>
@@ -39,8 +49,25 @@ public class ManagedObject : MonoBehaviour
         //Debug.Log(go.GetInstanceID() + "  asdf  " + gameObject.GetInstanceID());
 
         //PrefabUtility.InstantiatePrefab
+        this.ID = GetInstanceID();
 
-        return manager.GetManagedObject(gameObject).gameObject;
+        ManagedObject obj = manager.GetManagedObject(gameObject);
+
+
+        int objID = obj.GetInstanceID();
+        Debug.Log(ID + " " + objID + " " + obj.ID);
+        if (ID != obj.ID)
+        {
+            // Reflection?
+            // Method
+            obj.ID = ID;
+        }
+        //var bindingFlags= BindingFlags.
+        List<string> fieldValues = this.GetType().GetFields().Select(f => f.Name).ToList();
+
+        DebugHelper.LogList<string>(fieldValues);
+        
+        return obj.gameObject;
     }
 
     /// <summary>

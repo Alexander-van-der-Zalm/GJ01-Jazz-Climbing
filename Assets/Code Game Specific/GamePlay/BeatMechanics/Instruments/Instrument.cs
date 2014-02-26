@@ -154,15 +154,7 @@ public class Instrument : MonoBehaviour
         return clip;
     }
 
-    private void DebugList<T>(List<T> list)
-    {
-        int i = 0;
-        foreach (T t in list)
-        {
-            Debug.Log(i + "st in list: " + t.ToString());
-            i++;
-        }
-    }
+   
 
     /// <summary>
     /// Returns crits, else just return the same list
