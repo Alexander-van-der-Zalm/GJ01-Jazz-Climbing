@@ -52,9 +52,9 @@ public class MultipleObjectsManager : MonoBehaviour
 
     public void Activate(ManagedObject obj)
     {
-        if (activeObjects.Contains(obj))
-            Debug.LogError("MultipleObjectManager.Activate(obj) already active");
-        else
+        if (!activeObjects.Contains(obj))//activeObjects.Contains(obj))
+            //Debug.Log("MultipleObjectManager.Activate(obj) already active");
+        //else
             activeObjects.Add(obj);
         
         obj.gameObject.SetActive(true);

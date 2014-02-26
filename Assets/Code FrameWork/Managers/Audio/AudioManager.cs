@@ -123,9 +123,19 @@ public class AudioManager : Singleton<AudioManager>
 
     #region Pause
 
+    public static void Pause()
+    {
+        AudioListener.pause = true;
+    }
+
     #endregion
 
     #region Resume
+
+    public static void Resume()
+    {
+        AudioListener.pause = false;
+    }
 
     #endregion
 
@@ -270,9 +280,7 @@ public class AudioManager : Singleton<AudioManager>
             cont.UpdateVolume();
         }
     }
-
-    public static void Pause() { }
-    public static void Resume() { }
+    
     public static void Seek() { }
     public static void Transition() { }
     

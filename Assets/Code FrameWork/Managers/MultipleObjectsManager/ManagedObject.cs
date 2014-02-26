@@ -7,26 +7,18 @@ public class ManagedObject : MonoBehaviour
 {
     private MultipleObjectsManager manager;
 
-    //void Awake()
-    //{
-    //    if (manager == null)
-    //        Debug.Log(this + "Will not be registerd");
-    //    else
-    //        manager.Register(this);
-    //}
-
-    void OnEnable()
+    protected virtual void OnEnable()
     {
         CheckManager(this.GetType());
-        Debug.Log("Enable " + this + " " + manager.ToString());
+        //Debug.Log("Enable " + this + " " + manager.ToString());
         
         manager.Activate(this);
     }
 
-    void OnDisable()
+    protected virtual void OnDisable()
     {
         CheckManager(this.GetType());
-        Debug.Log("Disable " + this + " " + manager.ToString());
+        //Debug.Log("Disable " + this + " " + manager.ToString());
         manager.Deactivate(this);
     }
 
@@ -41,7 +33,7 @@ public class ManagedObject : MonoBehaviour
     /// deactivates and destroys in a smart manner 
     /// instead of just creating and destroying objects.
     /// </summary>
-    public GameObject Create()
+    public virtual GameObject Create()
     {
         CheckManager(this.GetType());
         //Debug.Log(go.GetInstanceID() + "  asdf  " + gameObject.GetInstanceID());
