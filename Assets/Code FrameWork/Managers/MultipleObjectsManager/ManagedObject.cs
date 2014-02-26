@@ -5,17 +5,34 @@ using System.Collections;
 public class ManagedObject : MonoBehaviour
 {
     private MultipleObjectsManager manager;
-    private ManagedObject managedObject;
 
-    void Awake()
+    //void Awake()
+    //{
+    //    if (manager == null)
+    //        Debug.Log(this + "Will not be registerd");
+    //    else
+    //        manager.Register(this);
+    //}
+
+    void OnEnable()
     {
-        //if(managedObject == null)
-
+        CheckManager(this.GetType());
+        Debug.Log("Enable " + this + " " + manager.ToString());
+        
+        manager.Activate(this);
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
+        CheckManager(this.GetType());
+        Debug.Log("Disable " + this + " " + manager.ToString());
+        manager.Deactivate(this);
+    }
 
+    private void CheckManager(Type t)
+    {
+        if (manager == null)
+            manager = ObjectCEO.GetManager(t);
     }
 
     /// <summary>
@@ -23,13 +40,19 @@ public class ManagedObject : MonoBehaviour
     /// deactivates and destroys in a smart manner 
     /// instead of just creating and destroying objects.
     /// </summary>
-    protected GameObject Create(Type t, GameObject go)
+    protected GameObject Create(GameObject go)
     {
-        if (manager == null)
-            manager = ObjectCEO.GetManager(t);
+        CheckManager(this.GetType());
+        Debug.Log(manager + "  a  " + this.GetType());
+        //managedObject = 
+        //ID = managedObject.GetInstanceID();
+        //Debug.Log(ID);
+        ManagedObject obj = manager.GetManagedObject(go);
+        Debug.Log(obj.manager);
+        obj.manager = manager;
         
-        managedObject = manager.GetManagedObject(go);
-        return managedObject.gameObject;
+        
+        return obj.gameObject;
     }
 
     /// <summary>

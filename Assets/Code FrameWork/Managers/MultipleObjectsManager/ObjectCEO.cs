@@ -16,10 +16,10 @@ public class ObjectCEO : Singleton<ObjectCEO>
             go.name = "ManagedObjects";
         }
 
-        MultipleObjectsManager manager = Instance.Managers[type];
+        MultipleObjectsManager manager; 
         
         // Create a new manager if it is not there yet
-        if (manager == null)
+        if (!Instance.Managers.ContainsKey(type))
         {
             // Create new gameObject and parent it to the ceo
             GameObject go = new GameObject();
@@ -30,6 +30,8 @@ public class ObjectCEO : Singleton<ObjectCEO>
             manager = go.AddComponent<MultipleObjectsManager>();
             Instance.Managers.Add(type, manager);
         }
+        else
+            manager = Instance.Managers[type];
 
         return manager;    
     }

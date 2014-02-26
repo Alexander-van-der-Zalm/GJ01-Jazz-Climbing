@@ -6136,6 +6136,7 @@ MonoBehaviour:
   AClipForEveryBeat: 0
   ActivationMode: 1
   CollisionMode: 0
+  Test: {fileID: 576052129}
 --- !u!60 &235669732
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -13795,13 +13796,14 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 576052128}
+  - 114: {fileID: 576052129}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &576052128
 Transform:
   m_ObjectHideFlags: 0
@@ -13813,6 +13815,18 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!114 &576052129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 576052127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa259e381229db45a66011bdaa27ca0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LifeTime: 1
 --- !u!1 &583257845
 GameObject:
   m_ObjectHideFlags: 0
@@ -17285,6 +17299,10 @@ Prefab:
       propertyPath: Sounds.Array.data[3].TestPopup
       value: BGM_drum1
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
+      propertyPath: Test
+      value: 
+      objectReference: {fileID: 576052129}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
   m_RootGameObject: {fileID: 235669729}

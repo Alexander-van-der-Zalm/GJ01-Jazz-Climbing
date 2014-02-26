@@ -9,8 +9,8 @@ public class MultipleObjectsManager : MonoBehaviour
 
     public readonly int MaxInactiveObjects = 100;
 
-    private List<ManagedObject> activeObjects;
-    private List<ManagedObject> inactiveObjects;
+    private List<ManagedObject> activeObjects = new List<ManagedObject>();
+    private List<ManagedObject> inactiveObjects = new List<ManagedObject>();
 
     public ManagedObject GetManagedObject(GameObject objectoToClone)
     {
@@ -30,19 +30,41 @@ public class MultipleObjectsManager : MonoBehaviour
         }
 
         // Make active and add to list
-        obj.gameObject.SetActive(true);
+        Activate(obj);
         
-
         return obj;
     }
+    
 
-    public void Register(ManagedObject obj)
+
+    //public void Register(ManagedObject obj)
+    //{
+    //    if (Contains(obj))
+    //        return;
+    //    activeObjects.Add(obj);
+    //    obj.transform.parent = transform;
+    //}
+
+    //public bool Contains(ManagedObject obj)
+    //{
+    //    return activeObjects.Contains(obj) || inactiveObjects.Contains(obj);
+    //}
+
+    public void Activate(ManagedObject obj)
     {
-        activeObjects.Add(obj);
+        if (activeObjects.Contains(obj))
+            Debug.LogError("MultipleObjectManager.Activate(obj) already active");
+        else
+            activeObjects.Add(obj);
+        
+        obj.gameObject.SetActive(true);
     }
 
     public void Deactivate(ManagedObject obj)
     {
+        if (!activeObjects.Contains(obj))
+            Debug.LogError("MultipleObjectManager.Deactivate(obj) not active");
+        
         // Remove from the active list
         activeObjects.Remove(obj);
 
