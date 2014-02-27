@@ -65,8 +65,6 @@ public class Instrument : MonoBehaviour
     public InstrumentActivationMode ActivationMode;
     public InstrumentCollisionMode CollisionMode;
 
-    public Particle Test;
-
     private string LastSampleName;
     private InstrumentClip lastInstrumentClip;
 
@@ -279,8 +277,7 @@ public class Instrument : MonoBehaviour
         {
             // Calculate a random vector direction based on the angles in NoteSettings
             Vector2 noteDir = GetRandomAngleFromSettings(baseDir);
-            Test.Create();
-            NoteSettings.Note.Create();//CreateNote(transform.position, noteDir, (int)Settings.Damage);
+            NoteSettings.Note.LaunchNote(transform.position, noteDir, NoteSettings.InitialVelocity, (int)Settings.Damage);
         }
     }
 

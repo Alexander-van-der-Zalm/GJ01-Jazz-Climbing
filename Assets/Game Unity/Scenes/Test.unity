@@ -2518,9 +2518,43 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
       propertyPath: PhysicsSettings.Gravity
-      value: 7
+      value: 50
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Collides
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Radius
+      value: .200000003
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Mass
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.FixedAngle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.LinearDrag
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.AngularDrag
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: LifeTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Material
+      value: 
+      objectReference: {fileID: 6200000, guid: d8c6e3d5b1908ad45a91e1652f6616b3, type: 2}
+    m_RemovedComponents:
+    - {fileID: 5800000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+    - {fileID: 5000000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
   m_RootGameObject: {fileID: 1756941663}
   m_IsPrefabParent: 0
@@ -4850,8 +4884,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 507564413}
   - {fileID: 1756941664}
+  - {fileID: 507564413}
   m_Father: {fileID: 1434093777}
 --- !u!1 &206110828
 GameObject:
@@ -6185,7 +6219,6 @@ MonoBehaviour:
   AClipForEveryBeat: 0
   ActivationMode: 1
   CollisionMode: 0
-  Test: {fileID: 576052129}
 --- !u!60 &235669732
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -12532,8 +12565,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 507564413}
   - 114: {fileID: 507564416}
-  - 58: {fileID: 507564415}
-  - 50: {fileID: 507564414}
   - 212: {fileID: 507564417}
   m_Layer: 9
   m_Name: Note_NoGravity
@@ -12553,34 +12584,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 204718035}
---- !u!50 &507564414
-Rigidbody2D:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 5000000, guid: 5cda3128436ca6b469372509c5bcbe8c,
-    type: 2}
-  m_PrefabInternal: {fileID: 1376681061}
-  m_GameObject: {fileID: 507564412}
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: .0500000007
-  m_GravityScale: 1
-  m_FixedAngle: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
---- !u!58 &507564415
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 5800000, guid: 5cda3128436ca6b469372509c5bcbe8c,
-    type: 2}
-  m_PrefabInternal: {fileID: 1376681061}
-  m_GameObject: {fileID: 507564412}
-  m_Enabled: 1
-  m_Material: {fileID: 6200000, guid: b73b728f6ca9c7a4b87d87b61d9e22c9, type: 2}
-  m_IsTrigger: 0
-  m_Radius: .0500000007
-  m_Center: {x: 0, y: 0}
 --- !u!114 &507564416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12595,13 +12598,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   ID: 0
-  LifeTime: 5
+  LifeTime: 1
   PhysicsSettings:
     Gravity: 0
-    Collides: 0
-    Radius: 0
-    Material: {fileID: 0}
-    Mass: 0
+    Collides: 1
+    Radius: .100000001
+    Material: {fileID: 6200000, guid: d8c6e3d5b1908ad45a91e1652f6616b3, type: 2}
+    Mass: 1
     FixedAngle: 0
     LinearDrag: 0
     AngularDrag: .0500000007
@@ -13219,6 +13222,47 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_Size: {x: .850000024, y: 1.29999995}
   m_Center: {x: 0, y: 0}
+--- !u!1 &559469089
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 559469091}
+  - 114: {fileID: 559469090}
+  m_Layer: 0
+  m_Name: SpawnerTester
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &559469090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 559469089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c32824ffbb9a23f4ba3a44cd893418bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  notes:
+  - {fileID: 1756941668}
+  - {fileID: 507564416}
+--- !u!4 &559469091
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 559469089}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -14.9722061, y: -5.22729397, z: .264160156}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
 --- !u!1 &564529804
 GameObject:
   m_ObjectHideFlags: 0
@@ -13845,56 +13889,6 @@ SpriteRenderer:
   m_SortingLayerID: 4081136285
   m_Sprite: {fileID: 21300000, guid: 7f4e6f0f3716d814ba8ff0dac5d11740, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
---- !u!1 &576052127
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 576052128}
-  - 114: {fileID: 576052129}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &576052128
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 576052127}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.8235579, y: -3.79148412, z: .264160156}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
---- !u!114 &576052129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 576052127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7aa259e381229db45a66011bdaa27ca0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manager: {fileID: 0}
-  ID: 0
-  LifeTime: 1
-  PhysicsSettings:
-    Gravity: 0
-    Collides: 1
-    Radius: 1
-    Material: {fileID: 6200000, guid: d8c6e3d5b1908ad45a91e1652f6616b3, type: 2}
-    Mass: 0
-    FixedAngle: 0
-    LinearDrag: 0
-    AngularDrag: 0
 --- !u!1 &583257845
 GameObject:
   m_ObjectHideFlags: 0
@@ -17370,7 +17364,7 @@ Prefab:
     - target: {fileID: 11400000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
       propertyPath: Test
       value: 
-      objectReference: {fileID: 576052129}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5b1009ed2c054bc458c9a731d0b96dad, type: 2}
   m_RootGameObject: {fileID: 235669729}
@@ -35251,7 +35245,29 @@ Prefab:
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Radius
+      value: .100000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: LifeTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Collides
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+      propertyPath: PhysicsSettings.Material
+      value: 
+      objectReference: {fileID: 6200000, guid: d8c6e3d5b1908ad45a91e1652f6616b3, type: 2}
+    m_RemovedComponents:
+    - {fileID: 5800000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
+    - {fileID: 5000000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 5cda3128436ca6b469372509c5bcbe8c, type: 2}
   m_RootGameObject: {fileID: 507564412}
   m_IsPrefabParent: 0
@@ -43935,8 +43951,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 1756941664}
   - 114: {fileID: 1756941668}
-  - 58: {fileID: 1756941667}
-  - 50: {fileID: 1756941666}
   - 212: {fileID: 1756941665}
   m_Layer: 9
   m_Name: Note_Gravity!!!
@@ -43980,34 +43994,6 @@ SpriteRenderer:
   m_SortingLayerID: 1228881561
   m_Sprite: {fileID: 21300000, guid: 21da4a24254f8844193b0056003d2af4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
---- !u!50 &1756941666
-Rigidbody2D:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 5000000, guid: 5cda3128436ca6b469372509c5bcbe8c,
-    type: 2}
-  m_PrefabInternal: {fileID: 142994568}
-  m_GameObject: {fileID: 1756941663}
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: .0500000007
-  m_GravityScale: 1
-  m_FixedAngle: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
---- !u!58 &1756941667
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 5800000, guid: 5cda3128436ca6b469372509c5bcbe8c,
-    type: 2}
-  m_PrefabInternal: {fileID: 142994568}
-  m_GameObject: {fileID: 1756941663}
-  m_Enabled: 1
-  m_Material: {fileID: 6200000, guid: b73b728f6ca9c7a4b87d87b61d9e22c9, type: 2}
-  m_IsTrigger: 0
-  m_Radius: .0500000007
-  m_Center: {x: 0, y: 0}
 --- !u!114 &1756941668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44022,16 +44008,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   ID: 0
-  LifeTime: 5
+  LifeTime: 1
   PhysicsSettings:
-    Gravity: 7
-    Collides: 0
-    Radius: 0
-    Material: {fileID: 0}
-    Mass: 0
+    Gravity: 50
+    Collides: 1
+    Radius: .200000003
+    Material: {fileID: 6200000, guid: d8c6e3d5b1908ad45a91e1652f6616b3, type: 2}
+    Mass: 12
     FixedAngle: 0
-    LinearDrag: 0
-    AngularDrag: .0500000007
+    LinearDrag: 12
+    AngularDrag: 13
   Damage: 0
 --- !u!1 &1761308593
 GameObject:
