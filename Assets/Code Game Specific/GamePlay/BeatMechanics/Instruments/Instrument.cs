@@ -280,7 +280,7 @@ public class Instrument : MonoBehaviour
             // Calculate a random vector direction based on the angles in NoteSettings
             Vector2 noteDir = GetRandomAngleFromSettings(baseDir);
             Test.Create();
-            NoteSettings.Note.CreateNote(transform.position, noteDir, (int)Settings.Damage);
+            NoteSettings.Note.Create();//CreateNote(transform.position, noteDir, (int)Settings.Damage);
         }
     }
 

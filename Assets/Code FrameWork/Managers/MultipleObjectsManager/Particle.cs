@@ -9,7 +9,6 @@ public class Particle : ManagedObject
     public class ParticlePhysicsSettings
     {
         public float Gravity;
-        public float InitialVelocity;
         
         public bool Collides;
         public float Radius;
@@ -36,7 +35,7 @@ public class Particle : ManagedObject
     protected override void OnEnable()
     {
         base.OnEnable();
-        Debug.Log("Test");
+        //Debug.Log("Test");
         StartCoroutine(DeactivateAfterLifeTime());
     }
 
@@ -67,20 +66,68 @@ public class Particle : ManagedObject
             {
                 CircleCollider2D cc2d = transform.GetOrAddComponent<CircleCollider2D>();
                 cc2d.radius = PhysicsSettings.Radius;
-
-                if( PhysicsSettings.Material!=null)
-                    collider2D.sharedMaterial = PhysicsSettings.Material;
             }
             if (rigidbody2D == null)
             {
                 transform.GetOrAddComponent<Rigidbody2D>();
             }
-
-            rigidbody2D.fixedAngle = PhysicsSettings.FixedAngle;
-            rigidbody2D.drag = PhysicsSettings.LinearDrag;
-            rigidbody2D.angularDrag = PhysicsSettings.AngularDrag;
         }
+        SetParticleVariables(gameObject);
         return base.Create();
+    }
+
+    private void SetParticleVariables(GameObject go)
+    {
+        Particle p = go.GetComponent<Particle>();
+    
+        go.rigidbody2D.fixedAngle = p.PhysicsSettings.FixedAngle;
+        go.rigidbody2D.drag = p.PhysicsSettings.LinearDrag;
+        go.rigidbody2D.angularDrag = p.PhysicsSettings.AngularDrag;
+        go.rigidbody2D.mass = p.PhysicsSettings.Mass;
+        go.rigidbody2D.gravityScale = -p.PhysicsSettings.Gravity / Physics.gravity.y;
+
+        if (!p.PhysicsSettings.Collides)
+        {
+            if (go.rigidbody2D != null)
+                go.rigidbody2D.Sleep();// = true;
+            if (go.collider2D != null)
+                go.collider2D.enabled = false;
+        }
+        else
+        {
+            go.rigidbody2D.WakeUp();
+            go.collider2D.enabled = true;
+        }
+
+        CircleCollider2D cc2d = go.transform.GetComponent<CircleCollider2D>();
+        if (cc2d != null)
+            cc2d.radius = p.PhysicsSettings.Radius; 
+
+        if (p.PhysicsSettings.Material != null)
+            go.collider2D.sharedMaterial = p.PhysicsSettings.Material;
+
+        
+    }
+
+    protected override void SetVariables(GameObject set, GameObject get)
+    {
+ 	    base.SetVariables(set, get);
+        SetParticleVariables(set);
+
+        //Debug.Log(GetInstanceID() +  " s " + set.GetInstanceID() + " g " + get.GetInstanceID());
+        Particle p = set.GetComponent<Particle>();
+        set.rigidbody2D.mass = p.PhysicsSettings.Mass;
+
+        //Debug.Log(p.PhysicsSettings.Mass + " " + set.rigidbody2D.mass);
+        //SetParticleVariables(set,get);
+    }
+
+    public GameObject Launch(Vector3 pos, Vector2 dir, float velocity)
+    {
+        GameObject go = Create();
+        go.transform.position = pos;
+        go.rigidbody2D.velocity = dir*velocity;
+        return go;
     }
 
     #region Collision

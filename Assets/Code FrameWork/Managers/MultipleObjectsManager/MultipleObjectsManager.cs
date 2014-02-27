@@ -35,26 +35,9 @@ public class MultipleObjectsManager : MonoBehaviour
         return obj;
     }
     
-
-
-    //public void Register(ManagedObject obj)
-    //{
-    //    if (Contains(obj))
-    //        return;
-    //    activeObjects.Add(obj);
-    //    obj.transform.parent = transform;
-    //}
-
-    //public bool Contains(ManagedObject obj)
-    //{
-    //    return activeObjects.Contains(obj) || inactiveObjects.Contains(obj);
-    //}
-
     public void Activate(ManagedObject obj)
     {
-        if (!activeObjects.Contains(obj))//activeObjects.Contains(obj))
-            //Debug.Log("MultipleObjectManager.Activate(obj) already active");
-        //else
+        if (!activeObjects.Contains(obj))
             activeObjects.Add(obj);
         
         obj.gameObject.SetActive(true);
@@ -70,7 +53,7 @@ public class MultipleObjectsManager : MonoBehaviour
 
         // Destroy if over the max inactive
         if (inactiveObjects.Count > MaxInactiveObjects)
-            GameObject.DestroyImmediate(obj.gameObject);
+            GameObject.Destroy(obj.gameObject);
         else
         {
             obj.gameObject.SetActive(false);

@@ -16,26 +16,20 @@ public class ManagedObject : MonoBehaviour
 
     protected virtual void OnEnable()
     {
-        CheckManager(this.GetType());
-        //Debug.Log("Enable " + this + " " + manager.ToString());
-        
+        CheckManager(this.GetType());      
         manager.Activate(this);
     }
 
     protected virtual void OnDisable()
     {
         CheckManager(this.GetType());
-        //Debug.Log("Disable " + this + " " + manager.ToString());
         manager.Deactivate(this);
     }
 
     private void CheckManager(Type t)
     {
         if (manager == null)
-        {
             manager = ObjectCEO.GetManager(t);
-            Debug.Log("New manager");
-        }
     }
 
     /// <summary>
@@ -46,28 +40,33 @@ public class ManagedObject : MonoBehaviour
     public virtual GameObject Create()
     {
         CheckManager(this.GetType());
-        //Debug.Log(go.GetInstanceID() + "  asdf  " + gameObject.GetInstanceID());
-
-        //PrefabUtility.InstantiatePrefab
         this.ID = GetInstanceID();
 
         ManagedObject obj = manager.GetManagedObject(gameObject);
 
-
-        int objID = obj.GetInstanceID();
-        Debug.Log(ID + " " + objID + " " + obj.ID);
         if (ID != obj.ID)
         {
-            // Reflection?
-            // Method
-            obj.ID = ID;
-        }
-        //var bindingFlags= BindingFlags.
-        List<string> fieldValues = this.GetType().GetFields().Select(f => f.Name).ToList();
+            //// Reflection?
+            //// Method
+            var bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+            var fieldValues = this.GetType().GetFields(bindingFlags).ToList();
 
-        DebugHelper.LogList<string>(fieldValues);
-        
+            int count = fieldValues.Count;
+            for (int i = 0; i < count; i++)
+            {
+                fieldValues[i].SetValue(obj, fieldValues[i].GetValue(this));
+            }
+            Debug.Log("this " + GetInstanceID() + " " + gameObject.GetType() + " " + gameObject.GetComponent<ManagedObject>().GetInstanceID());
+            SetVariables(obj.gameObject, gameObject);
+            obj.ID = ID;
+            obj.name = gameObject.name;
+        }       
         return obj.gameObject;
+    }
+
+    protected virtual void SetVariables(GameObject set, GameObject get)
+    {
+        Debug.Log("base");
     }
 
     /// <summary>
