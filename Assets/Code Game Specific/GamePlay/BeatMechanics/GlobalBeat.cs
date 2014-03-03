@@ -17,6 +17,8 @@ public class GlobalBeat : Singleton<GlobalBeat>
     private bool doingXF = false;
     private AudioSample oldSample;
 
+    public static int Measures { get { return Instance.Measure; } }
+
     public static bool StartBeat(string currentZoneName, AudioSample sample, float crossFadeDurationInMeasures)
     {
         if (Instance.started && Instance.CurrentZoneName == currentZoneName)
