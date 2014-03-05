@@ -441,11 +441,7 @@ public class PlayerController : MonoBehaviour
         // On the floor - Or - No More slide space
         if (playerState == PlayerState.WallSliding && (Grounded || lastSlided.Count == 0))
         {
-            //Fall();
             SetState(PlayerState.Idle);
-            //lastSlided.Clear();
-            //wallInCollision.Clear();
-            //Debug.Log("SLIDING Clear");
         }
 
         // Start a new slide 
