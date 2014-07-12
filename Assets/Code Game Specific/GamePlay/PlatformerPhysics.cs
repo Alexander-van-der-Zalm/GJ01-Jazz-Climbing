@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -108,11 +109,15 @@ public class PlatformerPhysics : MonoBehaviour
     private List<GameObject> floorsInCollision = new List<GameObject>();
     private List<int> lastSlided = new List<int>();
     private List<GameObject> wallInCollision = new List<GameObject>();
+    private List<GameObject> allInTriggerRange = new List<GameObject>();
     private int lastGrabbedID = 0;
 
     private Animator animator;
     private Rigidbody2D rigid;
     private Transform tr;
+
+    private string floorTag = "Floor";
+    private string wallTag = "Wall";
 
     #endregion
 
@@ -152,7 +157,7 @@ public class PlatformerPhysics : MonoBehaviour
 	void FixedUpdate ()
     {
         // Handled by PlayerInput or AI
-        SetInputValues();
+        StartOfUpdate();
 
         #region Vars
         // hor: Input & Dir is a mini cached var
@@ -179,7 +184,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region WallSlide
 
-        if (WallSliding())
+        if (CasulWallSliding())
         {
             EndOfUpdate();
             return;
@@ -276,15 +281,60 @@ public class PlatformerPhysics : MonoBehaviour
         EndOfUpdate();
 	}
 
+    private int floorEmptyCount = 0;
+
+    private void StartOfUpdate()
+    {
+        // Set Animator floats
+        animator.SetFloat("Horizontal", InputHorizontal);
+        animator.SetFloat("Vertical", InputVertical);
+
+        // Check if all collision lists are legal
+        List<string> tags = (from p in allInTriggerRange
+                             select p.tag).Distinct().ToList();
+        
+        Collider2D[] colls = tr.GetComponents<Collider2D>();
+        List<RaycastHit2D> hits = CastRays(colls[0].b
+        //List<string> tags2 = 
+
+        // Show all in collision with
+        foreach (string str in tags)
+        {
+            Debug.Log(str + " " + (from p in allInTriggerRange where p.CompareTag(str) select p).Count() + " " + Time.timeSinceLevelLoad);
+        }
+
+        
+
+        Grounded = floorsInCollision.Count > 0;
+
+        if (!tags.Contains(floorTag))
+        {
+            //DebugHelper.LogList<string>(tags);
+            if (floorEmptyCount < 3)
+            {
+                floorEmptyCount++;
+                return;
+            }
+            floorEmptyCount = 0;
+            floorsInCollision.Clear();
+            Debug.Log("FloorClear | count: " + tags.Count());
+        }
+        else
+            floorEmptyCount = 0;
+
+        if (!tags.Contains(wallTag))
+            wallInCollision.Clear();
+    }
+
     private void EndOfUpdate()
     {
-        ////Reset grounded
-        //if (playerState == PlayerState.Airborne && playerState == PlayerState.Grabbing && playerState == PlayerState.Falling && playerState == PlayerState.WallSliding)
-        //    Grounded = false;
         animator.SetFloat("VelocityX", rigid.velocity.x);
         animator.SetFloat("VelocityY", rigid.velocity.y);
         animator.SetFloat("Speed", Mathf.Abs(rigid.velocity.x)/RunSettings.RunMaxVelocity);
+        
         InputJump = false;
+        
+        //allInTriggerRange.Clear();
     }
 
     #endregion
@@ -298,15 +348,6 @@ public class PlatformerPhysics : MonoBehaviour
         InputJump = jump;
         InputJumpDown = jumpDown;
         InputDash = dash;
-    }
-
-    private void SetInputValues()
-    {
-        // Set Animator floats
-        animator.SetFloat("Horizontal", InputHorizontal);
-        animator.SetFloat("Vertical", InputVertical);
-
-        Grounded = floorsInCollision.Count > 0;
     }
 
     #endregion
@@ -418,7 +459,7 @@ public class PlatformerPhysics : MonoBehaviour
 
     #region WallJump & Slide
 
-    private bool WallSliding()
+    private bool OriginalWallSliding()
     {
         // During sliding:
         // On the floor - Or - No More slide space
@@ -435,15 +476,15 @@ public class PlatformerPhysics : MonoBehaviour
             {
                 float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
                 float inputSign = Mathf.Sign(InputHorizontal);
-                 
+
                 // inputdir is correct in relation to position differance
-                if(relPosSign == inputSign)
+                if (relPosSign == inputSign)
                     SetState(PlayerState.WallSliding);
 
                 CheckFlipBy(relPosSign);
             }
         }
-        
+
         if (playerState == PlayerState.WallSliding && InputJump)
         {
             float dir = 1;
@@ -462,6 +503,65 @@ public class PlatformerPhysics : MonoBehaviour
         if (playerState == PlayerState.WallSliding && InputHorizontal == 0)
         {
             Fall();
+        }
+
+        return playerState == PlayerState.WallSliding;   
+    }
+
+    private bool CasulWallSliding()
+    {
+        // During sliding:
+        // On the floor - Or - No More slide space
+        if (playerState == PlayerState.WallSliding && (Grounded || lastSlided.Count == 0))
+        {
+            SetState(PlayerState.Idle);
+        }
+
+        // Start a new slide 
+        if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 )
+        {
+            SetState(PlayerState.WallSliding);
+            
+            // Still needed???
+            foreach (GameObject col in wallInCollision)
+            {
+                float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
+
+                CheckFlipBy(relPosSign);
+            }
+        }
+        
+        // Jump
+        if (playerState == PlayerState.WallSliding && InputJump)
+        {
+            float dir = 1;
+            if (facingRight)
+                dir = -1;
+
+            rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
+
+            WallJump();
+
+            lastSlided.Clear();
+            wallInCollision.Clear();
+            //Debug.Log("SLIDING Clear");
+        }
+
+        // Fall 
+        if (playerState == PlayerState.WallSliding )
+        {
+            // only if the input is away from the wall
+            foreach (GameObject col in wallInCollision)
+            {
+                if(InputHorizontal == 0)
+                    break;
+                float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
+                float inputSign = Mathf.Sign(InputHorizontal);
+
+                if(relPosSign!=inputSign)
+                    Fall(true);
+            }
+            
         }
 
         return playerState == PlayerState.WallSliding;    
@@ -692,76 +792,50 @@ public class PlatformerPhysics : MonoBehaviour
     public void OnGroundedTriggerEnter(Collider2D other)
     {
         int id = other.GetInstanceID();
-        if (other.tag == "Floor" && !floorsInCollision.Contains(other.gameObject))//floorIds.Contains(id))
+        if (other.CompareTag(floorTag) && !floorsInCollision.Contains(other.gameObject))//floorIds.Contains(id))
         {
             //floorIds.Add(id);
             floorsInCollision.Add(other.gameObject);
+            allInTriggerRange.Add(other.gameObject);
+            Debug.Log("add floor. Count of floors: " + (from s in allInTriggerRange where s.CompareTag(floorTag) select s).Count());
+            
             //Debug.Log("ENTER Floors: " + floorsInCollision.Count + " id " + id);
         }
 
-        if (other.tag == "Wall" && !lastSlided.Contains(id))
+        if (other.CompareTag(wallTag) && !lastSlided.Contains(id))
         {
             lastSlided.Add(id);
             wallInCollision.Add(other.gameObject);
+            allInTriggerRange.Add(other.gameObject);
             //Debug.Log("ENTER Walls: " + lastSlided.Count + " id " + id);
         }
     }
 
+    private float triggerTime;
+
     public void OnGroundedTriggerStay(Collider2D other)
     {
-        //int id = GetInstanceID();
-
-        //if (other.tag == "Wall")
-        //{
-        //    if (Grounded && lastSlided.Count != 0)
-        //    {
-        //        lastSlided.Clear();
-        //        wallInCollision.Clear();
-        //        Debug.Log("SLIDING Clear");
-        //        return;
-        //    }
-
-        //    if (!lastSlided.Contains(id) && playerState == PlayerState.WallSliding)
-        //    {
-        //        lastSlided.Add(id);
-        //        wallInCollision.Add(other.gameObject);
-        //        Debug.Log("SLIDING count" + lastSlided.Count);
-        //        return;
-        //    }
-
-        //    if (!Grounded && playerState != PlayerState.WallSliding && rigid.velocity.y < 0 && lastSlided.Count == 0)
-        //    {
-        //        lastSlided.Add(id);
-        //        wallInCollision.Add(other.gameObject);
-
-        //        float relPosSign = Mathf.Sign(other.transform.position.x - transform.position.x);
-        //        float inputSign = Mathf.Sign(HorizontalInput);
-        //        Debug.Log(relPosSign + " input " + inputSign);
-        //        if(HorizontalInput != 0 && relPosSign == inputSign)
-        //            SetState(PlayerState.WallSliding);
-
-        //        Debug.Log("NewSlide count" + lastSlided.Count);
-        //        return;
-        //    }
-
-        //    if (!Grounded && HorizontalInput == 0)
-        //        Fall();
-
-        //}
+        if (triggerTime != Time.timeSinceLevelLoad)
+        {
+            
+            allInTriggerRange.Clear();
+            triggerTime = Time.timeSinceLevelLoad;
+        }
+        allInTriggerRange.Add(other.gameObject);
     }
 
     public void OnGroundedTriggerExit(Collider2D other)
     {
         int id = other.GetInstanceID();
 
-        if (other.tag == "Wall" && lastSlided.Contains(id))
+        if (other.CompareTag(wallTag) && lastSlided.Contains(id))
         {
             lastSlided.Remove(id);
             wallInCollision.Remove(other.gameObject);
             //Debug.Log("EXIT Walls: " + floorIds.Count);
         }
 
-        if (other.tag == "Floor" && floorsInCollision.Contains(other.gameObject))
+        if (other.CompareTag(floorTag) && floorsInCollision.Contains(other.gameObject))
         {
             //floorIds.Remove(id);
             floorsInCollision.Remove(other.gameObject);
@@ -776,6 +850,29 @@ public class PlatformerPhysics : MonoBehaviour
     private void SetGravity(float targetGravity)
     {
         rigid.gravityScale = targetGravity / Mathf.Abs(Physics2D.gravity.y);
+    }
+
+    private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, bool debug = false)
+    {
+        List<RaycastHit2D> collided = new List<RaycastHit2D>();
+        
+        Vector2 offset = (endPos-startPos)/amount;
+        Vector2 ray = rayDirection.normalized * rayLength;
+
+        for (int i = 0; i < amount; i++)
+        {
+            Vector2 v = startPos + i * offset;
+
+            List<RaycastHit2D> hits = Physics2D.RaycastAll(v, ray).ToList();
+            Color color = hits.Count>0 ? Color.green : Color.red;
+            
+            if(debug)
+                Debug.DrawRay(v, ray, color);
+
+            collided.AddRange(hits);
+        }
+
+        return collided;
     }
 
     #endregion

@@ -25,7 +25,9 @@ public class ControlScheme// : MonoBehaviour
 
     public ControlKeyType InputType = ControlKeyType.PC;
 
+    [SerializeField]
     public Axis Horizontal;
+    [SerializeField]
     public Axis Vertical;
 
     public List<Action> Actions = new List<Action>();

@@ -16,8 +16,8 @@ public class PlayerController : MonoBehaviour
 
         #region Controls
 
-        //if (ControlScheme == null)
-        //{
+        if (ControlScheme == null)
+        {
             ControlScheme = ControlScheme.CreateScheme<JazzClimbingPlayerActions>();
 
             // Make this into a nice function
@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
 
             ControlScheme.Actions[(int)JazzClimbingPlayerActions.PlayInstrument].Keys.Add(ControlKey.PCKey(KeyCode.E));
             ControlScheme.Actions[(int)JazzClimbingPlayerActions.PlayInstrument].Keys.Add(ControlKey.XboxButton(XboxCtrlrInput.XboxButton.B));
-        //}
+        }
 
         ControlManager.Instance.ControlSchemes[0] = ControlScheme;
 

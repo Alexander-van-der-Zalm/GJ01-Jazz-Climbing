@@ -5,6 +5,7 @@ using System.Collections;
 public abstract class Control 
 {
     public string Name;
+    [SerializeField]
     protected ControlScheme scheme;
 
     public Control(ControlScheme scheme, string name = "defaultControlName")
