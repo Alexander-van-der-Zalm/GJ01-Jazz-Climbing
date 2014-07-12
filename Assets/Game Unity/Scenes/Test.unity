@@ -273,7 +273,8 @@ Prefab:
       propertyPath: InstrumentsInCollection.Array.data[0]
       value: 
       objectReference: {fileID: 235669731}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11400000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: e50e40d792a9d3844a38ac922f42dea1, type: 2}
   m_RootGameObject: {fileID: 684476201}
   m_IsPrefabParent: 0
@@ -1340,7 +1341,6 @@ GameObject:
   - 4: {fileID: 71675992}
   - 212: {fileID: 71675991}
   - 95: {fileID: 71675994}
-  - 114: {fileID: 71675996}
   - 50: {fileID: 71675993}
   - 61: {fileID: 71675990}
   - 58: {fileID: 71675995}
@@ -1444,37 +1444,6 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_Radius: .300000012
   m_Center: {x: 0, y: .310000002}
---- !u!114 &71675996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400000, guid: e50e40d792a9d3844a38ac922f42dea1,
-    type: 2}
-  m_PrefabInternal: {fileID: 18941544}
-  m_GameObject: {fileID: 71675989}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 521a07b7406045f42808c2df92d14401, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  JumpSettings:
-    JumpMaxHeight: 4
-    JumpMinHeight: 1
-    JumpTimeToApex: .439999998
-  RunSettings:
-    RunMaxVelocity: 5
-    RunAccelTime: .400000006
-    RunDeAccelTime: .25
-  WallSlideSettings:
-    WallSlideGravity: 4
-    WallSlideInitialVelocity: .5
-    SlideBeforeFall: .25
-  FallSettings:
-    FallGravity: 50
-    MaxFallTimeToRespawn: 3
-  OtherSettings:
-    GrabMinNegYDist: .100000001
-  playerState: 0
-  DebugStateChanges: 0
 --- !u!61 &71675997
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4441,12 +4410,12 @@ MonoBehaviour:
   audioLayerSettings:
   - layer: 0
     Volume: 1
-    Mute: 0
+    Mute: 1
     MaxClips: -1
     ClipsPlaying: 0
   - layer: 1
     Volume: 1
-    Mute: 0
+    Mute: 1
     MaxClips: -1
     ClipsPlaying: 0
   - layer: 2
@@ -4482,26 +4451,92 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ControlSchemes:
-  - Name: Test
-    controllerID: 0
-    playerID: 0
+  - Name: JazzClimbingPlayerActions
+    controllerID: 1
+    playerID: 1
     UpdateType: 1
     InputType: 0
     Horizontal:
-      Name: 
+      Name: Horizontal
       AxisKeys:
+      - Type: 1
+        keys:
+        - LeftStickX
+        xboxAxisType: 1
+      - Type: 1
+        keys:
+        - Left
+        - Right
+        xboxAxisType: 0
       - Type: 0
         keys:
-        - 
+        - A
+        - D
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - LeftArrow
+        - RightArrow
         xboxAxisType: 0
     Vertical:
-      Name: 
-      AxisKeys: []
+      Name: Vertical
+      AxisKeys:
+      - Type: 1
+        keys:
+        - LeftStickY
+        xboxAxisType: 1
+      - Type: 1
+        keys:
+        - Down
+        - Up
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - S
+        - W
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - DownArrow
+        - UpArrow
+        xboxAxisType: 0
     Actions:
-    - Name: 
+    - Name: Jump
       Keys:
       - Type: 0
-        KeyValue: 
+        KeyValue: Space
+        LastState: 0
+        CurState: 0
+      - Type: 1
+        KeyValue: A
+        LastState: 0
+        CurState: 0
+    - Name: Dash
+      Keys:
+      - Type: 0
+        KeyValue: Y
+        LastState: 0
+        CurState: 0
+    - Name: Interact
+      Keys:
+      - Type: 0
+        KeyValue: Q
+        LastState: 0
+        CurState: 0
+    - Name: Slide
+      Keys:
+      - Type: 0
+        KeyValue: L
+        LastState: 0
+        CurState: 0
+    - Name: PlayInstrument
+      Keys:
+      - Type: 0
+        KeyValue: E
+        LastState: 0
+        CurState: 0
+      - Type: 1
+        KeyValue: B
         LastState: 0
         CurState: 0
 --- !u!1 &197101384
@@ -14305,32 +14340,6 @@ SpriteRenderer:
   m_SortingLayerID: 4081136285
   m_Sprite: {fileID: 21300004, guid: d3952fc2bf55bc84987efac8123d09e7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
---- !u!1 &589115063
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 589115064}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &589115064
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 589115063}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.8235579, y: -3.79148412, z: .264160156}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
 --- !u!1 &589524216
 GameObject:
   m_ObjectHideFlags: 0
@@ -16877,6 +16886,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 684476202}
+  - 114: {fileID: 684476204}
+  - 114: {fileID: 684476203}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -16898,6 +16909,138 @@ Transform:
   - {fileID: 71675992}
   - {fileID: 1335148439}
   m_Father: {fileID: 0}
+--- !u!114 &684476203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 684476201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 521a07b7406045f42808c2df92d14401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RigidBody: {fileID: 71675993}
+  Animator: {fileID: 71675994}
+  JumpSettings:
+    JumpMaxHeight: 4
+    JumpMinHeight: 1
+    JumpTimeToApex: .439999998
+  RunSettings:
+    RunMaxVelocity: 5
+    RunAccelTime: .400000006
+    RunDeAccelTime: .25
+  WallSlideSettings:
+    WallSlideGravity: 4
+    WallSlideInitialVelocity: .5
+    SlideBeforeFall: .25
+  FallSettings:
+    FallGravity: 50
+    MaxFallTimeToRespawn: 3
+  OtherSettings:
+    GrabMinNegYDist: .100000001
+  playerState: 0
+  DebugStateChanges: 0
+--- !u!114 &684476204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 684476201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325d4aae03f04924d9d9d384ba194bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ControlScheme:
+    Name: JazzClimbingPlayerActions
+    controllerID: 1
+    playerID: 1
+    UpdateType: 1
+    InputType: 0
+    Horizontal:
+      Name: Horizontal
+      AxisKeys:
+      - Type: 1
+        keys:
+        - LeftStickX
+        xboxAxisType: 1
+      - Type: 1
+        keys:
+        - Left
+        - Right
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - A
+        - D
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - LeftArrow
+        - RightArrow
+        xboxAxisType: 0
+    Vertical:
+      Name: Vertical
+      AxisKeys:
+      - Type: 1
+        keys:
+        - LeftStickY
+        xboxAxisType: 1
+      - Type: 1
+        keys:
+        - Down
+        - Up
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - S
+        - W
+        xboxAxisType: 0
+      - Type: 0
+        keys:
+        - DownArrow
+        - UpArrow
+        xboxAxisType: 0
+    Actions:
+    - Name: Jump
+      Keys:
+      - Type: 0
+        KeyValue: Space
+        LastState: 0
+        CurState: 0
+      - Type: 1
+        KeyValue: A
+        LastState: 0
+        CurState: 0
+    - Name: Dash
+      Keys:
+      - Type: 0
+        KeyValue: Y
+        LastState: 0
+        CurState: 0
+    - Name: Interact
+      Keys:
+      - Type: 0
+        KeyValue: Q
+        LastState: 0
+        CurState: 0
+    - Name: Slide
+      Keys:
+      - Type: 0
+        KeyValue: L
+        LastState: 0
+        CurState: 0
+    - Name: PlayInstrument
+      Keys:
+      - Type: 0
+        KeyValue: E
+        LastState: 0
+        CurState: 0
+      - Type: 1
+        KeyValue: B
+        LastState: 0
+        CurState: 0
 --- !u!1 &692755001
 GameObject:
   m_ObjectHideFlags: 0
@@ -26497,7 +26640,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!95 &997489979
 Animator:
   serializedVersion: 2
@@ -39771,32 +39914,6 @@ SpriteRenderer:
   m_SortingLayerID: 4081136285
   m_Sprite: {fileID: 21300006, guid: e90ba97250ef6ee4e80eaf6e51abedca, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
---- !u!1 &1562671795
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1562671796}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1562671796
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1562671795}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.8235579, y: -3.79148412, z: .264160156}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
 --- !u!1 &1563274741
 GameObject:
   m_ObjectHideFlags: 0

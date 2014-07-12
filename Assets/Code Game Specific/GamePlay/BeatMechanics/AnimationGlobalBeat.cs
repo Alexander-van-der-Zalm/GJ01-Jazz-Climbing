@@ -13,7 +13,6 @@ public class AnimationGlobalBeat : MonoBehaviour
         [ReadOnly] public int ClipHash;
         public float SpeedPerMeasure = 1.0f;
         public bool SyncAnimation = false;
-        
     }
 
     Animator anim;
@@ -22,37 +21,38 @@ public class AnimationGlobalBeat : MonoBehaviour
 
     public List<AnimationGBInfo> AnimationsInfo;
 
-    
-
-	// Use this for initialization
 	void Awake () 
     {
         anim = GetComponent<Animator>();
         CheckAnimationInfo();
 	}
 	
-	// Update is called once per frame
 	void Update () 
     {
+        
+        #if UNITY_EDITOR
+        // Check all the animations and update the animation info
+        if(!UnityEditor.EditorApplication.isPlaying)
+        {
+            CheckAnimationInfo();
+            return;
+        }
+        #endif
+
+        // Only runs in playmode
+
         var a = anim.GetCurrentAnimatorStateInfo(0);
         var b = anim.GetCurrentAnimationClipState(0);
-        //anim.
-        //anim.
+
         animHash = a.nameHash.ToString();
         animName = b[0].clip.name;
-        //Debug.Log(b[0].clip.name);
-
-        if (AnimationsInfo.Where(an => an.ClipHash == a.nameHash && an.SyncAnimation).Count() > 0)
+        
+        if (AnimationsInfo.Where(an => a.IsName(an.Name) && an.SyncAnimation).Count() >0)//an.ClipHash == a.nameHash && an.SyncAnimation).Count() > 0)
         {
             anim.ForceStateNormalizedTime(GlobalBeat.ProgressInMeasure() / GlobalBeat.Measures);
-            Debug.Log(0);
         } 
         
         anim.ForceStateNormalizedTime(GlobalBeat.ProgressInMeasure() / GlobalBeat.Measures);
-            //a.normalizedTime = GlobalBeat.ProgressInMeasure() / GlobalBeat.Measures;
-        //b[0].clip.
-
-        
 	}
 
     private List<string> GetAllNames()
@@ -79,19 +79,7 @@ public class AnimationGlobalBeat : MonoBehaviour
         return names;
     }
 
-    //private void CheckAnimationInfo()
-    //{
-    //    //if (AnimationsInfo != null && AnimationsInfo.Count > 0)
-    //    //    return;
-
-    //    AnimationsInfo = GetAllAnimInfo();// new List<AnimationGBInfo>();
-    //    //List<string> animNames = GetAllNames();
-    //    //foreach (string s in animNames)
-    //    //{
-    //    //    AnimationsInfo.Add(new AnimationGBInfo() { Name = s });
-    //    //}
-    //}
-
+    //
     private void CheckAnimationInfo()
     {
         UnityEditorInternal.AnimatorController ac = GetComponent<Animator>().runtimeAnimatorController as UnityEditorInternal.AnimatorController;
@@ -100,6 +88,7 @@ public class AnimationGlobalBeat : MonoBehaviour
         if(AnimationsInfo == null)
             AnimationsInfo = new List<AnimationGBInfo>();
 
+        // For each animation layer
         for (int i = 0; i < layerCount; i++)
         {
             UnityEditorInternal.AnimatorControllerLayer layer = ac.GetLayer(i);
@@ -110,15 +99,14 @@ public class AnimationGlobalBeat : MonoBehaviour
             for (int j = 0; j < smCount; j++)
             {
                 UnityEditorInternal.State state = sm.GetState(j);
-                Debug.Log(string.Format("State: {0}", state.uniqueName));
+                //Debug.Log(string.Format("State: {0}", state.uniqueName));
 
                 var cur = AnimationsInfo.Where(a => a.Name == state.uniqueName);
+                
+                // Replace hash if it exists, keep all the other info (boolean etc.)
                 if (cur.Count() > 0)
-                {
                     cur.First().ClipHash = Animator.StringToHash(state.uniqueName);
-                    Debug.Log("REplace");
-                }
-                else
+                else // make a new one
                     AnimationsInfo.Add(new AnimationGBInfo() { Name = state.uniqueName, ClipHash = state.uniqueNameHash});
             }
         }
