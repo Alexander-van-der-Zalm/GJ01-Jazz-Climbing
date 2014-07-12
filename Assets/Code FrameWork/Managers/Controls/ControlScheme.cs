@@ -42,7 +42,7 @@ public class ControlScheme// : MonoBehaviour
         ControlScheme controlScheme = new ControlScheme();
         controlScheme.Name = typeof(T).ToString();
         controlScheme.UpdateType = updateType;
-        controlScheme.SetActionsFromEnum<T>();
+        controlScheme.SetActionsFromEnum<T>(controlScheme);
 
         controlScheme.Horizontal = new Axis(controlScheme, "Horizontal");
         controlScheme.Vertical = new Axis(controlScheme, "Vertical");
@@ -74,7 +74,7 @@ public class ControlScheme// : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    public void SetActionsFromEnum<T>() where T : struct, IConvertible
+    public void SetActionsFromEnum<T>(ControlScheme controlScheme) where T : struct, IConvertible
     {
        if (!typeof(T).IsEnum) 
        {
@@ -85,7 +85,7 @@ public class ControlScheme// : MonoBehaviour
 
         foreach (T value in values)
         {
-            Actions.Add(new Action(this, value.ToString()));
+            Actions.Add(new Action(controlScheme, value.ToString()));
         }
     }
 

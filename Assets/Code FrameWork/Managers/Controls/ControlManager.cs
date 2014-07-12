@@ -23,12 +23,6 @@ public class ControlManager : Singleton<ControlManager>
         return Instance.ControlSchemes.Where(c => c.playerID == player).First();
     }
 
-	// Use this for initialization
-	void Start () 
-    {
-	
-	}
-
     #region Updates
 
     void FixedUpdate()

@@ -9,13 +9,18 @@ public class ChildTrigger2DDelegates : MonoBehaviour
     public Transform Parent;
     private Vector3 offset;
 
+    private bool parented = true;
     public void Start()
     {
-        offset = transform.position - Parent.position;
+        if(parented)
+            offset = transform.position - Parent.position;
     }
 
     public void FixedUpdate()
     {
+        if (!parented)
+            return;
+
         Vector3 curOffset = offset;
         curOffset.x *= Parent.localScale.x;
         transform.position = Parent.position + curOffset;
@@ -25,10 +30,18 @@ public class ChildTrigger2DDelegates : MonoBehaviour
     public static ChildTrigger2DDelegates AddChildTrigger2D(GameObject child, Transform parent, TriggerDelegate onTriggerStay = null, TriggerDelegate onTriggerEnter = null, TriggerDelegate onTriggerExit = null)
     {
         ChildTrigger2DDelegates grabDels = child.gameObject.AddComponent<ChildTrigger2DDelegates>();
-        grabDels.Parent = parent;
+
         grabDels.OnTriggerEnter = onTriggerEnter;
         grabDels.OnTriggerStay = onTriggerStay;
         grabDels.OnTriggerExit = onTriggerExit;
+
+        if (parent == null)
+        {
+            grabDels.parented = false;
+            return grabDels;
+        }
+
+        grabDels.Parent = parent;
 
         if (child.rigidbody2D == null)
             child.AddComponent<Rigidbody2D>();
@@ -38,7 +51,6 @@ public class ChildTrigger2DDelegates : MonoBehaviour
         child.rigidbody2D.interpolation = RigidbodyInterpolation2D.Interpolate;
         child.rigidbody2D.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         child.rigidbody2D.fixedAngle = true;
-
 
         return grabDels;
     }
