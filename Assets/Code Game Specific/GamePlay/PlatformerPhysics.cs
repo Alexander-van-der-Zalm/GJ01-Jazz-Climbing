@@ -346,22 +346,22 @@ public class PlatformerPhysics : MonoBehaviour
 
         // Y correct when falling
 
-        //Debug.Log(distToGround);
-        if (-rigid.velocity.y > distToGround)
-        {
-            Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
-            Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
-            Debug.Break();
-            // Set transform to GroundedDistanceToGround
-            float yPos = colliderBotMid.y - distToGround + GroundingRayCastSettings.GroundedDistanceToGround;
-            tr.position = new Vector2(colliderBotMid.x, yPos);
+        ////Debug.Log(distToGround);
+        //if (-rigid.velocity.y > distToGround)
+        //{
+        //    Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
+        //    Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
+        //    Debug.Break();
+        //    // Set transform to GroundedDistanceToGround
+        //    float yPos = colliderBotMid.y - distToGround + GroundingRayCastSettings.GroundedDistanceToGround;
+        //    tr.position = new Vector2(colliderBotMid.x, yPos);
 
-            // Kill gravity and stop y velocity
-            rigid.velocity = new Vector2(rigid.velocity.x, 0);
-            rigid.gravityScale = 0;
+        //    // Kill gravity and stop y velocity
+        //    rigid.velocity = new Vector2(rigid.velocity.x, 0);
+        //    rigid.gravityScale = 0;
 
-            Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
-        }
+        //    Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
+        //}
 
 
         #endregion
