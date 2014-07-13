@@ -75,6 +75,11 @@ public class PlatformerPhysics : MonoBehaviour
     public Rigidbody2D RigidBody;
     public Animator Animator;
 
+    public Vector2 FeetOffset;
+    public float FeetWidth;
+    public float RayDepth;
+    public int FeetRays;
+
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
     public WallSlideSettingsC WallSlideSettings;
@@ -89,9 +94,11 @@ public class PlatformerPhysics : MonoBehaviour
     private Vector3 GrabOffset;
 
     // Debug
+    [ReadOnly]
     public PlayerState playerState;
     public bool DebugStateChanges = false;
-    
+    public bool DebugRayText = false;
+
     // Jump and direction
     private bool facingRight = true;
     private bool grounded;
@@ -293,37 +300,51 @@ public class PlatformerPhysics : MonoBehaviour
         List<string> tags = (from p in allInTriggerRange
                              select p.tag).Distinct().ToList();
         
-        Collider2D[] colls = tr.GetComponents<Collider2D>();
-        List<RaycastHit2D> hits = CastRays(colls[0].b
+        Vector2 startPos = tr.position;
+        startPos += FeetOffset + Vector2.right * -FeetWidth;
+        Vector2 endPos = startPos + Vector2.right *2 * FeetWidth;
+        List<RaycastHit2D> hits = CastRays(startPos, endPos, Vector2.up * -1, FeetRays, RayDepth, LayerMask.NameToLayer("Tiles"), true);
+        Debug.Log(hits.Count());
+        //hits[0].collider.bounds
+        //List<GameObject> gos = (from h in hits select h.rigidbody.gameObject).Distinct().ToList();
+        //foreach (RaycastHit2D hit in hits)
+        //{
+        //    if(hit.collider != null)
+        //    //if (hit != null)
+        //        Debug.Log(hit.rigidbody.gameObject.tag);
+        //}
+        //Debug.Log(gos.Count());
+        //List<string> tags2 = (from h in hits
+        //                      select h.rigidbody.gameObject.tag).Distinct().ToList();
+        
         //List<string> tags2 = 
-
-        // Show all in collision with
-        foreach (string str in tags)
-        {
-            Debug.Log(str + " " + (from p in allInTriggerRange where p.CompareTag(str) select p).Count() + " " + Time.timeSinceLevelLoad);
-        }
 
         
 
         Grounded = floorsInCollision.Count > 0;
 
-        if (!tags.Contains(floorTag))
-        {
-            //DebugHelper.LogList<string>(tags);
-            if (floorEmptyCount < 3)
-            {
-                floorEmptyCount++;
-                return;
-            }
-            floorEmptyCount = 0;
-            floorsInCollision.Clear();
-            Debug.Log("FloorClear | count: " + tags.Count());
-        }
-        else
-            floorEmptyCount = 0;
+        //if (!tags2.Contains(floorTag))
+        //{
+        //    // Show all in collision with
+        //    foreach (string str in tags2)
+        //    {
+        //        Debug.Log(str + " " + (tags2).Count() + " " + Time.timeSinceLevelLoad);
+        //    }
+        //    //DebugHelper.LogList<string>(tags);
+        //    if (floorEmptyCount < 3)
+        //    {
+        //        floorEmptyCount++;
+        //        return;
+        //    }
+        //    floorEmptyCount = 0;
+        //    floorsInCollision.Clear();
+        //    Debug.Log("FloorClear | count: " + tags2.Count());
+        //}
+        //else
+        //    floorEmptyCount = 0;
 
-        if (!tags.Contains(wallTag))
-            wallInCollision.Clear();
+        //if (!tags.Contains(wallTag))
+        //    wallInCollision.Clear();
     }
 
     private void EndOfUpdate()
@@ -852,20 +873,22 @@ public class PlatformerPhysics : MonoBehaviour
         rigid.gravityScale = targetGravity / Mathf.Abs(Physics2D.gravity.y);
     }
 
-    private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, bool debug = false)
+    private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
     {
         List<RaycastHit2D> collided = new List<RaycastHit2D>();
         
-        Vector2 offset = (endPos-startPos)/amount;
+        Vector2 offset = (endPos-startPos)/(amount-1);
         Vector2 ray = rayDirection.normalized * rayLength;
 
         for (int i = 0; i < amount; i++)
         {
             Vector2 v = startPos + i * offset;
-
-            List<RaycastHit2D> hits = Physics2D.RaycastAll(v, ray).ToList();
-            Color color = hits.Count>0 ? Color.green : Color.red;
+            // Only select non null hits and colliders
+            List<RaycastHit2D> hits = Physics2D.RaycastAll(v, ray, rayLength, 1 << layerMask).Where(h => h != null && h.collider != null).ToList();
             
+            Color color = hits.Count>0 ? Color.green : Color.red;
+
+           
             if(debug)
                 Debug.DrawRay(v, ray, color);
 
@@ -873,6 +896,17 @@ public class PlatformerPhysics : MonoBehaviour
         }
 
         return collided;
+    }
+
+    private float GetMinDistance(List<RaycastHit2D> hits)
+    {
+        float minDist = float.MaxValue;
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.fraction < minDist)
+                minDist = hit.fraction;
+        }
+        return minDist;
     }
 
     #endregion

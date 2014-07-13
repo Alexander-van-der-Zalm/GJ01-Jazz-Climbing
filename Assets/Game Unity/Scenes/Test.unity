@@ -27133,7 +27133,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RigidBody: {fileID: 71675993}
   Animator: {fileID: 71675994}
-  FloorCollider: {fileID: 71675990}
+  FeetOffset: {x: 0, y: 0}
+  FeetWidth: .400000006
+  RayDepth: .400000006
+  FeetRays: 5
   JumpSettings:
     JumpMaxHeight: 4
     JumpMinHeight: 1
