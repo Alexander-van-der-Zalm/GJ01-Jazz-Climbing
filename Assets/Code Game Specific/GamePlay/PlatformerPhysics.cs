@@ -106,7 +106,6 @@ public class PlatformerPhysics : MonoBehaviour
     private Vector3 GrabOffset;
 
     // Debug
-    [ReadOnly]
     public PlayerState playerState;
     public bool DebugStateChanges = false;
     public bool DebugRayText = false;
@@ -204,6 +203,11 @@ public class PlatformerPhysics : MonoBehaviour
         //List<RaycastHit2D> hits = CastRays(startPos, endPos, Vector2.up * -1, JumpSettings.RaySettings.FeetRays, JumpSettings.RaySettings.RayDepth, LayerMask.NameToLayer("Tiles"), true);
         //Debug.Log(hits.Count());
 
+        if (hits.Count > 2)
+        {
+
+        }
+
         Grounded = hits.Count > 2;
 
         #endregion
@@ -213,17 +217,24 @@ public class PlatformerPhysics : MonoBehaviour
         // Cast Grab Rays
         hits = CastRaysInAnglesFromPoint(Grab.position, -15, 45, 4, 0.3f, LayerMask.NameToLayer("GrabMe"), true, !facingRight);
 
-        Debug.Log(hits.Count());
+        //Debug.Log(hits.Count());
 
-        if (hits.Count() > 0)
+        if (hits.Count() > 0 && playerState != PlayerState.Grabbing)
         {
             GrabFunction(hits[0].collider);
+            EndOfUpdate();
+            return;
         }
         else if (playerState == PlayerState.Grabbing)
         {
             HandleGrabbing();
             EndOfUpdate();
             return;
+        }
+        else if(lastGrabbedID != 0) // Reset
+        {
+            lastGrabbedID = 0;
+            //Debug.Log("Clear Grab");
         }
 
         #endregion
@@ -411,6 +422,14 @@ public class PlatformerPhysics : MonoBehaviour
 
     private void GrabFunction(Collider2D other)
     {
+        // The id is used to make sure it can actually leave the grab state 
+        // and not regrab immediately
+        int id = other.GetInstanceID();
+
+        if (id == lastGrabbedID)
+            return;
+
+        // Not sure if this still needs to be in there
         float yDist = Grab.position.y - other.transform.position.y;
 
         if (yDist + OtherSettings.GrabMinNegYDist < 0)
@@ -427,7 +446,9 @@ public class PlatformerPhysics : MonoBehaviour
         tr.position = newPos;
 
         SetState(PlayerState.Grabbing);
+        lastGrabbedID = id;
 
+        // Make sure the animation clip is facing the right direction
         CheckFlipBy(dir);
     }
 
