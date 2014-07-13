@@ -286,44 +286,20 @@ public class PlatformerPhysics : MonoBehaviour
         if (InputHorizontal == 0 && velocityX == 0)
         {
             if (Grounded)
-            {
                 SetState(PlayerState.Idle);
-            }
         }//DeAccel if on the ground with no input
         else if (InputHorizontal == 0 && Grounded && velocityX != 0) //No Input & onground     
         {
-            SetState(PlayerState.Running);
-
-            //Debug.Log("DEACCEL");
-            //DeAccel();
-            // Possible to do fraction deaccel if wanted
-            accel *= -velocityDirection / this.RunSettings.RunDeAccelTime;
-
-            // CLAMP: If it ends up going in the other direction after accel, clamp it to 0
-            float newXVelocity = velocityX + accel;
-            if (newXVelocity / Mathf.Abs(newXVelocity) != velocityDirection)
-                rigid.velocity = new Vector2(0, rigid.velocity.y);
-            else
-                rigid.velocity += new Vector2(accel, 0);
-        }
-        else if (InputHorizontal != 0 && Mathf.Abs(velocityX) > 0 && velocityDirection != InputHorizontal)
-        {
-            //Debug.Log("DEACCEL OTHER DIRECTION " + velocityX);
             DeAccel();
-        }
+        } // Has input in the other direction (also in AIR)
+        else if (InputHorizontal != 0 && velocityX != 0 && velocityDirection != horInputDirection)
+        { 
+            DeAccel();
+        } // Accel
         else if(InputHorizontal != 0)
-        {//Accel
-            if (Grounded)
-                SetState(PlayerState.RunningStopping);
-
-            //Debug.Log("ACCEL");
-
-            accel *= InputHorizontal / RunSettings.RunAccelTime;
-            //CLAMP
-            if (Mathf.Abs(velocityX + accel) > RunSettings.RunMaxVelocity)
-                rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * velocityDirection, rigid.velocity.y);
-            else
-                rigid.velocity += new Vector2(accel, 0);
+        {
+            
+            Accel();
         }
         #endregion
 
@@ -381,25 +357,47 @@ public class PlatformerPhysics : MonoBehaviour
 
     #region Movement
 
+    private void Accel()
+    {
+        if (Grounded)
+            SetState(PlayerState.Running);
+        //else
+        //   todo air Accel animation
+
+        // Calculate the acceleration and add it to velocity
+        float accel = (Time.fixedDeltaTime * RunSettings.RunMaxVelocity * Mathf.Sign(InputHorizontal)) / RunSettings.RunAccelTime;
+
+        rigid.velocity += new Vector2(accel, 0);
+
+        float velX = rigid.velocity.x;
+
+        //CLAMP by this speed (lower max if input is not full)
+        float maxSpeed = Mathf.Abs(RunSettings.RunMaxVelocity * InputHorizontal);
+        if (Mathf.Abs(velX) > maxSpeed)
+            rigid.velocity = new Vector2(maxSpeed * Mathf.Sign(velX), rigid.velocity.y);
+    }
+
     private void DeAccel()
     {
-        float XVelocity = Mathf.Sign(rigid.velocity.x);
-        float velXDirS = Mathf.Sign(XVelocity);
-
-        // Possible to do fraction deaccel if wanted
-        float accel = (Time.fixedDeltaTime * RunSettings.RunMaxVelocity * -velXDirS) / this.RunSettings.RunDeAccelTime;
-
-        float newXVelocity = XVelocity + accel;
+        if(Grounded)
+            SetState(PlayerState.RunningStopping);
+        //else
+        //    todo air stop animation
         
-        float newVelDirS = Mathf.Sign(newXVelocity);
+        float velocityX = rigid.velocity.x;
+        float velocityDirection = Mathf.Sign(velocityX);
+
+        float accel = (Time.fixedDeltaTime * RunSettings.RunMaxVelocity * -velocityDirection) / this.RunSettings.RunDeAccelTime;
+
+        rigid.velocity += new Vector2(accel, 0);
+
+        // Only clamp to 0 with no input and an actual velocity
+        if (InputHorizontal != 0 || rigid.velocity.x == 0)
+            return;
+
         // CLAMP: If it ends up going in the other direction after accel, clamp it to 0
-        if (newVelDirS != velXDirS)
-        {
-            Debug.Log("Clamp");
+        if (Mathf.Sign(rigid.velocity.x) != velocityDirection)
             rigid.velocity = new Vector2(0, rigid.velocity.y);
-        }
-        else // add to velocity
-            rigid.velocity += new Vector2(accel, 0);
     }
 
     #endregion
