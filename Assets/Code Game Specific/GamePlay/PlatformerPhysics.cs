@@ -213,11 +213,13 @@ public class PlatformerPhysics : MonoBehaviour
 
         if (hits.Count > 2)
         {
-            // Make sure it steps up in height if it hits an object to the left or right side if possible
-            // Maybe also in collision method?
+            // EDGE WONK TIME!
+
+            
         }
 
-        Grounded = hits.Count > 2;
+        Grounded = hits.Count > 2; // and min dist
+
 
         #endregion
 
@@ -228,12 +230,12 @@ public class PlatformerPhysics : MonoBehaviour
         // Offset
         grabPos += !facingRight ? new Vector2(-GrabSettings.RayOffset.x, GrabSettings.RayOffset.y) : GrabSettings.RayOffset;
 
-        hits = CastRaysInAnglesFromPoint(grabPos, GrabSettings.GrabRayStartAngle, GrabSettings.GrabRayEndAngle,
+        List<RaycastHit2D>  grabHits = CastRaysInAnglesFromPoint(grabPos, GrabSettings.GrabRayStartAngle, GrabSettings.GrabRayEndAngle,
                                          GrabSettings.GrabRayAmount, GrabSettings.GrabRayDistance, 
                                          LayerMask.NameToLayer("GrabMe"), true, !facingRight);
 
         // Not grabbing, but colliding with grab object
-        if (hits.Count() > 0 && playerState != PlayerState.Grabbing)
+        if (grabHits.Count() > 0 && playerState != PlayerState.Grabbing)
         {
             GrabFunction(hits[0].collider);
             EndOfUpdate();
@@ -298,7 +300,6 @@ public class PlatformerPhysics : MonoBehaviour
         } // Accel
         else if(InputHorizontal != 0)
         {
-            
             Accel();
         }
         #endregion
@@ -307,17 +308,30 @@ public class PlatformerPhysics : MonoBehaviour
 
         // Jump
         if (Grounded && InputJump)
-        {
             Jump();
-        }
 
         #endregion
 
         Fall();
 
         CheckFlipBy(InputHorizontal);
+        //CheckFlipByVelocity(); //old
 
-        //CheckFlipByVelocity();
+        #region Correct y position
+
+        // Make sure it steps up in height if it hits an object to the left or right side if possible
+        // Maybe also in collision method?
+
+        // Y correct up
+
+
+        // Y correct when falling
+        float distToGround = GetMinDistance(hits);
+        Debug.Log(distToGround);
+        //if(rigid.velocity.y
+
+
+        #endregion
 
         EndOfUpdate();
 	}
@@ -335,6 +349,7 @@ public class PlatformerPhysics : MonoBehaviour
         animator.SetFloat("VelocityY", rigid.velocity.y);
         animator.SetFloat("Speed", Mathf.Abs(rigid.velocity.x)/RunSettings.RunMaxVelocity);
         
+        // Jump queue plx
         InputJump = false;
         
         //allInTriggerRange.Clear();
@@ -909,6 +924,8 @@ public class PlatformerPhysics : MonoBehaviour
             {
                 Color color = hits.Count > 0 ? Color.green : Color.red;
                 Debug.DrawRay(v, ray, color);
+                float minDist = GetMinDistance(hits);
+                Debug.DrawRay(v + ray * minDist, Vector2.right * 0.1f, Color.clear);
             }
 
             collided.AddRange(hits);

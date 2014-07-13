@@ -118,7 +118,7 @@ public class Instrument : MonoBehaviour
         int beat = (int)Mathf.Round(GlobalBeat.ProgressInMeasure());
         float dist = GlobalBeat.SecondsFromBeat();
 
-        Debug.Log("Range: " + dist);
+        //Debug.Log("Range: " + dist);
 
         // Clips in range
         // Filter out the farther ones?
