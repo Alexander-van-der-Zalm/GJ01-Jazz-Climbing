@@ -6,6 +6,16 @@ Physics2DSettings:
   m_Gravity: {x: 0, y: -9.81000042}
   m_DefaultMaterial: {fileID: 6200000, guid: 497b083c553c2034f9aaed96d6281e89, type: 2}
   m_VelocityIterations: 8
-  m_PositionIterations: 3
+  m_PositionIterations: 4
+  m_VelocityThreshold: 2
+  m_MaxLinearCorrection: .200000003
+  m_MaxAngularCorrection: 8
+  m_MaxTranslationSpeed: 100
+  m_MaxRotationSpeed: 360
+  m_BaumgarteScale: .200000003
+  m_BaumgarteTimeOfImpactScale: .75
+  m_TimeToSleep: .5
+  m_LinearSleepTolerance: .00999999978
+  m_AngularSleepTolerance: 2
   m_RaycastsHitTriggers: 1
-  m_LayerCollisionMatrix: ffedffffffedffffffedffffffffffffffedffffffffffffffffffffffffffffffffffffe8e9fffffffdffffffefffffe8e5ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_LayerCollisionMatrix: ffcdffffffcdffffffcdffffffffffffffcdffffffdfffffffffffffffffffffffdfffffe8c9ffffffddffffffcfffffe8c5ffffc8c0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
