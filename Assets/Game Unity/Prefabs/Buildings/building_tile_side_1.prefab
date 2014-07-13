@@ -44,7 +44,7 @@ GameObject:
   - 4: {fileID: 400004}
   - 58: {fileID: 5800002}
   - 61: {fileID: 6100002}
-  m_Layer: 8
+  m_Layer: 13
   m_Name: GrabMe
   m_TagString: GrabMe
   m_Icon: {fileID: 0}
@@ -98,6 +98,7 @@ Transform:
   - {fileID: 400002}
   - {fileID: 400006}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
 --- !u!4 &400002
 Transform:
   m_ObjectHideFlags: 1
@@ -109,6 +110,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400000}
+  m_RootOrder: 2
 --- !u!4 &400004
 Transform:
   m_ObjectHideFlags: 1
@@ -120,6 +122,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400000}
+  m_RootOrder: 0
 --- !u!4 &400006
 Transform:
   m_ObjectHideFlags: 1
@@ -131,6 +134,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400000}
+  m_RootOrder: 3
 --- !u!4 &400008
 Transform:
   m_ObjectHideFlags: 1
@@ -142,6 +146,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400000}
+  m_RootOrder: 1
 --- !u!58 &5800002
 CircleCollider2D:
   m_ObjectHideFlags: 1
@@ -489,9 +494,8 @@ SpriteRenderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_SortingLayer: 4
-  m_SortingOrder: 0
   m_SortingLayerID: 4081136285
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300002, guid: 14f9a6efbe884ff43b406c80e19415d8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &100100000

@@ -17,6 +17,11 @@ public class PlatformerPhysics : MonoBehaviour
 {
     #region Helper Enums & Classes
 
+    private enum Side
+    {
+        Top,Left,Right,Bottom
+    }
+
     public enum PlayerState
     {
         Idle,
@@ -35,6 +40,18 @@ public class PlatformerPhysics : MonoBehaviour
         public float JumpMaxHeight = 4.0f;
         public float JumpMinHeight = 1.0f;
         public float JumpTimeToApex = 0.44f;
+
+        public RayCastSettings RaySettings;
+
+        [System.Serializable]
+        public class RayCastSettings
+        {
+            public float JumpMaxDistToGround = 0.1f;
+            public Vector2 FeetOffset;
+            public float FeetWidth;
+            public float RayDepth;
+            public int FeetRays;
+        }
     }
 
     [System.Serializable]
@@ -74,11 +91,6 @@ public class PlatformerPhysics : MonoBehaviour
 
     public Rigidbody2D RigidBody;
     public Animator Animator;
-
-    public Vector2 FeetOffset;
-    public float FeetWidth;
-    public float RayDepth;
-    public int FeetRays;
 
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
@@ -126,6 +138,8 @@ public class PlatformerPhysics : MonoBehaviour
     private string floorTag = "Floor";
     private string wallTag = "Wall";
 
+    private Vector2 feetOffset1, feetOffset2;
+
     #endregion
 
     #region Start
@@ -147,8 +161,8 @@ public class PlatformerPhysics : MonoBehaviour
         ChildTrigger2DDelegates playerDels = ChildTrigger2DDelegates.AddChildTrigger2D(PlayerCharacter.gameObject, null);
 
         //grabDels.OnTriggerEnter = new TriggerDelegate(OnWallTriggerEnter);
-        grabDels.OnTriggerStay = new TriggerDelegate(OnWallTriggerEnter);
-        grabDels.OnTriggerExit = new TriggerDelegate(LeaveWallTrigger);
+        //grabDels.OnTriggerStay = new TriggerDelegate(OnWallTriggerEnter);
+        //grabDels.OnTriggerExit = new TriggerDelegate(LeaveWallTrigger);
 
         GrabOffset = Grab.position - tr.position;
 
@@ -167,6 +181,7 @@ public class PlatformerPhysics : MonoBehaviour
         StartOfUpdate();
 
         #region Vars
+
         // hor: Input & Dir is a mini cached var
         //float hor = HorizontalInput;
         float velocityX = rigid.velocity.x;
@@ -178,9 +193,33 @@ public class PlatformerPhysics : MonoBehaviour
 
         #endregion
 
-        #region Grab
+        #region Grounded Check (Ray casts)
 
-        if (playerState == PlayerState.Grabbing)
+        Vector2 startPos = tr.position;
+
+        startPos += JumpSettings.RaySettings.FeetOffset + Vector2.right * -JumpSettings.RaySettings.FeetWidth;
+        Vector2 endPos = startPos + Vector2.right * 2 * JumpSettings.RaySettings.FeetWidth;
+
+        List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, JumpSettings.RaySettings.FeetRays, JumpSettings.RaySettings.RayDepth, LayerMask.NameToLayer("Tiles"), true);
+        //List<RaycastHit2D> hits = CastRays(startPos, endPos, Vector2.up * -1, JumpSettings.RaySettings.FeetRays, JumpSettings.RaySettings.RayDepth, LayerMask.NameToLayer("Tiles"), true);
+        //Debug.Log(hits.Count());
+
+        Grounded = hits.Count > 2;
+
+        #endregion
+
+        #region Grab (RayCasts)
+
+        // Cast Grab Rays
+        hits = CastRaysInAnglesFromPoint(Grab.position, -15, 45, 4, 0.3f, LayerMask.NameToLayer("GrabMe"), true, !facingRight);
+
+        Debug.Log(hits.Count());
+
+        if (hits.Count() > 0)
+        {
+            GrabFunction(hits[0].collider);
+        }
+        else if (playerState == PlayerState.Grabbing)
         {
             HandleGrabbing();
             EndOfUpdate();
@@ -288,63 +327,11 @@ public class PlatformerPhysics : MonoBehaviour
         EndOfUpdate();
 	}
 
-    private int floorEmptyCount = 0;
-
     private void StartOfUpdate()
     {
         // Set Animator floats
         animator.SetFloat("Horizontal", InputHorizontal);
         animator.SetFloat("Vertical", InputVertical);
-
-        // Check if all collision lists are legal
-        List<string> tags = (from p in allInTriggerRange
-                             select p.tag).Distinct().ToList();
-        
-        Vector2 startPos = tr.position;
-        startPos += FeetOffset + Vector2.right * -FeetWidth;
-        Vector2 endPos = startPos + Vector2.right *2 * FeetWidth;
-        List<RaycastHit2D> hits = CastRays(startPos, endPos, Vector2.up * -1, FeetRays, RayDepth, LayerMask.NameToLayer("Tiles"), true);
-        Debug.Log(hits.Count());
-        //hits[0].collider.bounds
-        //List<GameObject> gos = (from h in hits select h.rigidbody.gameObject).Distinct().ToList();
-        //foreach (RaycastHit2D hit in hits)
-        //{
-        //    if(hit.collider != null)
-        //    //if (hit != null)
-        //        Debug.Log(hit.rigidbody.gameObject.tag);
-        //}
-        //Debug.Log(gos.Count());
-        //List<string> tags2 = (from h in hits
-        //                      select h.rigidbody.gameObject.tag).Distinct().ToList();
-        
-        //List<string> tags2 = 
-
-        
-
-        Grounded = floorsInCollision.Count > 0;
-
-        //if (!tags2.Contains(floorTag))
-        //{
-        //    // Show all in collision with
-        //    foreach (string str in tags2)
-        //    {
-        //        Debug.Log(str + " " + (tags2).Count() + " " + Time.timeSinceLevelLoad);
-        //    }
-        //    //DebugHelper.LogList<string>(tags);
-        //    if (floorEmptyCount < 3)
-        //    {
-        //        floorEmptyCount++;
-        //        return;
-        //    }
-        //    floorEmptyCount = 0;
-        //    floorsInCollision.Clear();
-        //    Debug.Log("FloorClear | count: " + tags2.Count());
-        //}
-        //else
-        //    floorEmptyCount = 0;
-
-        //if (!tags.Contains(wallTag))
-        //    wallInCollision.Clear();
     }
 
     private void EndOfUpdate()
@@ -365,10 +352,10 @@ public class PlatformerPhysics : MonoBehaviour
     public void SetMovementInput(float horizontalInput, float verticalInput, bool jump, bool jumpDown, bool dash)
     {
         InputHorizontal = horizontalInput;
-        InputVertical = verticalInput;
-        InputJump = jump;
-        InputJumpDown = jumpDown;
-        InputDash = dash;
+        InputVertical   = verticalInput;
+        InputJump       = jump;
+        InputJumpDown   = jumpDown;
+        InputDash       = dash;
     }
 
     #endregion
@@ -421,6 +408,29 @@ public class PlatformerPhysics : MonoBehaviour
 
         }
     }
+
+    private void GrabFunction(Collider2D other)
+    {
+        float yDist = Grab.position.y - other.transform.position.y;
+
+        if (yDist + OtherSettings.GrabMinNegYDist < 0)
+            return;
+
+        // Grab the object
+        Vector3 relPos = other.transform.position - tr.position;
+        float dir = Mathf.Sign(relPos.x);
+
+        Vector3 offset = GrabOffset;
+        offset.x *= dir;
+        Vector3 newPos = other.transform.position - offset;
+
+        tr.position = newPos;
+
+        SetState(PlayerState.Grabbing);
+
+        CheckFlipBy(dir);
+    }
+
 
     #region GrabTriggers
 
@@ -832,17 +842,17 @@ public class PlatformerPhysics : MonoBehaviour
         }
     }
 
-    private float triggerTime;
+    //private float triggerTime;
 
     public void OnGroundedTriggerStay(Collider2D other)
     {
-        if (triggerTime != Time.timeSinceLevelLoad)
-        {
+        //if (triggerTime != Time.timeSinceLevelLoad)
+        //{
             
-            allInTriggerRange.Clear();
-            triggerTime = Time.timeSinceLevelLoad;
-        }
-        allInTriggerRange.Add(other.gameObject);
+        //    allInTriggerRange.Clear();
+        //    triggerTime = Time.timeSinceLevelLoad;
+        //}
+        //allInTriggerRange.Add(other.gameObject);
     }
 
     public void OnGroundedTriggerExit(Collider2D other)
@@ -873,6 +883,34 @@ public class PlatformerPhysics : MonoBehaviour
         rigid.gravityScale = targetGravity / Mathf.Abs(Physics2D.gravity.y);
     }
 
+    private List<RaycastHit2D> CastRays(Collider2D collider, Side side, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
+    {
+        Vector2 v1, v2;
+        Vector2 min = collider.bounds.min;
+        Vector2 max = collider.bounds.max;
+
+        switch(side)
+        {
+            case Side.Bottom:
+                v1 = min;
+                v2 = new Vector2(max.x,min.y);
+                break;
+            case Side.Left:
+                v1 = min;
+                v2 = new Vector2(min.x,max.y);
+                break;
+            case Side.Right:
+                v1 = max;
+                v2 = new Vector2(max.x,min.y);
+                break;
+            default://TOP
+                v1 = max;
+                v2 = new Vector2(min.x,max.y);
+                break;
+        }
+        return CastRays(v1, v2, rayDirection, amount, rayLength, layerMask, debug);
+    }
+
     private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
     {
         List<RaycastHit2D> collided = new List<RaycastHit2D>();
@@ -886,15 +924,41 @@ public class PlatformerPhysics : MonoBehaviour
             // Only select non null hits and colliders
             List<RaycastHit2D> hits = Physics2D.RaycastAll(v, ray, rayLength, 1 << layerMask).Where(h => h != null && h.collider != null).ToList();
             
-            Color color = hits.Count>0 ? Color.green : Color.red;
-
-           
-            if(debug)
+            if (debug)
+            {
+                Color color = hits.Count > 0 ? Color.green : Color.red;
                 Debug.DrawRay(v, ray, color);
+            }
 
             collided.AddRange(hits);
         }
 
+        return collided;
+    }
+
+    private List<RaycastHit2D> CastRaysInAnglesFromPoint(Vector2 centerPoint, float startAngle, float endAngle, int amount, float rayLength, LayerMask layerMask, bool debug = false, bool flipX = false)
+    {
+        List<RaycastHit2D> collided = new List<RaycastHit2D>();
+
+        float angleStep = (endAngle - startAngle) / (amount - 1);
+
+        for (int i = 0; i < amount; i++)
+        {
+            float a = startAngle + angleStep * i;
+            Vector2 ray = new Vector2(Mathf.Cos(a * Mathf.Deg2Rad), Mathf.Sin(a * Mathf.Deg2Rad)).normalized * rayLength;
+
+            if (flipX)
+                ray.x = ray.x * -1;
+
+            List<RaycastHit2D> hits = Physics2D.RaycastAll(centerPoint, ray, rayLength, 1 << layerMask).Where(h => h != null && h.collider != null).ToList();
+
+            if (debug)
+            {
+                Color color = hits.Count > 0 ? Color.green : Color.red;
+                Debug.DrawRay(centerPoint, ray, color);
+            }
+            collided.AddRange(hits);
+        }
         return collided;
     }
 
