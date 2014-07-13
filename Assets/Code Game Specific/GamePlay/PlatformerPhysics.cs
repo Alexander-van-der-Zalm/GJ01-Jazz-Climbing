@@ -40,18 +40,6 @@ public class PlatformerPhysics : MonoBehaviour
         public float JumpMaxHeight = 4.0f;
         public float JumpMinHeight = 1.0f;
         public float JumpTimeToApex = 0.44f;
-
-        public RayCastSettings RaySettings;
-
-        [System.Serializable]
-        public class RayCastSettings
-        {
-            public float JumpMaxDistToGround = 0.1f;
-            public Vector2 FeetOffset;
-            public float FeetWidth;
-            public float RayDepth;
-            public int FeetRays;
-        }
     }
 
     [System.Serializable]
@@ -60,6 +48,19 @@ public class PlatformerPhysics : MonoBehaviour
         public float RunMaxVelocity = 4;
         public float RunAccelTime = 0.5f;
         public float RunDeAccelTime = 0.25f;
+    }
+
+    [System.Serializable]
+    public class GroundingRayCastSettingsC
+    {
+        public float GroundedDistanceToGround = 0.1f;
+        
+        public Vector2 FeetOffset;
+        public float RayDepth = 0.3f;
+        public int FeetRays = 5;
+
+        public float JumpMaxDistToGround = 0.15f;
+
     }
 
     [System.Serializable]
@@ -94,6 +95,19 @@ public class PlatformerPhysics : MonoBehaviour
         public Vector2 RayOffset = Vector2.zero;
     }
 
+    public struct DoubleVector2
+    {
+        public Vector2 V1,V2;
+
+        public DoubleVector2(Vector2 v1, Vector2 v2)
+        {
+            V1 = v1;
+            V2 = v2;
+        }
+
+        public Vector2 Mid { get { return V1 + 0.5f * (V2 - V1); } }
+    }
+
     #endregion
 
     #region Fields
@@ -103,6 +117,7 @@ public class PlatformerPhysics : MonoBehaviour
 
     public JumpSettingsC JumpSettings;
     public RunSettingsC RunSettings;
+    public GroundingRayCastSettingsC GroundingRayCastSettings;
     public WallSlideSettingsC WallSlideSettings;
     public FallSettingsC FallSettings;
     public GrabSettingsC GrabSettings;
@@ -193,33 +208,26 @@ public class PlatformerPhysics : MonoBehaviour
         // hor: Input & Dir is a mini cached var
         //float hor = HorizontalInput;
         float velocityX = rigid.velocity.x;
+        float velocityY = rigid.velocity.y;
 
         // do some precalculaltions 
         float accel = Time.fixedDeltaTime * RunSettings.RunMaxVelocity;
         float velocityDirection = Mathf.Sign(velocityX);
         float horInputDirection = Mathf.Sign(InputHorizontal);
 
+        Vector2 colliderBotMid = GetColliderEdges(tr.collider2D, Side.Bottom).Mid;
+
         #endregion
 
         #region Grounded Check (Ray casts)
 
-        // Maybe cache a little
-        Vector2 startPos = tr.position;
+        float rayDepth = GroundingRayCastSettings.RayDepth;
+        rayDepth += velocityY < 0 ? velocityY * Time.fixedDeltaTime * 1.5f : 0;
 
-        startPos += JumpSettings.RaySettings.FeetOffset + Vector2.right * -JumpSettings.RaySettings.FeetWidth;
-        Vector2 endPos = startPos + Vector2.right * 2 * JumpSettings.RaySettings.FeetWidth;
+        List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, GroundingRayCastSettings.FeetRays, rayDepth, LayerMask.NameToLayer("Tiles"), true);
+        float distToGround = GetMinDistance(hits);
 
-        List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, JumpSettings.RaySettings.FeetRays, JumpSettings.RaySettings.RayDepth, LayerMask.NameToLayer("Tiles"), true);
-
-        if (hits.Count > 2)
-        {
-            // EDGE WONK TIME!
-
-            
-        }
-
-        Grounded = hits.Count > 2; // and min dist
-
+        Grounded = hits.Count > 2 && distToGround < GroundingRayCastSettings.JumpMaxDistToGround; // and min dist
 
         #endregion
 
@@ -250,6 +258,17 @@ public class PlatformerPhysics : MonoBehaviour
         else if(lastGrabbedID != 0) // Reset
         {
             lastGrabbedID = 0;
+        }
+
+        #endregion
+
+        #region Edgde Wonk
+
+        if (hits.Count > 2)
+        {
+            // EDGE WONK TIME!
+
+
         }
 
         #endregion
@@ -326,9 +345,23 @@ public class PlatformerPhysics : MonoBehaviour
 
 
         // Y correct when falling
-        float distToGround = GetMinDistance(hits);
+
         //Debug.Log(distToGround);
-        //if(rigid.velocity.y
+        if (-rigid.velocity.y > distToGround)
+        {
+            Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
+            Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
+            Debug.Break();
+            // Set transform to GroundedDistanceToGround
+            float yPos = colliderBotMid.y - distToGround + GroundingRayCastSettings.GroundedDistanceToGround;
+            tr.position = new Vector2(colliderBotMid.x, yPos);
+
+            // Kill gravity and stop y velocity
+            rigid.velocity = new Vector2(rigid.velocity.x, 0);
+            rigid.gravityScale = 0;
+
+            Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
+        }
 
 
         #endregion
@@ -345,14 +378,13 @@ public class PlatformerPhysics : MonoBehaviour
 
     private void EndOfUpdate()
     {
+        // Set end of update animator values
         animator.SetFloat("VelocityX", rigid.velocity.x);
         animator.SetFloat("VelocityY", rigid.velocity.y);
         animator.SetFloat("Speed", Mathf.Abs(rigid.velocity.x)/RunSettings.RunMaxVelocity);
         
         // Jump queue plx
         InputJump = false;
-        
-        //allInTriggerRange.Clear();
     }
 
     #endregion
@@ -726,17 +758,17 @@ public class PlatformerPhysics : MonoBehaviour
     private void Fall(bool falldown = false)
     {
         // Fall gravity
-        if (!Grounded && (rigid.velocity.y < 0 || falldown))
+        if (!Grounded && rigid.velocity.y > 0)// || falldown)
+        {
+            SetState(PlayerState.Airborne);
+        }
+        else if (!Grounded && playerState != PlayerState.Falling)
         {
             //Debug.Log("FALLING " + falldown + " " + playerState);
             SetState(PlayerState.Falling);
             SetGravity(FallSettings.FallGravity);
-            
+            Debug.Log("Fall");
             //rigid.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
-        }
-        else if (!Grounded)
-        {
-            SetState(PlayerState.Airborne);
         }
     }
 
@@ -881,30 +913,8 @@ public class PlatformerPhysics : MonoBehaviour
 
     private List<RaycastHit2D> CastRays(Collider2D collider, Side side, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
     {
-        Vector2 v1, v2;
-        Vector2 min = collider.bounds.min;
-        Vector2 max = collider.bounds.max;
-
-        switch(side)
-        {
-            case Side.Bottom:
-                v1 = min;
-                v2 = new Vector2(max.x,min.y);
-                break;
-            case Side.Left:
-                v1 = min;
-                v2 = new Vector2(min.x,max.y);
-                break;
-            case Side.Right:
-                v1 = max;
-                v2 = new Vector2(max.x,min.y);
-                break;
-            default://TOP
-                v1 = max;
-                v2 = new Vector2(min.x,max.y);
-                break;
-        }
-        return CastRays(v1, v2, rayDirection, amount, rayLength, layerMask, debug);
+        DoubleVector2 vec = GetColliderEdges(collider, side);
+        return CastRays(vec.V1, vec.V2, rayDirection, amount, rayLength, layerMask, debug);
     }
 
     private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
@@ -970,6 +980,34 @@ public class PlatformerPhysics : MonoBehaviour
                 minDist = hit.fraction;
         }
         return minDist;
+    }
+
+    private DoubleVector2 GetColliderEdges(Collider2D collider, Side side)
+    {
+        Vector2 v1, v2;
+        Vector2 min = collider.bounds.min;
+        Vector2 max = collider.bounds.max;
+
+        switch (side)
+        {
+            case Side.Bottom:
+                v1 = min;
+                v2 = new Vector2(max.x, min.y);
+                break;
+            case Side.Left:
+                v1 = min;
+                v2 = new Vector2(min.x, max.y);
+                break;
+            case Side.Right:
+                v1 = max;
+                v2 = new Vector2(max.x, min.y);
+                break;
+            default://TOP
+                v1 = max;
+                v2 = new Vector2(min.x, max.y);
+                break;
+        }
+        return new DoubleVector2(v1,v2);
     }
 
     #endregion

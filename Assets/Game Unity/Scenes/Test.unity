@@ -1431,7 +1431,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 400000, guid: 7bb3ce6f966973241be29211b1e312e0, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -3.24322796
+      value: -4.17861462
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 7bb3ce6f966973241be29211b1e312e0, type: 2}
       propertyPath: m_LocalPosition.y
@@ -18904,16 +18904,16 @@ MonoBehaviour:
     JumpMaxHeight: 4
     JumpMinHeight: 1
     JumpTimeToApex: .439999998
-    RaySettings:
-      JumpMaxDistToGround: .100000001
-      FeetOffset: {x: 0, y: 0}
-      FeetWidth: .25
-      RayDepth: .100000001
-      FeetRays: 5
   RunSettings:
     RunMaxVelocity: 5
     RunAccelTime: .400000006
     RunDeAccelTime: .25
+  GroundingRayCastSettings:
+    GroundedDistanceToGround: .00999999978
+    FeetOffset: {x: 0, y: 0}
+    RayDepth: .300000012
+    FeetRays: 5
+    JumpMaxDistToGround: .150000006
   WallSlideSettings:
     WallSlideGravity: 4
     WallSlideInitialVelocity: .5
@@ -36884,7 +36884,7 @@ Transform:
   m_PrefabInternal: {fileID: 94672456}
   m_GameObject: {fileID: 1449339657}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.24322796, y: -2.0332346, z: -.00146484375}
+  m_LocalPosition: {x: -4.17861462, y: -2.0332346, z: -.00146484375}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 397845091}
