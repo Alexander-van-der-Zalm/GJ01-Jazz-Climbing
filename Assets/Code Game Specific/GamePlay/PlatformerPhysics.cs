@@ -327,7 +327,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         // Y correct when falling
         float distToGround = GetMinDistance(hits);
-        Debug.Log(distToGround);
+        //Debug.Log(distToGround);
         //if(rigid.velocity.y
 
 
@@ -925,7 +925,8 @@ public class PlatformerPhysics : MonoBehaviour
                 Color color = hits.Count > 0 ? Color.green : Color.red;
                 Debug.DrawRay(v, ray, color);
                 float minDist = GetMinDistance(hits);
-                Debug.DrawRay(v + ray * minDist, Vector2.right * 0.1f, Color.clear);
+                //Debug.Log(minDist);
+                Debug.DrawRay(v + ray * minDist, Vector2.right * 0.05f, Color.magenta);
             }
 
             collided.AddRange(hits);
