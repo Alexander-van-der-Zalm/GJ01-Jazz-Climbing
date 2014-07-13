@@ -79,10 +79,19 @@ public class PlatformerPhysics : MonoBehaviour
     }
 
     [System.Serializable]
-    public class OtherSettingsC
+    public class GrabSettingsC
     {
-        [Range(0, 0.5f)]
-        public float GrabMinNegYDist = 0.1f; // Check colliders tbh
+        [Range(0, 1f)]
+        public float GrabRayDistance = 0.3f;
+        [Range(0,30)]
+        public int GrabRayAmount = 4;
+        [Range(-360, 360)]
+        public float GrabRayStartAngle = -15;
+        [Range(-360, 360)]
+        public float GrabRayEndAngle = 45;
+        public float GrabMinNegYDist = 0.1f;
+        public float MaxYVelocity = 10;
+        public Vector2 RayOffset = Vector2.zero;
     }
 
     #endregion
@@ -96,7 +105,7 @@ public class PlatformerPhysics : MonoBehaviour
     public RunSettingsC RunSettings;
     public WallSlideSettingsC WallSlideSettings;
     public FallSettingsC FallSettings;
-    public OtherSettingsC OtherSettings;
+    public GrabSettingsC GrabSettings;
 
     // WallJump/SlideSettings
     private float WallJumpLastDirection = 0;
@@ -194,18 +203,18 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region Grounded Check (Ray casts)
 
+        // Maybe cache a little
         Vector2 startPos = tr.position;
 
         startPos += JumpSettings.RaySettings.FeetOffset + Vector2.right * -JumpSettings.RaySettings.FeetWidth;
         Vector2 endPos = startPos + Vector2.right * 2 * JumpSettings.RaySettings.FeetWidth;
 
         List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, JumpSettings.RaySettings.FeetRays, JumpSettings.RaySettings.RayDepth, LayerMask.NameToLayer("Tiles"), true);
-        //List<RaycastHit2D> hits = CastRays(startPos, endPos, Vector2.up * -1, JumpSettings.RaySettings.FeetRays, JumpSettings.RaySettings.RayDepth, LayerMask.NameToLayer("Tiles"), true);
-        //Debug.Log(hits.Count());
 
         if (hits.Count > 2)
         {
-
+            // Make sure it steps up in height if it hits an object to the left or right side if possible
+            // Maybe also in collision method?
         }
 
         Grounded = hits.Count > 2;
@@ -215,26 +224,30 @@ public class PlatformerPhysics : MonoBehaviour
         #region Grab (RayCasts)
 
         // Cast Grab Rays
-        hits = CastRaysInAnglesFromPoint(Grab.position, -15, 45, 4, 0.3f, LayerMask.NameToLayer("GrabMe"), true, !facingRight);
+        Vector2 grabPos = Grab.position;
+        // Offset
+        grabPos += !facingRight ? new Vector2(-GrabSettings.RayOffset.x, GrabSettings.RayOffset.y) : GrabSettings.RayOffset;
 
-        //Debug.Log(hits.Count());
+        hits = CastRaysInAnglesFromPoint(grabPos, GrabSettings.GrabRayStartAngle, GrabSettings.GrabRayEndAngle,
+                                         GrabSettings.GrabRayAmount, GrabSettings.GrabRayDistance, 
+                                         LayerMask.NameToLayer("GrabMe"), true, !facingRight);
 
+        // Not grabbing, but colliding with grab object
         if (hits.Count() > 0 && playerState != PlayerState.Grabbing)
         {
             GrabFunction(hits[0].collider);
             EndOfUpdate();
             return;
-        }
+        } // Grabbing
         else if (playerState == PlayerState.Grabbing)
         {
             HandleGrabbing();
             EndOfUpdate();
             return;
-        }
+        } // Not colliding with grab object, but id still in memory
         else if(lastGrabbedID != 0) // Reset
         {
             lastGrabbedID = 0;
-            //Debug.Log("Clear Grab");
         }
 
         #endregion
@@ -269,8 +282,6 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region Movement
 
-
-
         // Passive
         if (InputHorizontal == 0 && velocityX == 0)
         {
@@ -278,7 +289,6 @@ public class PlatformerPhysics : MonoBehaviour
             {
                 SetState(PlayerState.Idle);
             }
-
         }//DeAccel if on the ground with no input
         else if (InputHorizontal == 0 && Grounded && velocityX != 0) //No Input & onground     
         {
@@ -295,8 +305,6 @@ public class PlatformerPhysics : MonoBehaviour
                 rigid.velocity = new Vector2(0, rigid.velocity.y);
             else
                 rigid.velocity += new Vector2(accel, 0);
-
-            
         }
         else if (InputHorizontal != 0 && Mathf.Abs(velocityX) > 0 && velocityDirection != InputHorizontal)
         {
@@ -422,6 +430,8 @@ public class PlatformerPhysics : MonoBehaviour
 
     private void GrabFunction(Collider2D other)
     {
+        #region Cancel grab if one of these conditions is true (id, dist, yUpSpeed)
+
         // The id is used to make sure it can actually leave the grab state 
         // and not regrab immediately
         int id = other.GetInstanceID();
@@ -429,13 +439,19 @@ public class PlatformerPhysics : MonoBehaviour
         if (id == lastGrabbedID)
             return;
 
-        // Not sure if this still needs to be in there
+        // Makes sure its not to far down?
         float yDist = Grab.position.y - other.transform.position.y;
 
-        if (yDist + OtherSettings.GrabMinNegYDist < 0)
+        if (yDist + GrabSettings.GrabMinNegYDist < 0)
             return;
 
-        // Grab the object
+        // If the upvelocity is too high, it will pass till falling down
+        if (rigid.velocity.y > GrabSettings.MaxYVelocity)
+            return;
+
+        #endregion
+
+        // Grab the object by translation
         Vector3 relPos = other.transform.position - tr.position;
         float dir = Mathf.Sign(relPos.x);
 
@@ -445,67 +461,13 @@ public class PlatformerPhysics : MonoBehaviour
 
         tr.position = newPos;
 
+        // Change the state
         SetState(PlayerState.Grabbing);
         lastGrabbedID = id;
 
         // Make sure the animation clip is facing the right direction
         CheckFlipBy(dir);
     }
-
-
-    #region GrabTriggers
-
-    private void OnWallTriggerEnter(Collider2D other)
-    {
-        int id = other.GetInstanceID();
-
-        if (other.tag == "GrabMe" && id != lastGrabbedID)
-        {
-            float yDist = Grab.position.y - other.transform.position.y;
-            //Debug.Log(yDist + " Gr " + OtherSettings.GrabMinNegYDist + " bool: " + (yDist + OtherSettings.GrabMinNegYDist < 0));
-            if (yDist + OtherSettings.GrabMinNegYDist < 0)
-                return;
-            
-            // Grab the object
-            Vector3 relPos = other.transform.position - tr.position;
-            float dir = Mathf.Sign(relPos.x);
-
-            Vector3 offset = GrabOffset;
-            offset.x *= dir;
-            Vector3 newPos = other.transform.position - offset;
-
-            // WIP BUGFIX
-            //Collider2D[] cols = Physics2D.OverlapCircleAll(new Vector2(newPos.x,newPos.y),0.1f);
-            
-            //if (cols.Length>0)
-            //{
-            //    Debug.Log("STOUT");
-            //    GameObject bla = new GameObject();
-            //    bla.transform.position = newPos;
-            //    return;
-            //}
-
-            tr.position = newPos;
-
-            SetState(PlayerState.Grabbing);
-            lastGrabbedID = id;
-
-            CheckFlipBy(dir);
-
-        }
-    }
-
-    private void LeaveWallTrigger(Collider2D other)
-    {
-        int id = other.GetInstanceID();
-
-        if (other.tag == "GrabMe" && lastGrabbedID == id)
-        {
-            lastGrabbedID = 0;
-        }
-    }
-
-    #endregion
 
     #endregion
 
