@@ -861,7 +861,7 @@ public class PlatformerPhysics : MonoBehaviour
             case PlayerState.WallSliding:
                 animator.SetBool("WallSlide", true);
                 SetGravity(WallSlideSettings.WallSlideGravity);
-                rigid.velocity = new Vector2(0, -WallSlideSettings.WallSlideInitialVelocity);
+                //rigid.velocity = new Vector2(0, -WallSlideSettings.WallSlideInitialVelocity);
                 //Debug.Log("StartSlide grav: " + rigid.gravityScale);
                 break;
 
