@@ -95,6 +95,7 @@ public class PlatformerPhysics : MonoBehaviour
     public class EdgeWonkSettingsC
     {
         public float HopHeight = 0.3f;
+        public float MinHopXVelocity = 2.0f;
         public float MaxVelocityForStop = 8.0f;
         public float MinFractionForHop = 0.3f;
     }
@@ -242,9 +243,9 @@ public class PlatformerPhysics : MonoBehaviour
         float velocityY = rigid.velocity.y;
 
         // do some precalculaltions 
-        float accel = Time.fixedDeltaTime * RunSettings.RunMaxVelocity;
-        float velocityDirection = Mathf.Sign(velocityX);
-        float horInputDirection = Mathf.Sign(InputHorizontal);
+        //float accel = Time.fixedDeltaTime * RunSettings.RunMaxVelocity;
+        //float velocityDirection = Mathf.Sign(velocityX);
+        //float horInputDirection = Mathf.Sign(InputHorizontal);
 
         Vector2 colliderBotMid = GetColliderEdges(tr.collider2D, Side.Bottom).Mid;
 
@@ -309,8 +310,6 @@ public class PlatformerPhysics : MonoBehaviour
 
         #endregion
 
-        
-
         #region WallSlide
 
         if (CazulWallSliding())
@@ -351,7 +350,7 @@ public class PlatformerPhysics : MonoBehaviour
         {
             DeAccel();
         } // Has input in the other direction (also in AIR)
-        else if (InputHorizontal != 0 && velocityX != 0 && velocityDirection != horInputDirection)
+        else if (InputHorizontal != 0 && velocityX != 0 && Mathf.Sign(velocityX) != Mathf.Sign(InputHorizontal))
         { 
             DeAccel();
         } // Accel
@@ -393,7 +392,14 @@ public class PlatformerPhysics : MonoBehaviour
         #region EdgeHop
 
         if (lastGrounded && !Grounded && jumpAmount == 0)
+        {
+            // Gieb x velocity
+            if (Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MinHopXVelocity)
+                rigid.velocity = new Vector2(EdgeWonkSettings.MinHopXVelocity, rigid.velocity.y);
+            // Change to proper jump
             Jump();
+        }
+            
 
         #endregion
 
