@@ -47,4 +47,20 @@ public class PlayerController : MonoBehaviour
 
         platformer.SetMovementInput(ControlScheme.Horizontal.Value(), ControlScheme.Vertical.Value(), ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].IsPressed(), ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].IsDown(), false);//ControlScheme.Actions[(int)JazzClimbingPlayerActions.Dash].IsPressed());
 	}
+
+    private IEnumerator RespawnWhenFallingTooLong()
+    {
+        float time = Time.timeSinceLevelLoad;
+        platformer.playerState = PlatformerPhysics.PlayerState.Falling;
+        while (platformer.playerState == PlatformerPhysics.PlayerState.Falling)
+        {
+            float dt = Time.timeSinceLevelLoad - time;
+            if ((dt) > platformer.FallSettings.MaxFallTimeToRespawn)
+            {
+                Debug.Log("Respawn");
+                PlayerSpawn.Respawn();
+            }
+            yield return null;
+        }
+    }
 }

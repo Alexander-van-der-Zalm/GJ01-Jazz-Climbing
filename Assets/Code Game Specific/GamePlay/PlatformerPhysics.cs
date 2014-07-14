@@ -222,10 +222,13 @@ public class PlatformerPhysics : MonoBehaviour
         #region Grounded Check (Ray casts)
 
         float rayDepth = GroundingRayCastSettings.RayDepth;
-        rayDepth += velocityY < 0 ? velocityY * Time.fixedDeltaTime * 1.5f : 0;
+        rayDepth -= velocityY < 0 ? velocityY * Time.fixedDeltaTime * 1.5f : 0;
 
         List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, GroundingRayCastSettings.FeetRays, rayDepth, LayerMask.NameToLayer("Tiles"), true);
-        float distToGround = GetMinDistance(hits);
+        
+        // Get the index of the closest ray (-1 is no hit)
+        int closestCollidingRayIndex = GetMinDistanceRay(hits);
+        float distToGround = closestCollidingRayIndex >= 0 ? hits[closestCollidingRayIndex].fraction : float.MaxValue;
 
         Grounded = hits.Count > 2 && distToGround < GroundingRayCastSettings.JumpMaxDistToGround; // and min dist
 
@@ -245,7 +248,7 @@ public class PlatformerPhysics : MonoBehaviour
         // Not grabbing, but colliding with grab object
         if (grabHits.Count() > 0 && playerState != PlayerState.Grabbing)
         {
-            GrabFunction(hits[0].collider);
+            GrabFunction(grabHits[0].collider);
             EndOfUpdate();
             return;
         } // Grabbing
@@ -347,22 +350,29 @@ public class PlatformerPhysics : MonoBehaviour
         // Y correct when falling
 
         ////Debug.Log(distToGround);
-        //if (-rigid.velocity.y > distToGround)
+        
+
+        if (Grounded && -rigid.velocity.y*Time.fixedDeltaTime > distToGround)
+        {
+            Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
+            Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
+            //Debug.Break();
+            
+            // Set transform to GroundedDistanceToGroundd
+            float yPos = hits[closestCollidingRayIndex].point.y + GroundingRayCastSettings.GroundedDistanceToGround;
+            tr.position = new Vector2(colliderBotMid.x, yPos);
+
+            // Kill gravity and stop y velocity
+            rigid.velocity = new Vector2(rigid.velocity.x, 0);
+            //rigid.gravityScale = 0;
+
+            Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
+        }
+
+        //if (Grounded && playerState != PlayerState.Airborne)
         //{
-        //    Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
-        //    Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
-        //    Debug.Break();
-        //    // Set transform to GroundedDistanceToGround
-        //    float yPos = colliderBotMid.y - distToGround + GroundingRayCastSettings.GroundedDistanceToGround;
-        //    tr.position = new Vector2(colliderBotMid.x, yPos);
-
-        //    // Kill gravity and stop y velocity
-        //    rigid.velocity = new Vector2(rigid.velocity.x, 0);
-        //    rigid.gravityScale = 0;
-
-        //    Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
+        //    SetGravity(0);
         //}
-
 
         #endregion
 
@@ -772,20 +782,7 @@ public class PlatformerPhysics : MonoBehaviour
         }
     }
 
-    private IEnumerator RespawnWhenFallingTooLong()
-    {
-        float time = Time.timeSinceLevelLoad;
-        playerState = PlayerState.Falling;
-        while (playerState == PlayerState.Falling)
-        {
-            float dt = Time.timeSinceLevelLoad - time;
-            if ((dt) > FallSettings.MaxFallTimeToRespawn)
-            {
-                PlayerSpawn.Respawn();
-            }
-            yield return null;
-        }
-    }
+    
 
     #endregion
 
@@ -815,7 +812,7 @@ public class PlatformerPhysics : MonoBehaviour
                 break;
 
             case PlayerState.Falling:
-                StartCoroutine(RespawnWhenFallingTooLong());
+                //StartCoroutine(RespawnWhenFallingTooLong());
                 break;
 
             case PlayerState.WallSliding:
@@ -911,6 +908,38 @@ public class PlatformerPhysics : MonoBehaviour
         rigid.gravityScale = targetGravity / Mathf.Abs(Physics2D.gravity.y);
     }
 
+    private DoubleVector2 GetColliderEdges(Collider2D collider, Side side)
+    {
+        Vector2 v1, v2;
+        Vector2 min = collider.bounds.min;
+        Vector2 max = collider.bounds.max;
+
+        switch (side)
+        {
+            case Side.Bottom:
+                v1 = min;
+                v2 = new Vector2(max.x, min.y);
+                break;
+            case Side.Left:
+                v1 = min;
+                v2 = new Vector2(min.x, max.y);
+                break;
+            case Side.Right:
+                v1 = max;
+                v2 = new Vector2(max.x, min.y);
+                break;
+            default://TOP
+                v1 = max;
+                v2 = new Vector2(min.x, max.y);
+                break;
+        }
+        return new DoubleVector2(v1, v2);
+    }
+
+    #endregion
+
+    #region Ray cast helpers
+
     private List<RaycastHit2D> CastRays(Collider2D collider, Side side, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
     {
         DoubleVector2 vec = GetColliderEdges(collider, side);
@@ -982,32 +1011,21 @@ public class PlatformerPhysics : MonoBehaviour
         return minDist;
     }
 
-    private DoubleVector2 GetColliderEdges(Collider2D collider, Side side)
+    private int GetMinDistanceRay(List<RaycastHit2D> hits)
     {
-        Vector2 v1, v2;
-        Vector2 min = collider.bounds.min;
-        Vector2 max = collider.bounds.max;
+        float minDist = float.MaxValue;
+        int index = -1;
 
-        switch (side)
+        for (int i = 0; i < hits.Count; i++)
         {
-            case Side.Bottom:
-                v1 = min;
-                v2 = new Vector2(max.x, min.y);
-                break;
-            case Side.Left:
-                v1 = min;
-                v2 = new Vector2(min.x, max.y);
-                break;
-            case Side.Right:
-                v1 = max;
-                v2 = new Vector2(max.x, min.y);
-                break;
-            default://TOP
-                v1 = max;
-                v2 = new Vector2(min.x, max.y);
-                break;
+            if (hits[i].fraction < minDist)
+            {
+                minDist = hits[i].fraction;
+                index = i;
+            }
         }
-        return new DoubleVector2(v1,v2);
+
+        return index;
     }
 
     #endregion
