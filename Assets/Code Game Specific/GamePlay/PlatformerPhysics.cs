@@ -69,6 +69,8 @@ public class PlatformerPhysics : MonoBehaviour
         public float WallSlideGravity = 4;
         public float WallSlideInitialVelocity = 0.5f;
         public float SlideBeforeFall = 0.25f;
+        public int WallSlideRays = 3;
+        public float WallSlideRayDepth = 0.3f;
     }
 
     [System.Serializable]
@@ -133,6 +135,9 @@ public class PlatformerPhysics : MonoBehaviour
     public PlayerState playerState;
     public bool DebugStateChanges = false;
     public bool DebugRayText = false;
+    public bool DebugFeetRays = true;
+    public bool DebugWallSlideRays = true;
+    public bool DebugGrabRays = true;
 
     // Jump and direction
     private bool facingRight = true;
@@ -202,7 +207,7 @@ public class PlatformerPhysics : MonoBehaviour
     {
         // Handled by PlayerInput or AI
         StartOfUpdate();
-
+        
         #region Vars
 
         // hor: Input & Dir is a mini cached var
@@ -224,7 +229,7 @@ public class PlatformerPhysics : MonoBehaviour
         float rayDepth = GroundingRayCastSettings.RayDepth;
         rayDepth -= velocityY < 0 ? velocityY * Time.fixedDeltaTime * 1.5f : 0;
 
-        List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, GroundingRayCastSettings.FeetRays, rayDepth, LayerMask.NameToLayer("Floor"), true);
+        List<RaycastHit2D> hits = CastRaysAll(tr.collider2D, Side.Bottom, Vector2.up * -1, GroundingRayCastSettings.FeetRays, rayDepth, LayerMask.NameToLayer("Floor"), DebugFeetRays);
         
         // Get the index of the closest ray (-1 is no hit)
         int closestCollidingRayIndex = GetMinDistanceRay(hits);
@@ -242,8 +247,8 @@ public class PlatformerPhysics : MonoBehaviour
         grabPos += !facingRight ? new Vector2(-GrabSettings.RayOffset.x, GrabSettings.RayOffset.y) : GrabSettings.RayOffset;
 
         List<RaycastHit2D>  grabHits = CastRaysInAnglesFromPoint(grabPos, GrabSettings.GrabRayStartAngle, GrabSettings.GrabRayEndAngle,
-                                         GrabSettings.GrabRayAmount, GrabSettings.GrabRayDistance, 
-                                         LayerMask.NameToLayer("GrabMe"), true, !facingRight);
+                                         GrabSettings.GrabRayAmount, GrabSettings.GrabRayDistance,
+                                         LayerMask.NameToLayer("GrabMe"), DebugGrabRays, !facingRight);
 
         // Not grabbing, but colliding with grab object
         if (grabHits.Count() > 0 && playerState != PlayerState.Grabbing)
@@ -278,7 +283,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region WallSlide
 
-        if (CasulWallSliding())
+        if (CazulWallSliding())
         {
             EndOfUpdate();
             return;
@@ -578,17 +583,31 @@ public class PlatformerPhysics : MonoBehaviour
         return playerState == PlayerState.WallSliding;   
     }
 
-    private bool CasulWallSliding()
+    private bool CazulWallSliding()
     {
+        #region EndSlide when on the floor
+
         // During sliding:
         // On the floor - Or - No More slide space
-        if (playerState == PlayerState.WallSliding && (Grounded || lastSlided.Count == 0))
+        if (playerState == PlayerState.WallSliding && Grounded)
         {
             SetState(PlayerState.Idle);
+            return false;
         }
 
+        #endregion
+
+        #region RayCasts
+
+        // Only cast to the side your facing
+        Side raycastSide = facingRight ? Side.Right : Side.Left;
+        Vector2 rayDir = facingRight ? Vector2.right : Vector2.right * -1;
+        List<RaycastHit2D> hits = CastRays(tr.collider2D, raycastSide, rayDir, WallSlideSettings.WallSlideRays, WallSlideSettings.WallSlideRayDepth, LayerMask.NameToLayer("Wall"),DebugWallSlideRays);
+
+        #endregion
+
         // Start a new slide 
-        if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 )
+        if (!Grounded && playerState != PlayerState.WallSliding )//Raycasts 
         {
             SetState(PlayerState.WallSliding);
             
@@ -611,13 +630,9 @@ public class PlatformerPhysics : MonoBehaviour
             rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
             WallJump();
-
-            lastSlided.Clear();
-            wallInCollision.Clear();
-            //Debug.Log("SLIDING Clear");
         }
 
-        // Fall 
+        // Wall cancel
         if (playerState == PlayerState.WallSliding )
         {
             // only if the input is away from the wall
@@ -941,13 +956,13 @@ public class PlatformerPhysics : MonoBehaviour
 
     #region Ray cast helpers
 
-    private List<RaycastHit2D> CastRays(Collider2D collider, Side side, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
+    private List<RaycastHit2D> CastRaysAll(Collider2D collider, Side side, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
     {
         DoubleVector2 vec = GetColliderEdges(collider, side);
-        return CastRays(vec.V1, vec.V2, rayDirection, amount, rayLength, layerMask, debug);
+        return CastRaysAll(vec.V1, vec.V2, rayDirection, amount, rayLength, layerMask, debug);
     }
 
-    private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
+    private List<RaycastHit2D> CastRaysAll(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
     {
         List<RaycastHit2D> collided = new List<RaycastHit2D>();
         
@@ -969,6 +984,56 @@ public class PlatformerPhysics : MonoBehaviour
         }
 
         return collided;
+    }
+
+    private List<RaycastHit2D> CastRays(Collider2D collider, Side side, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
+    {
+        DoubleVector2 vec = GetColliderEdges(collider, side);
+        return CastRays(vec.V1, vec.V2, rayDirection, amount, rayLength, layerMask, debug);
+    }
+
+    private List<RaycastHit2D> CastRays(Vector2 startPos, Vector2 endPos, Vector2 rayDirection, int amount, float rayLength, LayerMask layerMask, bool debug = false)
+    {
+        List<RaycastHit2D> collided = new List<RaycastHit2D>();
+
+        Vector2 offset = (endPos - startPos) / (amount - 1);
+        Vector2 ray = rayDirection.normalized * rayLength;
+
+        for (int i = 0; i < amount; i++)
+        {
+            Vector2 v = startPos + i * offset;
+            
+            RaycastHit2D hit = Physics2D.Raycast(v, ray, rayLength, 1 << layerMask);
+
+            if (debug)
+                DrawHit(hit, v, ray);
+            
+            // Only select non null hits and colliders
+            if(hit!= null && hit.collider != null)
+                collided.Add(hit);
+        }
+
+        return collided;
+    }
+
+    private bool DrawHit(RaycastHit2D hit, Vector2 v, Vector2 ray)
+    {
+        bool hitSomething = (hit != null && hit.collider != null);
+
+        Color color = hitSomething ? Color.green : Color.red;
+        Debug.DrawRay(v, ray, color);
+
+        if(!hitSomething)
+            return false;
+
+        // Cross product foor orthognal v2
+        Vector3 a = ray.normalized;
+        Vector3 b = Vector3.forward;
+        Vector2 x = Vector3.Cross(-a, b).normalized;
+
+        Debug.DrawRay(v + ray * hit.fraction, x * 0.05f, Color.magenta);
+        
+        return true;
     }
 
     private void DrawHits(List<RaycastHit2D> hits, Vector2 v, Vector2 ray)

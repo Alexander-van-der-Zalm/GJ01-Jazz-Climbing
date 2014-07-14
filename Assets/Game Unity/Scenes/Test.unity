@@ -23518,6 +23518,8 @@ MonoBehaviour:
     WallSlideGravity: 4
     WallSlideInitialVelocity: .5
     SlideBeforeFall: .25
+    WallSlideRays: 3
+    WallSlideRayDepth: .300000012
   FallSettings:
     FallGravity: 50
     MaxFallTimeToRespawn: 3
@@ -23532,6 +23534,9 @@ MonoBehaviour:
   playerState: 0
   DebugStateChanges: 0
   DebugRayText: 0
+  DebugFeetRays: 1
+  DebugWallSlideRays: 1
+  DebugGrabRays: 1
 --- !u!114 &684476204
 MonoBehaviour:
   m_ObjectHideFlags: 0
