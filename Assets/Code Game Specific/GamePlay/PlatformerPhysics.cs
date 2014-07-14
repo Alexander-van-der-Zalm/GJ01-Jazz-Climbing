@@ -348,10 +348,6 @@ public class PlatformerPhysics : MonoBehaviour
 
 
         // Y correct when falling
-
-        ////Debug.Log(distToGround);
-        
-
         if (Grounded && -rigid.velocity.y*Time.fixedDeltaTime > distToGround)
         {
             Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
@@ -368,11 +364,6 @@ public class PlatformerPhysics : MonoBehaviour
 
             Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
         }
-
-        //if (Grounded && playerState != PlayerState.Airborne)
-        //{
-        //    SetGravity(0);
-        //}
 
         #endregion
 

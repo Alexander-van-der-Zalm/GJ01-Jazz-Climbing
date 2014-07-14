@@ -92,7 +92,7 @@ GameObject:
   - 4: {fileID: 400010}
   - 58: {fileID: 5800002}
   - 61: {fileID: 6100008}
-  m_Layer: 8
+  m_Layer: 13
   m_Name: GrabMe
   m_TagString: GrabMe
   m_Icon: {fileID: 0}
