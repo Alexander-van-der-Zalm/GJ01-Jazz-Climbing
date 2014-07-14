@@ -23267,7 +23267,6 @@ MonoBehaviour:
   Animator: {fileID: 71675994}
   JumpSettings:
     JumpMaxHeight: 4
-    JumpMinHeight: 1
     JumpTimeToApex: .439999998
     JumpQueueTime: .100000001
     JumpSinceGrounded: .100000001
@@ -23292,6 +23291,10 @@ MonoBehaviour:
   FallSettings:
     FallGravity: 50
     MaxFallTimeToRespawn: 3
+  EdgeWonkSettings:
+    HopHeight: .300000012
+    MaxVelocityForStop: 8
+    MinFractionForHop: .300000012
   GrabSettings:
     GrabRayDistance: .600000024
     GrabRayAmount: 4

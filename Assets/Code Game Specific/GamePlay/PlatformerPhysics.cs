@@ -92,6 +92,14 @@ public class PlatformerPhysics : MonoBehaviour
     }
 
     [System.Serializable]
+    public class EdgeWonkSettingsC
+    {
+        public float HopHeight = 0.3f;
+        public float MaxVelocityForStop = 8.0f;
+        public float MinFractionForHop = 0.3f;
+    }
+
+    [System.Serializable]
     public class GrabSettingsC
     {
         [Range(0, 1f)]
@@ -132,6 +140,7 @@ public class PlatformerPhysics : MonoBehaviour
     public GroundingRayCastSettingsC GroundingRayCastSettings;
     public WallSlideSettingsC WallSlideSettings;
     public FallSettingsC FallSettings;
+    public EdgeWonkSettingsC EdgeWonkSettings;
     public GrabSettingsC GrabSettings;
 
     // WallJump/SlideSettings
@@ -239,10 +248,13 @@ public class PlatformerPhysics : MonoBehaviour
 
         Vector2 colliderBotMid = GetColliderEdges(tr.collider2D, Side.Bottom).Mid;
 
+        bool lastGrounded = Grounded;
+
         #endregion
 
         #region Grounded Check (Ray casts)
 
+        // Calculate a safe ray depth
         float rayDepth = GroundingRayCastSettings.RayDepth;
         rayDepth -= velocityY < 0 ? velocityY * Time.fixedDeltaTime * 1.5f : 0;
 
@@ -299,11 +311,17 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region Edgde Wonk
 
-        if (hits.Count > 2)
+        if (hits.Count < 4 && hits.Count > 1)
         {
             // EDGE WONK TIME!
-
-
+            animator.SetBool("EdgeWonk", true);
+            // EDGE WONK STOP :O
+            if ((InputHorizontal == 0 || Mathf.Abs(InputHorizontal) < EdgeWonkSettings.MinFractionForHop) && Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MaxVelocityForStop)
+                rigid.velocity = Vector2.zero;
+        }
+        else
+        {
+            animator.SetBool("EdgeWonk", false);
         }
 
         #endregion
@@ -367,6 +385,12 @@ public class PlatformerPhysics : MonoBehaviour
         //  allows jumping for a short while after leaving the grounded state
         if ((Grounded && (InputJump || jumpQueue > 0)) || (InputJump && jumpAmount == 0 && timeSinceGrounded < JumpSettings.JumpSinceGrounded))
             Jump();
+
+        #endregion
+
+        #region EdgeHop
+
+
 
         #endregion
 
