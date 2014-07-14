@@ -45,8 +45,8 @@ public class LevelGenerator : MonoBehaviour
         floor.transform.parent = parent.transform;
 
         Vector2[] floorPoints = new Vector2[2];
-        floorPoints[0] = new Vector2(0, blockHeight) * tileSet.TileSize;
-        floorPoints[1] = new Vector2(blockWidth, blockHeight) * tileSet.TileSize;
+        floorPoints[0] = new Vector2(0.05f, blockHeight-0.25f) * tileSet.TileSize;
+        floorPoints[1] = new Vector2(blockWidth-0.05f, blockHeight - 0.25f) * tileSet.TileSize;
         floorC.points = floorPoints;
 
         for (int x = 0; x < blockWidth; x++)
