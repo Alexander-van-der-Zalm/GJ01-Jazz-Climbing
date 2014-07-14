@@ -345,7 +345,7 @@ public class PlatformerPhysics : MonoBehaviour
         // Maybe also in collision method?
 
         // Y correct up
-
+        CorrectStuckYPosition();
 
         // Y correct when falling
         if (Grounded && -rigid.velocity.y*Time.fixedDeltaTime > distToGround)
@@ -369,6 +369,16 @@ public class PlatformerPhysics : MonoBehaviour
 
         EndOfUpdate();
 	}
+
+    private void CorrectStuckYPosition()
+    {
+        DoubleVector2 bottomCollider = GetColliderEdges(tr.collider2D, Side.Bottom);
+        Vector2 rayPos = facingRight ? bottomCollider.V1 : bottomCollider.V2;
+        Vector2 dir = Vector2.right * Mathf.Abs(rigid.velocity.x);
+        dir *= facingRight ? -1 : 1;
+        List<RaycastHit2D> hits = Physics2D.RaycastAll(rayPos, dir, dir.magnitude, 1 << LayerMask.NameToLayer("Tiles")).ToList();
+
+    }
 
     private void StartOfUpdate()
     {
@@ -952,17 +962,26 @@ public class PlatformerPhysics : MonoBehaviour
             
             if (debug)
             {
-                Color color = hits.Count > 0 ? Color.green : Color.red;
-                Debug.DrawRay(v, ray, color);
-                float minDist = GetMinDistance(hits);
-                //Debug.Log(minDist);
-                Debug.DrawRay(v + ray * minDist, Vector2.right * 0.05f, Color.magenta);
+                DrawHits(hits, v, ray, true);
             }
 
             collided.AddRange(hits);
         }
 
         return collided;
+    }
+
+    private void DrawHits(List<RaycastHit2D> hits, Vector2 v, Vector2 ray, bool p)
+    {
+        Color color = hits.Count > 0 ? Color.green : Color.red;
+        Debug.DrawRay(v, ray, color);
+        foreach(RaycastHit2D hit in hits)
+        {
+            Debug.DrawRay(v + ray * hit.fraction, Vector2.right * 0.05f, Color.magenta);
+        }
+        
+        //Debug.Log(minDist);
+        
     }
 
     private List<RaycastHit2D> CastRaysInAnglesFromPoint(Vector2 centerPoint, float startAngle, float endAngle, int amount, float rayLength, LayerMask layerMask, bool debug = false, bool flipX = false)
