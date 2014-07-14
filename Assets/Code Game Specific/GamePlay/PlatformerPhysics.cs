@@ -395,7 +395,10 @@ public class PlatformerPhysics : MonoBehaviour
         {
             // Gieb x velocity
             if (Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MinHopXVelocity)
-                rigid.velocity = new Vector2(EdgeWonkSettings.MinHopXVelocity, rigid.velocity.y);
+            {
+                float dir = facingRight ? 1 : -1;
+                rigid.velocity = new Vector2(EdgeWonkSettings.MinHopXVelocity * dir, rigid.velocity.y);
+            }
             // Change to proper jump
             Jump();
         }
