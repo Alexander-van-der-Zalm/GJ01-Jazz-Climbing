@@ -156,10 +156,10 @@ public class PlatformerPhysics : MonoBehaviour
 
     // Storage for collided 
     //private List<int> floorIds = new List<int>();
-    private List<GameObject> floorsInCollision = new List<GameObject>();
-    private List<int> lastSlided = new List<int>();
-    private List<GameObject> wallInCollision = new List<GameObject>();
-    private List<GameObject> allInTriggerRange = new List<GameObject>();
+    //private List<GameObject> floorsInCollision = new List<GameObject>();
+    //private List<int> lastSlided = new List<int>();
+    //private List<GameObject> wallInCollision = new List<GameObject>();
+    //private List<GameObject> allInTriggerRange = new List<GameObject>();
     private int lastGrabbedID = 0;
 
     private Animator animator;
@@ -197,9 +197,9 @@ public class PlatformerPhysics : MonoBehaviour
 
         GrabOffset = Grab.position - tr.position;
 
-        playerDels.OnTriggerEnter = new TriggerDelegate(OnGroundedTriggerEnter);
-        playerDels.OnTriggerStay = new TriggerDelegate(OnGroundedTriggerStay);
-        playerDels.OnTriggerExit = new TriggerDelegate(OnGroundedTriggerExit);
+        //playerDels.OnTriggerEnter = new TriggerDelegate(OnGroundedTriggerEnter);
+        //playerDels.OnTriggerStay = new TriggerDelegate(OnGroundedTriggerStay);
+        //playerDels.OnTriggerExit = new TriggerDelegate(OnGroundedTriggerExit);
     }
 
     #endregion
@@ -353,7 +353,7 @@ public class PlatformerPhysics : MonoBehaviour
         // Maybe also in collision method?
 
         // Y correct up
-        CorrectStuckYPosition();
+        //CorrectStuckYPosition();
 
         // Y correct when falling
         if (Grounded && -rigid.velocity.y*Time.fixedDeltaTime > distToGround)
@@ -537,54 +537,54 @@ public class PlatformerPhysics : MonoBehaviour
 
     #region WallJump & Slide
 
-    private bool OriginalWallSliding()
-    {
-        // During sliding:
-        // On the floor - Or - No More slide space
-        if (playerState == PlayerState.WallSliding && (Grounded || lastSlided.Count == 0))
-        {
-            SetState(PlayerState.Idle);
-        }
+    //private bool OriginalWallSliding()
+    //{
+    //    // During sliding:
+    //    // On the floor - Or - No More slide space
+    //    if (playerState == PlayerState.WallSliding && (Grounded || lastSlided.Count == 0))
+    //    {
+    //        SetState(PlayerState.Idle);
+    //    }
 
-        // Start a new slide 
-        if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 && InputHorizontal != 0)
-        {
-            // Slide only if the input is correct(to the wall)
-            foreach (GameObject col in wallInCollision)
-            {
-                float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
-                float inputSign = Mathf.Sign(InputHorizontal);
+    //    // Start a new slide 
+    //    if (!Grounded && playerState != PlayerState.WallSliding && lastSlided.Count > 0 && InputHorizontal != 0)
+    //    {
+    //        // Slide only if the input is correct(to the wall)
+    //        foreach (GameObject col in wallInCollision)
+    //        {
+    //            float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
+    //            float inputSign = Mathf.Sign(InputHorizontal);
 
-                // inputdir is correct in relation to position differance
-                if (relPosSign == inputSign)
-                    SetState(PlayerState.WallSliding);
+    //            // inputdir is correct in relation to position differance
+    //            if (relPosSign == inputSign)
+    //                SetState(PlayerState.WallSliding);
 
-                CheckFlipBy(relPosSign);
-            }
-        }
+    //            CheckFlipBy(relPosSign);
+    //        }
+    //    }
 
-        if (playerState == PlayerState.WallSliding && InputJump)
-        {
-            float dir = 1;
-            if (facingRight)
-                dir = -1;
+    //    if (playerState == PlayerState.WallSliding && InputJump)
+    //    {
+    //        float dir = 1;
+    //        if (facingRight)
+    //            dir = -1;
 
-            rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
+    //        rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
-            WallJump();
+    //        WallJump();
 
-            lastSlided.Clear();
-            wallInCollision.Clear();
-            //Debug.Log("SLIDING Clear");
-        }
+    //        lastSlided.Clear();
+    //        wallInCollision.Clear();
+    //        //Debug.Log("SLIDING Clear");
+    //    }
 
-        if (playerState == PlayerState.WallSliding && InputHorizontal == 0)
-        {
-            Fall();
-        }
+    //    if (playerState == PlayerState.WallSliding && InputHorizontal == 0)
+    //    {
+    //        Fall();
+    //    }
 
-        return playerState == PlayerState.WallSliding;   
-    }
+    //    return playerState == PlayerState.WallSliding;   
+    //}
 
     private bool CazulWallSliding()
     {
@@ -614,15 +614,20 @@ public class PlatformerPhysics : MonoBehaviour
         if (!Grounded && playerState != PlayerState.WallSliding && hits.Count >= WallSlideSettings.WallSlideRays -WallSlideSettings.WallSlideRaysDisconnectedFall)//Raycasts 
         {
             SetState(PlayerState.WallSliding);
+
             //float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
             //CheckFlipBy(relPosSign);
         }
 
         #endregion
 
-        #region Jump
+        // Exit out
+        if (playerState != PlayerState.WallSliding)
+            return false;
 
-        if (playerState == PlayerState.WallSliding && InputJump)
+        #region Jump (Input)
+
+        if (InputJump)
         {
             // Handles several cases:
             // - jump up when vertical input >= 0
@@ -652,11 +657,11 @@ public class PlatformerPhysics : MonoBehaviour
             else
                 Jump();
 
+            // Double check the direction
             CheckFlipByVelocity();
 
-            //Debug.Break();
-
-            //WallJump();
+            // Exit out
+            return false;
         }
 
         #endregion
@@ -664,14 +669,24 @@ public class PlatformerPhysics : MonoBehaviour
         #region Stop sliding (when above or below wall) (less than x raycasts)
 
         // Wall cancel
-        if (playerState == PlayerState.WallSliding && !(hits.Count >= WallSlideSettings.WallSlideRays -WallSlideSettings.WallSlideRaysDisconnectedFall))
+        if (!(hits.Count >= WallSlideSettings.WallSlideRays - WallSlideSettings.WallSlideRaysDisconnectedFall))
         {
             Fall();
+            return false; // Exit out
         }
 
         #endregion
 
-        return playerState == PlayerState.WallSliding;    
+        // Change Gravity during slide when going down
+        if(rigid.velocity.y < 0)
+            SetGravity(WallSlideSettings.WallSlideGravity);
+
+        // Stop x velocity when moving away from the wall
+        float facingDir = facingRight ? -1 : 1;
+        if (facingDir == Mathf.Sign(rigid.velocity.x))
+            rigid.velocity = new Vector2(0, rigid.velocity.y);
+           
+        return true;    
     }
 
     private void WallJump()
@@ -860,7 +875,7 @@ public class PlatformerPhysics : MonoBehaviour
 
             case PlayerState.WallSliding:
                 animator.SetBool("WallSlide", true);
-                SetGravity(WallSlideSettings.WallSlideGravity);
+                
                 //rigid.velocity = new Vector2(0, -WallSlideSettings.WallSlideInitialVelocity);
                 //Debug.Log("StartSlide grav: " + rigid.gravityScale);
                 break;
@@ -886,61 +901,61 @@ public class PlatformerPhysics : MonoBehaviour
 
     #endregion
 
-    #region Grounded Triggers
+    #region Grounded Triggers (Legacy)
 
-    public void OnGroundedTriggerEnter(Collider2D other)
-    {
-        int id = other.GetInstanceID();
-        if (other.CompareTag(floorTag) && !floorsInCollision.Contains(other.gameObject))//floorIds.Contains(id))
-        {
-            //floorIds.Add(id);
-            floorsInCollision.Add(other.gameObject);
-            allInTriggerRange.Add(other.gameObject);
-            Debug.Log("add floor. Count of floors: " + (from s in allInTriggerRange where s.CompareTag(floorTag) select s).Count());
+    //public void OnGroundedTriggerEnter(Collider2D other)
+    //{
+    //    int id = other.GetInstanceID();
+    //    if (other.CompareTag(floorTag) && !floorsInCollision.Contains(other.gameObject))//floorIds.Contains(id))
+    //    {
+    //        //floorIds.Add(id);
+    //        floorsInCollision.Add(other.gameObject);
+    //        allInTriggerRange.Add(other.gameObject);
+    //        Debug.Log("add floor. Count of floors: " + (from s in allInTriggerRange where s.CompareTag(floorTag) select s).Count());
             
-            //Debug.Log("ENTER Floors: " + floorsInCollision.Count + " id " + id);
-        }
+    //        //Debug.Log("ENTER Floors: " + floorsInCollision.Count + " id " + id);
+    //    }
 
-        if (other.CompareTag(wallTag) && !lastSlided.Contains(id))
-        {
-            lastSlided.Add(id);
-            wallInCollision.Add(other.gameObject);
-            allInTriggerRange.Add(other.gameObject);
-            //Debug.Log("ENTER Walls: " + lastSlided.Count + " id " + id);
-        }
-    }
+    //    if (other.CompareTag(wallTag) && !lastSlided.Contains(id))
+    //    {
+    //        lastSlided.Add(id);
+    //        wallInCollision.Add(other.gameObject);
+    //        allInTriggerRange.Add(other.gameObject);
+    //        //Debug.Log("ENTER Walls: " + lastSlided.Count + " id " + id);
+    //    }
+    //}
 
-    //private float triggerTime;
+    ////private float triggerTime;
 
-    public void OnGroundedTriggerStay(Collider2D other)
-    {
-        //if (triggerTime != Time.timeSinceLevelLoad)
-        //{
+    //public void OnGroundedTriggerStay(Collider2D other)
+    //{
+    //    //if (triggerTime != Time.timeSinceLevelLoad)
+    //    //{
             
-        //    allInTriggerRange.Clear();
-        //    triggerTime = Time.timeSinceLevelLoad;
-        //}
-        //allInTriggerRange.Add(other.gameObject);
-    }
+    //    //    allInTriggerRange.Clear();
+    //    //    triggerTime = Time.timeSinceLevelLoad;
+    //    //}
+    //    //allInTriggerRange.Add(other.gameObject);
+    //}
 
-    public void OnGroundedTriggerExit(Collider2D other)
-    {
-        int id = other.GetInstanceID();
+    //public void OnGroundedTriggerExit(Collider2D other)
+    //{
+    //    int id = other.GetInstanceID();
 
-        if (other.CompareTag(wallTag) && lastSlided.Contains(id))
-        {
-            lastSlided.Remove(id);
-            wallInCollision.Remove(other.gameObject);
-            //Debug.Log("EXIT Walls: " + floorIds.Count);
-        }
+    //    if (other.CompareTag(wallTag) && lastSlided.Contains(id))
+    //    {
+    //        lastSlided.Remove(id);
+    //        wallInCollision.Remove(other.gameObject);
+    //        //Debug.Log("EXIT Walls: " + floorIds.Count);
+    //    }
 
-        if (other.CompareTag(floorTag) && floorsInCollision.Contains(other.gameObject))
-        {
-            //floorIds.Remove(id);
-            floorsInCollision.Remove(other.gameObject);
-            //Debug.Log("EXIT Floors: " + floorsInCollision.Count);
-        }
-    }
+    //    if (other.CompareTag(floorTag) && floorsInCollision.Contains(other.gameObject))
+    //    {
+    //        //floorIds.Remove(id);
+    //        floorsInCollision.Remove(other.gameObject);
+    //        //Debug.Log("EXIT Floors: " + floorsInCollision.Count);
+    //    }
+    //}
 
     #endregion
 
