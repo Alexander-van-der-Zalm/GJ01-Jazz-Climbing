@@ -23293,6 +23293,7 @@ MonoBehaviour:
     MaxFallTimeToRespawn: 3
   EdgeWonkSettings:
     HopHeight: .300000012
+    MinHopXVelocity: 2
     MaxVelocityForStop: 8
     MinFractionForHop: .300000012
   GrabSettings:
