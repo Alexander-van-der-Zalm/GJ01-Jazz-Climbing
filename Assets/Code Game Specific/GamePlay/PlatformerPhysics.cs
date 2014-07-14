@@ -37,9 +37,12 @@ public class PlatformerPhysics : MonoBehaviour
     [System.Serializable]
     public class JumpSettingsC
     {
+        [Range(0,10.0f)]
         public float JumpMaxHeight = 4.0f;
         public float JumpMinHeight = 1.0f;
         public float JumpTimeToApex = 0.44f;
+        [Range(0,1.0f)]
+        public float JumpQueueTime = 0.1f;
     }
 
     [System.Serializable]
@@ -66,7 +69,8 @@ public class PlatformerPhysics : MonoBehaviour
     [System.Serializable]
     public class WallSlideSettingsC
     {
-        public float WallSlideGravity = 4;
+        public float WallSlideDownGravity = 4;
+        public float WallSlideUpGravity = 7;
         public float WallSlideInitialVelocity = 0.5f;
         //public float SlideBeforeFall = 0.25f;
         [Range(0,1.0f)]
@@ -136,6 +140,8 @@ public class PlatformerPhysics : MonoBehaviour
 
     // Debug
     public PlayerState playerState;
+    [ReadOnly]
+    public float Gravity;
     public bool DebugStateChanges = false;
     public bool DebugRayText = false;
     public bool DebugFeetRays = true;
@@ -170,6 +176,7 @@ public class PlatformerPhysics : MonoBehaviour
     private string wallTag = "Wall";
 
     private Vector2 feetOffset1, feetOffset2;
+    public float jumpQueue;
 
     #endregion
 
@@ -337,7 +344,7 @@ public class PlatformerPhysics : MonoBehaviour
         #region Jump
 
         // Jump
-        if (Grounded && InputJump)
+        if (Grounded && (InputJump || jumpQueue > 0))
             Jump();
 
         #endregion
@@ -404,6 +411,9 @@ public class PlatformerPhysics : MonoBehaviour
         
         // Jump queue plx
         InputJump = false;
+        jumpQueue -= Time.fixedDeltaTime;
+        jumpQueue = jumpQueue < 0 ? 0 : jumpQueue;
+        Gravity = GetGravity();
     }
 
     #endregion
@@ -414,7 +424,13 @@ public class PlatformerPhysics : MonoBehaviour
     {
         InputHorizontal = horizontalInput;
         InputVertical   = verticalInput;
+        
         InputJump       = jump;
+
+        // Jump Queue
+        if (InputJump != jumpDown && jumpDown)
+            jumpQueue = JumpSettings.JumpQueueTime;
+
         InputJumpDown   = jumpDown;
         InputDash       = dash;
     }
@@ -678,8 +694,10 @@ public class PlatformerPhysics : MonoBehaviour
         #endregion
 
         // Change Gravity during slide when going down
-        if(rigid.velocity.y < 0)
-            SetGravity(WallSlideSettings.WallSlideGravity);
+        if (rigid.velocity.y < 0)
+            SetGravity(WallSlideSettings.WallSlideDownGravity);
+        else
+            SetGravity(WallSlideSettings.WallSlideUpGravity);
 
         // Stop x velocity when moving away from the wall
         float facingDir = facingRight ? -1 : 1;
@@ -964,6 +982,11 @@ public class PlatformerPhysics : MonoBehaviour
     private void SetGravity(float targetGravity)
     {
         rigid.gravityScale = targetGravity / Mathf.Abs(Physics2D.gravity.y);
+    }
+
+    private float GetGravity()
+    {
+        return rigid.gravityScale * Mathf.Abs(Physics2D.gravity.y);
     }
 
     private DoubleVector2 GetColliderEdges(Collider2D collider, Side side)
