@@ -36,7 +36,18 @@ public class LevelGenerator : MonoBehaviour
 
         GameObject parent = new GameObject();
         parent.name = tileSet.name + " " + blockHeight + " x " + blockWidth + " seed: " + Random.seed;
-        
+
+        GameObject floor = new GameObject();
+        floor.name = "Floor Edge Collider";
+        //floor.gameObject.tag = "Tile";
+        floor.layer = 14;
+        EdgeCollider2D floorC = floor.AddComponent<EdgeCollider2D>();
+        floor.transform.parent = parent.transform;
+
+        Vector2[] floorPoints = new Vector2[2];
+        floorPoints[0] = new Vector2(0, blockHeight) * tileSet.TileSize;
+        floorPoints[1] = new Vector2(blockWidth, blockHeight) * tileSet.TileSize;
+        floorC.points = floorPoints;
 
         for (int x = 0; x < blockWidth; x++)
         {

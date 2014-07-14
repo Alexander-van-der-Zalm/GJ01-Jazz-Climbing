@@ -224,7 +224,7 @@ public class PlatformerPhysics : MonoBehaviour
         float rayDepth = GroundingRayCastSettings.RayDepth;
         rayDepth -= velocityY < 0 ? velocityY * Time.fixedDeltaTime * 1.5f : 0;
 
-        List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, GroundingRayCastSettings.FeetRays, rayDepth, LayerMask.NameToLayer("Tiles"), true);
+        List<RaycastHit2D> hits = CastRays(tr.collider2D, Side.Bottom, Vector2.up * -1, GroundingRayCastSettings.FeetRays, rayDepth, LayerMask.NameToLayer("Floor"), true);
         
         // Get the index of the closest ray (-1 is no hit)
         int closestCollidingRayIndex = GetMinDistanceRay(hits);
