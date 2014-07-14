@@ -43,7 +43,7 @@ public class PlatformerPhysics : MonoBehaviour
         public float JumpTimeToApex = 0.44f;
         [Range(0,1.0f)]
         public float JumpQueueTime = 0.1f;
-        [Range(0, 1.0f)]
+        [Range(0, 5.0f)]
         public float JumpSinceGrounded = 0.1f;
     }
 
@@ -180,8 +180,9 @@ public class PlatformerPhysics : MonoBehaviour
     private Vector2 feetOffset1, feetOffset2;
     
     private float jumpQueue;
+    private float timeSinceGrounded;
     [ReadOnly]
-    public float timeSinceGrounded;
+    public int jumpAmount;
 
     #endregion
 
@@ -257,6 +258,10 @@ public class PlatformerPhysics : MonoBehaviour
             timeSinceGrounded += Time.fixedDeltaTime;
         else
             timeSinceGrounded = 0;
+
+        // Reset jumpTimes
+        if (Grounded && velocityY < 0)
+            jumpAmount = 0;
 
         #endregion
 
@@ -359,7 +364,7 @@ public class PlatformerPhysics : MonoBehaviour
         //  remembers jump input for a short while
         // TimeSinceGrounded:
         //  allows jumping for a short while after leaving the grounded state
-        if ((Grounded && (InputJump || jumpQueue > 0)) || (InputJump && timeSinceGrounded < JumpSettings.JumpSinceGrounded))
+        if ((Grounded && (InputJump || jumpQueue > 0)) || (InputJump && jumpAmount == 0 && timeSinceGrounded < JumpSettings.JumpSinceGrounded))
             Jump();
 
         #endregion
@@ -742,6 +747,7 @@ public class PlatformerPhysics : MonoBehaviour
     public void Jump()
     { 
         SetState(PlayerState.Airborne);
+        jumpAmount++;
         StartCoroutine(MarioJump());
     }
 

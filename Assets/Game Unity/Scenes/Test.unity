@@ -23307,7 +23307,7 @@ MonoBehaviour:
   DebugFeetRays: 1
   DebugWallSlideRays: 1
   DebugGrabRays: 1
-  timeSinceGrounded: 0
+  jumpAmount: 0
 --- !u!114 &684476204
 MonoBehaviour:
   m_ObjectHideFlags: 0
