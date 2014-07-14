@@ -23269,6 +23269,8 @@ MonoBehaviour:
     JumpMaxHeight: 4
     JumpMinHeight: 1
     JumpTimeToApex: .439999998
+    JumpQueueTime: .100000001
+    JumpSinceGrounded: .100000001
   RunSettings:
     RunMaxVelocity: 5
     RunAccelTime: .400000006
@@ -23280,7 +23282,8 @@ MonoBehaviour:
     FeetRays: 5
     JumpMaxDistToGround: .300000012
   WallSlideSettings:
-    WallSlideGravity: 4
+    WallSlideDownGravity: 4
+    WallSlideUpGravity: 30
     WallSlideInitialVelocity: .5
     minSideVelocityFraction: .100000001
     WallSlideRays: 5
@@ -23298,11 +23301,13 @@ MonoBehaviour:
     MaxYVelocity: 5
     RayOffset: {x: -.289999992, y: -.289999992}
   playerState: 0
+  Gravity: 0
   DebugStateChanges: 0
   DebugRayText: 0
   DebugFeetRays: 1
   DebugWallSlideRays: 1
   DebugGrabRays: 1
+  timeSinceGrounded: 0
 --- !u!114 &684476204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41285,7 +41290,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1054048165}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.7683506, y: -8.79594707, z: .0068359999}
+  m_LocalPosition: {x: -6.86632824, y: -8.79594707, z: .0068359999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 869504406}

@@ -43,6 +43,8 @@ public class PlatformerPhysics : MonoBehaviour
         public float JumpTimeToApex = 0.44f;
         [Range(0,1.0f)]
         public float JumpQueueTime = 0.1f;
+        [Range(0, 1.0f)]
+        public float JumpSinceGrounded = 0.1f;
     }
 
     [System.Serializable]
@@ -176,7 +178,10 @@ public class PlatformerPhysics : MonoBehaviour
     private string wallTag = "Wall";
 
     private Vector2 feetOffset1, feetOffset2;
-    public float jumpQueue;
+    
+    private float jumpQueue;
+    [ReadOnly]
+    public float timeSinceGrounded;
 
     #endregion
 
@@ -244,8 +249,14 @@ public class PlatformerPhysics : MonoBehaviour
         // Get the index of the closest ray (-1 is no hit)
         int closestCollidingRayIndex = GetMinDistanceRay(hits);
         float distToGround = closestCollidingRayIndex >= 0 ? hits[closestCollidingRayIndex].fraction : float.MaxValue;
-
+        
         Grounded = hits.Count > 2 && distToGround < GroundingRayCastSettings.JumpMaxDistToGround; // and min dist
+
+        // Time since grounded for doing jumps
+        if (!Grounded)
+            timeSinceGrounded += Time.fixedDeltaTime;
+        else
+            timeSinceGrounded = 0;
 
         #endregion
 
@@ -344,7 +355,11 @@ public class PlatformerPhysics : MonoBehaviour
         #region Jump
 
         // Jump
-        if (Grounded && (InputJump || jumpQueue > 0))
+        // JumpQueue:
+        //  remembers jump input for a short while
+        // TimeSinceGrounded:
+        //  allows jumping for a short while after leaving the grounded state
+        if ((Grounded && (InputJump || jumpQueue > 0)) || (InputJump && timeSinceGrounded < JumpSettings.JumpSinceGrounded))
             Jump();
 
         #endregion
@@ -409,11 +424,16 @@ public class PlatformerPhysics : MonoBehaviour
         animator.SetFloat("VelocityY", rigid.velocity.y);
         animator.SetFloat("Speed", Mathf.Abs(rigid.velocity.x)/RunSettings.RunMaxVelocity);
         
-        // Jump queue plx
         InputJump = false;
+        // Jump queue plx
         jumpQueue -= Time.fixedDeltaTime;
         jumpQueue = jumpQueue < 0 ? 0 : jumpQueue;
+
+        // For debug purposes
         Gravity = GetGravity();
+
+        
+        
     }
 
     #endregion
