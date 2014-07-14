@@ -39,7 +39,8 @@ public class PlatformerPhysics : MonoBehaviour
     {
         [Range(0,10.0f)]
         public float JumpMaxHeight = 4.0f;
-        public float JumpMinHeight = 1.0f;
+        //public float JumpMinHeight = 1.0f;
+        [Range(0.01f,20.0f)]
         public float JumpTimeToApex = 0.44f;
         [Range(0,1.0f)]
         public float JumpQueueTime = 0.1f;
@@ -792,7 +793,7 @@ public class PlatformerPhysics : MonoBehaviour
     {
         float h = JumpSettings.JumpMaxHeight;//height
         float t = JumpSettings.JumpTimeToApex;//time to apex
-        float hmin = JumpSettings.JumpMinHeight;//minimum height
+        //float hmin = JumpSettings.JumpMinHeight;//minimum height (Not implemented yet)
 
         float g = (2*h)/(t*t); // gravity
         float v = Mathf.Sqrt(2*g*h); // initial y velocity
