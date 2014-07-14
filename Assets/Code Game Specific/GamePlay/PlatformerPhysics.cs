@@ -68,8 +68,11 @@ public class PlatformerPhysics : MonoBehaviour
     {
         public float WallSlideGravity = 4;
         public float WallSlideInitialVelocity = 0.5f;
-        public float SlideBeforeFall = 0.25f;
+        //public float SlideBeforeFall = 0.25f;
+        [Range(0,1.0f)]
+        public float minSideVelocityFraction = 0.1f;
         public int WallSlideRays = 3;
+        public int WallSlideRaysDisconnectedFall = 1;
         public float WallSlideRayDepth = 0.3f;
     }
 
@@ -291,21 +294,21 @@ public class PlatformerPhysics : MonoBehaviour
 
         #endregion
 
-        #region WallJump
+        #region WallJump (Inactive)
 
-        if (!Grounded && playerState == PlayerState.WallJump)
-        {
-            // Exit the walljumpstate if no or opposite direction input
-            // This state ignores 
-            if (InputHorizontal == 0 || InputHorizontal != WallJumpLastDirection)
-            {
-                SetState(PlayerState.Airborne);
-                //Debug.Log("ExitWalljump");
-            }
-            CheckFlipByVelocity();
-            EndOfUpdate();
-            return;
-        }
+        //if (!Grounded && playerState == PlayerState.WallJump)
+        //{
+        //    // Exit the walljumpstate if no or opposite direction input
+        //    // This state ignores 
+        //    if (InputHorizontal == 0 || InputHorizontal != WallJumpLastDirection)
+        //    {
+        //        SetState(PlayerState.Airborne);
+        //        //Debug.Log("ExitWalljump");
+        //    }
+        //    CheckFlipByVelocity();
+        //    EndOfUpdate();
+        //    return;
+        //}
 
         #endregion
 
@@ -606,48 +609,67 @@ public class PlatformerPhysics : MonoBehaviour
 
         #endregion
 
-        // Start a new slide 
-        if (!Grounded && playerState != PlayerState.WallSliding )//Raycasts 
+        #region Start a new slide (when x out of yd raycasts hit)
+
+        if (!Grounded && playerState != PlayerState.WallSliding && hits.Count >= WallSlideSettings.WallSlideRays -WallSlideSettings.WallSlideRaysDisconnectedFall)//Raycasts 
         {
             SetState(PlayerState.WallSliding);
-            
-            // Still needed???
-            foreach (GameObject col in wallInCollision)
-            {
-                float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
-
-                CheckFlipBy(relPosSign);
-            }
+            //float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
+            //CheckFlipBy(relPosSign);
         }
-        
-        // Jump
+
+        #endregion
+
+        #region Jump
+
         if (playerState == PlayerState.WallSliding && InputJump)
         {
-            float dir = 1;
-            if (facingRight)
-                dir = -1;
+            // Handles several cases:
+            // - jump up when vertical input >= 0
+            // - otherwise fall down
 
+            float fr = WallSlideSettings.minSideVelocityFraction;
+            float dir = facingRight ? -fr : fr;
+            
+            float hor = InputHorizontal;
+
+            // Fake analogue input when there is no analogue value
+            if (InputVertical != 0 && !(Mathf.Abs(InputHorizontal) < 1.0f) && InputHorizontal != 0)
+            {
+                hor *= 0.5f;
+                Debug.Log("WallJumpFraction");
+            }
+               
+            // Only add the input fraction if the input is away from the wall (otherwise ignore)
+            dir += Mathf.Sign(dir) == Mathf.Sign(hor) ? hor * (1-fr) : 0;
+            
+            // Add the velocity
             rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
-            WallJump();
+            // Fall
+            if (InputVertical < 0)
+                Fall();
+            else
+                Jump();
+
+            CheckFlipByVelocity();
+
+            //Debug.Break();
+
+            //WallJump();
         }
+
+        #endregion
+
+        #region Stop sliding (when above or below wall) (less than x raycasts)
 
         // Wall cancel
-        if (playerState == PlayerState.WallSliding )
+        if (playerState == PlayerState.WallSliding && !(hits.Count >= WallSlideSettings.WallSlideRays -WallSlideSettings.WallSlideRaysDisconnectedFall))
         {
-            // only if the input is away from the wall
-            foreach (GameObject col in wallInCollision)
-            {
-                if(InputHorizontal == 0)
-                    break;
-                float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
-                float inputSign = Mathf.Sign(InputHorizontal);
-
-                if(relPosSign!=inputSign)
-                    Fall(true);
-            }
-            
+            Fall();
         }
+
+        #endregion
 
         return playerState == PlayerState.WallSliding;    
     }
@@ -710,31 +732,36 @@ public class PlatformerPhysics : MonoBehaviour
     public IEnumerator MarioJump()
     {
         float h = JumpSettings.JumpMaxHeight;//height
-        float t = JumpSettings.JumpTimeToApex;//time
-        float hmin = JumpSettings.JumpMinHeight;
+        float t = JumpSettings.JumpTimeToApex;//time to apex
+        float hmin = JumpSettings.JumpMinHeight;//minimum height
 
-        float g = (2*h)/(t*t);
-        float v = Mathf.Sqrt(2*g*h);
+        float g = (2*h)/(t*t); // gravity
+        float v = Mathf.Sqrt(2*g*h); // initial y velocity
 
+        #region debug stuff
         //Debug.Log("JUMP");
         //Debug.Log("g: " + g + " v " + v + " gnow " + Physics2D.gravity.y);
         //Debug.Log(rigid.velocity + " " + playerState + " g: " + Grounded);
+        #endregion
 
-        rigid.gravityScale = g / Mathf.Abs(Physics2D.gravity.y);
+        // Set velocity and gravity
+        SetGravity(g);
         rigid.velocity = new Vector2(rigid.velocity.x, v);
 
         float timeStart = Time.timeSinceLevelLoad;
         float flyTime = 0;
 
-        //float vearly = Mathf.Sqrt(v*v+2*g(
+        //float vearly = Mathf.Sqrt(v*v+2*g( // WIP
 
+        // Keep initial gravity till apex or player releases input
         while (flyTime < t && InputJumpDown)
         {
             flyTime = Time.timeSinceLevelLoad - timeStart;
             //Debug.Log(rigid.velocity + " " + playerState + " g: " + Grounded);
             yield return null;
         }
-        //Debug.Log("JUMP");
+        
+        // Time for falling gravity (till it hits the apex then it auto changes to falling gravity)
         if(playerState == PlayerState.Airborne)
             rigid.gravityScale = 10; 
     }
