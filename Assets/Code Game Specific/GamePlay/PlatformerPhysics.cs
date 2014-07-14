@@ -309,22 +309,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         #endregion
 
-        #region Edgde Wonk
-
-        if (hits.Count < 4 && hits.Count > 1)
-        {
-            // EDGE WONK TIME!
-            animator.SetBool("EdgeWonk", true);
-            // EDGE WONK STOP :O
-            if ((InputHorizontal == 0 || Mathf.Abs(InputHorizontal) < EdgeWonkSettings.MinFractionForHop) && Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MaxVelocityForStop)
-                rigid.velocity = Vector2.zero;
-        }
-        else
-        {
-            animator.SetBool("EdgeWonk", false);
-        }
-
-        #endregion
+        
 
         #region WallSlide
 
@@ -388,11 +373,31 @@ public class PlatformerPhysics : MonoBehaviour
 
         #endregion
 
-        #region EdgeHop
+        #region Edgde Wonk
 
-
+        if (hits.Count < 4 && hits.Count > 1)
+        {
+            // EDGE WONK TIME!
+            animator.SetBool("EdgeWonk", true);
+            // EDGE WONK STOP :O
+            if ((InputHorizontal == 0 || Mathf.Abs(InputHorizontal) < EdgeWonkSettings.MinFractionForHop) && Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MaxVelocityForStop)
+                rigid.velocity = Vector2.zero;
+        }
+        else
+        {
+            animator.SetBool("EdgeWonk", false);
+        }
 
         #endregion
+
+        #region EdgeHop
+
+        if (lastGrounded && !Grounded && jumpAmount == 0)
+            Jump();
+
+        #endregion
+
+
 
         Fall();
 
