@@ -45,6 +45,9 @@ public class PlayerController : MonoBehaviour
 
         #endif
 
+        if (Input.GetKeyUp(KeyCode.P))
+            PlayerSpawn.Respawn();
+
         platformer.SetMovementInput(ControlScheme.Horizontal.Value(), ControlScheme.Vertical.Value(), ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].IsPressed(), ControlScheme.Actions[(int)JazzClimbingPlayerActions.Jump].IsDown(), false);//ControlScheme.Actions[(int)JazzClimbingPlayerActions.Dash].IsPressed());
 	}
 

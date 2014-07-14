@@ -373,11 +373,11 @@ public class PlatformerPhysics : MonoBehaviour
     private void CorrectStuckYPosition()
     {
         DoubleVector2 bottomCollider = GetColliderEdges(tr.collider2D, Side.Bottom);
-        Vector2 rayPos = facingRight ? bottomCollider.V1 : bottomCollider.V2;
-        Vector2 dir = Vector2.right * Mathf.Abs(rigid.velocity.x);
-        dir *= facingRight ? -1 : 1;
+        Vector2 rayPos = !facingRight ? bottomCollider.V1 : bottomCollider.V2;
+        Vector2 dir = Vector2.right * Mathf.Abs(rigid.velocity.x) * Time.fixedDeltaTime;
+        dir *= facingRight ? 1 : -1;
         List<RaycastHit2D> hits = Physics2D.RaycastAll(rayPos, dir, dir.magnitude, 1 << LayerMask.NameToLayer("Tiles")).ToList();
-
+        DrawHits(hits, rayPos, dir);
     }
 
     private void StartOfUpdate()
@@ -962,7 +962,7 @@ public class PlatformerPhysics : MonoBehaviour
             
             if (debug)
             {
-                DrawHits(hits, v, ray, true);
+                DrawHits(hits, v, ray);
             }
 
             collided.AddRange(hits);
@@ -971,13 +971,22 @@ public class PlatformerPhysics : MonoBehaviour
         return collided;
     }
 
-    private void DrawHits(List<RaycastHit2D> hits, Vector2 v, Vector2 ray, bool p)
+    private void DrawHits(List<RaycastHit2D> hits, Vector2 v, Vector2 ray)
     {
         Color color = hits.Count > 0 ? Color.green : Color.red;
         Debug.DrawRay(v, ray, color);
+
+        if (hits.Count == 0)
+            return;
+
+        // Cross product foor orthognal v2
+        Vector3 a = ray.normalized;
+        Vector3 b = Vector3.forward;
+        Vector2 x = Vector3.Cross(-a,b).normalized;
+
         foreach(RaycastHit2D hit in hits)
         {
-            Debug.DrawRay(v + ray * hit.fraction, Vector2.right * 0.05f, Color.magenta);
+            Debug.DrawRay(v + ray * hit.fraction, x * 0.05f, Color.magenta);
         }
         
         //Debug.Log(minDist);
