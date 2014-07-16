@@ -91,7 +91,7 @@ public class PlatformerPhysics : MonoBehaviour
     {
         // Fall Settings
         public float FallGravity = 50;
-        public float MaxFallTimeToRespawn = 3.0f;
+        //public float MaxFallTimeToRespawn = 3.0f;
     }
 
     [System.Serializable]
@@ -395,7 +395,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region EdgeHop
 
-        if (lastGrounded && !Grounded && jumpAmount == 0)
+        if (lastGrounded && !Grounded && jumpAmount == 0 && playerState != PlayerState.Airborne)
         {
             //Debug.Log("EdgeHop");
             // Gieb x velocity
