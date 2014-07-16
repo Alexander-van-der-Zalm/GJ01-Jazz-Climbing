@@ -23270,7 +23270,7 @@ MonoBehaviour:
     JumpMinHeight: 1
     JumpTimeToApex: .439999998
     JumpQueueTime: .100000001
-    JumpSinceGrounded: .100000001
+    JumpSinceGrounded: .200000003
   RunSettings:
     RunMaxVelocity: 5
     RunAccelTime: .400000006

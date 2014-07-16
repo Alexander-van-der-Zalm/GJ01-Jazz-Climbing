@@ -397,13 +397,13 @@ public class PlatformerPhysics : MonoBehaviour
 
         if (lastGrounded && !Grounded && jumpAmount == 0)
         {
-            Debug.Log("EdgeHop");
+            //Debug.Log("EdgeHop");
             // Gieb x velocity
             if (Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MinHopXVelocity)
             {
                 float dir = facingRight ? 1 : -1;
                 rigid.velocity = new Vector2(EdgeWonkSettings.MinHopXVelocity * dir, rigid.velocity.y);
-                Debug.Log("X velocity");
+                //Debug.Log("X velocity");
             }
             // Change to proper jump
             EdgeHop();
@@ -459,6 +459,10 @@ public class PlatformerPhysics : MonoBehaviour
         List<RaycastHit2D> hits = Physics2D.RaycastAll(rayPos, dir, dir.magnitude, 1 << LayerMask.NameToLayer("Tiles")).ToList();
         DrawHits(hits, rayPos, dir);
     }
+
+    #endregion
+
+    #region Start and End of update
 
     private void StartOfUpdate()
     {
@@ -949,12 +953,10 @@ public class PlatformerPhysics : MonoBehaviour
             //Debug.Log("FALLING " + falldown + " " + playerState);
             SetState(PlayerState.Falling);
             SetGravity(FallSettings.FallGravity);
-            Debug.Log("Fall");
+            //Debug.Log("Fall");
             //rigid.gravityScale = FallGravity / Mathf.Abs(Physics2D.gravity.y);
         }
     }
-
-    
 
     #endregion
 
