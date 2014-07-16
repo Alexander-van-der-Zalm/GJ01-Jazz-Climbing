@@ -39,13 +39,16 @@ public class PlatformerPhysics : MonoBehaviour
     {
         [Range(0,10.0f)]
         public float JumpMaxHeight = 4.0f;
-        //public float JumpMinHeight = 1.0f;
+        [Range(0, 10.0f)]
+        public float JumpMinHeight = 1.0f;
         [Range(0.01f,20.0f)]
         public float JumpTimeToApex = 0.44f;
         [Range(0,1.0f)]
         public float JumpQueueTime = 0.1f;
         [Range(0, 5.0f)]
         public float JumpSinceGrounded = 0.1f;
+
+        //public float JumpMinHeight;
     }
 
     [System.Serializable]
@@ -95,6 +98,7 @@ public class PlatformerPhysics : MonoBehaviour
     public class EdgeWonkSettingsC
     {
         public float HopHeight = 0.3f;
+        public float HopTimeToApex = 0.5f;
         public float MinHopXVelocity = 2.0f;
         public float MaxVelocityForStop = 8.0f;
         public float MinFractionForHop = 0.3f;
@@ -374,7 +378,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region Edgde Wonk
 
-        if (hits.Count < 4 && hits.Count > 1)
+        if (hits.Count < 4 && hits.Count > 1 && playerState != PlayerState.Airborne)
         {
             // EDGE WONK TIME!
             animator.SetBool("EdgeWonk", true);
@@ -393,20 +397,22 @@ public class PlatformerPhysics : MonoBehaviour
 
         if (lastGrounded && !Grounded && jumpAmount == 0)
         {
+            Debug.Log("EdgeHop");
             // Gieb x velocity
             if (Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MinHopXVelocity)
             {
                 float dir = facingRight ? 1 : -1;
                 rigid.velocity = new Vector2(EdgeWonkSettings.MinHopXVelocity * dir, rigid.velocity.y);
+                Debug.Log("X velocity");
             }
             // Change to proper jump
-            Jump();
+            EdgeHop();
+            EndOfUpdate();
+            return;
         }
             
 
         #endregion
-
-
 
         Fall();
 
@@ -422,22 +428,22 @@ public class PlatformerPhysics : MonoBehaviour
         //CorrectStuckYPosition();
 
         // Y correct when falling
-        if (Grounded && -rigid.velocity.y*Time.fixedDeltaTime > distToGround)
-        {
-            Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
-            Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
-            //Debug.Break();
+        //if (Grounded && -rigid.velocity.y*Time.fixedDeltaTime > distToGround)
+        //{
+        //    Debug.Log("Correct y when falling | dist: " + distToGround + " | localpos: " + tr.localPosition.y + " world pos: " + tr.position.y + " | col: " + colliderBotMid.y + " |  y vel: " + rigid.velocity.y + " |  rayDepth: " + rayDepth);
+        //    Debug.Log("Collider Pos " + hits[0].transform.position);// + " + center: " + hits[0].rigidbody.gameObject.transform.position + new Vector3(0,0.5f,0));
+        //    //Debug.Break();
             
-            // Set transform to GroundedDistanceToGroundd
-            float yPos = hits[closestCollidingRayIndex].point.y + GroundingRayCastSettings.GroundedDistanceToGround;
-            tr.position = new Vector2(colliderBotMid.x, yPos);
+        //    // Set transform to GroundedDistanceToGroundd
+        //    float yPos = hits[closestCollidingRayIndex].point.y + GroundingRayCastSettings.GroundedDistanceToGround;
+        //    tr.position = new Vector2(colliderBotMid.x, yPos);
 
-            // Kill gravity and stop y velocity
-            rigid.velocity = new Vector2(rigid.velocity.x, 0);
-            //rigid.gravityScale = 0;
+        //    // Kill gravity and stop y velocity
+        //    rigid.velocity = new Vector2(rigid.velocity.x, 0);
+        //    //rigid.gravityScale = 0;
 
-            Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
-        }
+        //    Debug.Log("Corrected y when falling | dist: " + distToGround + " | pos: " + tr.position.y);
+        //}
 
         #endregion
 
@@ -475,9 +481,6 @@ public class PlatformerPhysics : MonoBehaviour
 
         // For debug purposes
         Gravity = GetGravity();
-
-        
-        
     }
 
     #endregion
@@ -776,7 +779,7 @@ public class PlatformerPhysics : MonoBehaviour
         SetState(PlayerState.WallJump);
         WallJumpLastDirection = facingRight ? 1.0f : -1.0f;
         Debug.Log("WallJump");
-        StartCoroutine(MarioJump());
+        //StartCoroutine(MarioJump());
     }
 
     #endregion
@@ -787,7 +790,13 @@ public class PlatformerPhysics : MonoBehaviour
     { 
         SetState(PlayerState.Airborne);
         jumpAmount++;
-        StartCoroutine(MarioJump());
+        StartCoroutine(MarioJump(JumpSettings.JumpMaxHeight, JumpSettings.JumpTimeToApex, JumpSettings.JumpMinHeight, true));
+    }
+
+    public void EdgeHop()
+    {
+        SetState(PlayerState.Airborne);
+        StartCoroutine(MarioJump(EdgeWonkSettings.HopHeight, EdgeWonkSettings.HopTimeToApex, EdgeWonkSettings.HopHeight, false));
     }
 
     #region Old
@@ -827,11 +836,19 @@ public class PlatformerPhysics : MonoBehaviour
     //}
     #endregion
 
-    public IEnumerator MarioJump()
+    /// <summary>
+    /// A jump that changes the entities gravityscale to create the desired jump effect.
+    /// </summary>
+    /// <param name="height"></param>
+    /// <param name="timeToApex"></param>
+    /// <param name="minimumHeight">Optional parameter</param>
+    /// <param name="holdInputForHeight">Optional parameter</param>
+    /// <returns></returns>
+    public IEnumerator MarioJump(float height, float timeToApex, float minimumHeight, bool holdInputForHeight = false)
     {
-        float h = JumpSettings.JumpMaxHeight;//height
-        float t = JumpSettings.JumpTimeToApex;//time to apex
-        //float hmin = JumpSettings.JumpMinHeight;//minimum height (Not implemented yet)
+        float h = height;//height
+        float t = timeToApex;//time to apex
+        float hmin = minimumHeight;//minimum height (Not implemented yet)
 
         float g = (2*h)/(t*t); // gravity
         float v = Mathf.Sqrt(2*g*h); // initial y velocity
@@ -848,16 +865,27 @@ public class PlatformerPhysics : MonoBehaviour
 
         float timeStart = Time.timeSinceLevelLoad;
         float flyTime = 0;
+        float initialHeight = rigid.position.y;
 
-        //float vearly = Mathf.Sqrt(v*v+2*g( // WIP
+        bool holdDown = holdInputForHeight ? InputJump : false;
 
-        // Keep initial gravity till apex or player releases input
-        while (flyTime < t && InputJumpDown)
+        // Keep initial gravity till apex or player releases input (when the min height has been reached)
+        while (flyTime < t && (holdDown || initialHeight + minimumHeight > rigid.position.y))
         {
             flyTime = Time.timeSinceLevelLoad - timeStart;
-            //Debug.Log(rigid.velocity + " " + playerState + " g: " + Grounded);
+            if(holdInputForHeight)
+                holdDown = InputJumpDown;
+            
+            //Debug.Log(holdInputForHeight + " " + InputJump +  " " + )
+            
+            //Debug.Log("startY " + initialHeight + " |y " + rigid.position.y + " |min " + minimumHeight);
+            //Debug.Log("holdDown " + holdDown + " |flytime " + (flyTime) + " |t " + (t));
+            //Debug.Log("inputBool " + holdInputForHeight + " |  Input " + InputJumpDown);
+            //Debug.Log(rigid.velocity + " g " + Grounded);
             yield return null;
         }
+        //Debug.Log("JumpFinish");
+        
         
         // Time for falling gravity (till it hits the apex then it auto changes to falling gravity)
         if(playerState == PlayerState.Airborne)
@@ -908,12 +936,15 @@ public class PlatformerPhysics : MonoBehaviour
 
     private void Fall(bool falldown = false)
     {
+        if (Grounded)
+            return;
+
         // Fall gravity
-        if (!Grounded && rigid.velocity.y > 0)// || falldown)
+        if (rigid.velocity.y > 0)// || falldown)
         {
             SetState(PlayerState.Airborne);
         }
-        else if (!Grounded && playerState != PlayerState.Falling)
+        else if (playerState != PlayerState.Falling)
         {
             //Debug.Log("FALLING " + falldown + " " + playerState);
             SetState(PlayerState.Falling);
