@@ -17,6 +17,13 @@ public class PlatformerPhysics : MonoBehaviour
 {
     #region Helper Enums & Classes
 
+    public enum WallJumpState
+    {
+        LastLeft,
+        Free,
+        LastRight
+    }
+
     private enum Side
     {
         Top,Left,Right,Bottom
@@ -185,6 +192,7 @@ public class PlatformerPhysics : MonoBehaviour
     //private List<GameObject> allInTriggerRange = new List<GameObject>();
     private int lastGrabbedID = 0;
 
+    // Small optimisation
     private Animator animator;
     private Rigidbody2D rigid;
     private Transform tr;
@@ -196,8 +204,8 @@ public class PlatformerPhysics : MonoBehaviour
     
     private float jumpQueue;
     private float timeSinceGrounded;
-    [ReadOnly]
-    public int jumpAmount;
+    private int jumpAmount;
+    public WallJumpState lastJumpSide;
 
     #endregion
 
@@ -236,7 +244,7 @@ public class PlatformerPhysics : MonoBehaviour
     
 	void FixedUpdate ()
     {
-        // Handled by PlayerInput or AI
+        // Set some animator values
         StartOfUpdate();
         
         #region Vars
@@ -372,8 +380,11 @@ public class PlatformerPhysics : MonoBehaviour
         // TimeSinceGrounded:
         //  allows jumping for a short while after leaving the grounded state
         if ((Grounded && (InputJump || jumpQueue > 0)) || (InputJump && jumpAmount == 0 && timeSinceGrounded < JumpSettings.JumpSinceGrounded))
+        {
             Jump();
-
+            CheckFlipBy(InputHorizontal);
+            EndOfUpdate();
+        }
         #endregion
 
         #region Edgde Wonk
@@ -397,27 +408,23 @@ public class PlatformerPhysics : MonoBehaviour
 
         if (lastGrounded && !Grounded && jumpAmount == 0 && playerState != PlayerState.Airborne)
         {
-            //Debug.Log("EdgeHop");
-            // Gieb x velocity
+            // Gieb x velocity in the right direction (so it doest just jump up)
             if (Mathf.Abs(rigid.velocity.x) < EdgeWonkSettings.MinHopXVelocity)
             {
                 float dir = facingRight ? 1 : -1;
                 rigid.velocity = new Vector2(EdgeWonkSettings.MinHopXVelocity * dir, rigid.velocity.y);
-                //Debug.Log("X velocity");
             }
-            // Change to proper jump
+            // Do the edge hop
             EdgeHop();
             EndOfUpdate();
             return;
         }
-            
 
         #endregion
 
         Fall();
 
         CheckFlipBy(InputHorizontal);
-        //CheckFlipByVelocity(); //old
 
         #region Correct y position
 
@@ -482,6 +489,10 @@ public class PlatformerPhysics : MonoBehaviour
         // Jump queue plx
         jumpQueue -= Time.fixedDeltaTime;
         jumpQueue = jumpQueue < 0 ? 0 : jumpQueue;
+
+        // Reset the walljumpstate if grounded
+        if (Grounded)
+            lastJumpSide = WallJumpState.Free;
 
         // For debug purposes
         Gravity = GetGravity();
@@ -701,7 +712,6 @@ public class PlatformerPhysics : MonoBehaviour
         if (!Grounded && playerState != PlayerState.WallSliding && hits.Count >= WallSlideSettings.WallSlideRays -WallSlideSettings.WallSlideRaysDisconnectedFall)//Raycasts 
         {
             SetState(PlayerState.WallSliding);
-
             //float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
             //CheckFlipBy(relPosSign);
         }
@@ -716,39 +726,8 @@ public class PlatformerPhysics : MonoBehaviour
 
         if (InputJump)
         {
-            // Handles several cases:
-            // - jump up when vertical input >= 0
-            // - otherwise fall down
-
-            float fr = WallSlideSettings.minSideVelocityFraction;
-            float dir = facingRight ? -fr : fr;
-            
-            float hor = InputHorizontal;
-
-            // Fake analogue input when there is no analogue value
-            if (InputVertical != 0 && !(Mathf.Abs(InputHorizontal) < 1.0f) && InputHorizontal != 0)
-            {
-                hor *= 0.5f;
-                Debug.Log("WallJumpFraction");
-            }
-               
-            // Only add the input fraction if the input is away from the wall (otherwise ignore)
-            dir += Mathf.Sign(dir) == Mathf.Sign(hor) ? hor * (1-fr) : 0;
-            
-            // Add the velocity
-            rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
-
-            // Fall
-            if (InputVertical < 0)
-                Fall();
-            else
-                Jump();
-
-            // Double check the direction
-            CheckFlipByVelocity();
-
-            // Exit out
-            return false;
+            if (WallJump()) // Exit out
+                return false;
         }
 
         #endregion
@@ -778,12 +757,56 @@ public class PlatformerPhysics : MonoBehaviour
         return true;    
     }
 
-    private void WallJump()
+    private bool WallJump()
     {
-        SetState(PlayerState.WallJump);
-        WallJumpLastDirection = facingRight ? 1.0f : -1.0f;
-        Debug.Log("WallJump");
-        //StartCoroutine(MarioJump());
+        // Ideas:
+        // - Walljump height based on upwards velocity
+        // - Walljump same side only once (reset per dash, other side hit, grounded or possibly a timer)
+        // 
+
+        // Only walljump if it did not jump on that same side already
+        WallJumpState jumpSideNow = facingRight ? WallJumpState.LastLeft : WallJumpState.LastRight;
+
+        if (jumpSideNow == lastJumpSide) //Cancel out
+            return false;
+
+        //Debug.Log(jumpSideNow + " " + lastJumpSide);
+
+        lastJumpSide = jumpSideNow;
+
+        // If jumping is allowed:
+        // Handled as several cases:
+        // - jump up when vertical input >= 0
+        // - otherwise fall down
+
+        float fr = WallSlideSettings.minSideVelocityFraction;
+        float dir = facingRight ? -fr : fr;
+
+        float hor = InputHorizontal;
+
+        // Fake analogue input when there is no analogue value
+        if (InputVertical != 0 && !(Mathf.Abs(InputHorizontal) < 1.0f) && InputHorizontal != 0)
+        {
+            hor *= 0.5f;
+            Debug.Log("WallJumpFraction");
+        }
+
+        // Only add the input fraction if the input is away from the wall (otherwise ignore)
+        dir += Mathf.Sign(dir) == Mathf.Sign(hor) ? hor * (1 - fr) : 0;
+
+        // Add the velocity
+        rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
+
+        // Fall
+        if (InputVertical < 0)
+            Fall();
+        else
+            Jump();
+
+        // Double check the direction
+        CheckFlipByVelocity();
+
+        return true;
     }
 
     #endregion

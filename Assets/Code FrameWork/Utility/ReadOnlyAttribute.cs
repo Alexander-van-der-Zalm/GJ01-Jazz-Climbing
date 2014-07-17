@@ -3,11 +3,8 @@ using System.Collections;
 
 public class ReadOnlyAttribute : PropertyAttribute 
 {
-    //public readonly List<string> list;
 
-    public ReadOnlyAttribute()//List<string> list)
+    public ReadOnlyAttribute()
     {
-       // this.list = AudioManager.Instance.AudioLibrary.SampleNames;
-        //this.list = list;
     }
 }
