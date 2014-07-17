@@ -492,7 +492,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         // Reset the walljumpstate if grounded
         if (Grounded)
-            lastJumpSide = WallJumpState.Free;
+            resetWallJump();
 
         // For debug purposes
         Gravity = GetGravity();
@@ -626,9 +626,17 @@ public class PlatformerPhysics : MonoBehaviour
         // Change the state
         SetState(PlayerState.Grabbing);
         lastGrabbedID = id;
+        
+        // Can walljump in any direction after grabbing
+        resetWallJump();
 
         // Make sure the animation clip is facing the right direction
         CheckFlipBy(dir);
+    }
+
+    private void resetWallJump()
+    {
+        lastJumpSide = WallJumpState.Free;
     }
 
     #endregion
@@ -761,7 +769,7 @@ public class PlatformerPhysics : MonoBehaviour
     {
         // Ideas:
         // - Walljump height based on upwards velocity
-        // - Walljump same side only once (reset per dash, other side hit, grounded or possibly a timer)
+        // - Walljump same side only once (reset per dash, other side hit, grounded, grab and/or possibly a timer)
         // 
 
         // Only walljump if it did not jump on that same side already
