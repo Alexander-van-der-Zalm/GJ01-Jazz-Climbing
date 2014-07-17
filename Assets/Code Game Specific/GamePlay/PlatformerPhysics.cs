@@ -772,10 +772,12 @@ public class PlatformerPhysics : MonoBehaviour
         // - Walljump same side only once (reset per dash, other side hit, grounded, grab and/or possibly a timer)
         // 
 
+        bool fallDown = InputVertical < 0 || (InputVertical == 0 && InputHorizontal == 0);
+
         // Only walljump if it did not jump on that same side already
         WallJumpState jumpSideNow = facingRight ? WallJumpState.LastLeft : WallJumpState.LastRight;
 
-        if (jumpSideNow == lastJumpSide) //Cancel out
+        if (jumpSideNow == lastJumpSide && !fallDown) //Cancel out if trying to jump up
             return false;
 
         //Debug.Log(jumpSideNow + " " + lastJumpSide);
@@ -792,12 +794,14 @@ public class PlatformerPhysics : MonoBehaviour
 
         float hor = InputHorizontal;
 
-        // Fake analogue input when there is no analogue value
+        #region Fake analogue input when there is no analogue value
+
         if (InputVertical != 0 && !(Mathf.Abs(InputHorizontal) < 1.0f) && InputHorizontal != 0)
         {
             hor *= 0.5f;
             Debug.Log("WallJumpFraction");
         }
+        #endregion
 
         // Only add the input fraction if the input is away from the wall (otherwise ignore)
         dir += Mathf.Sign(dir) == Mathf.Sign(hor) ? hor * (1 - fr) : 0;
@@ -806,7 +810,7 @@ public class PlatformerPhysics : MonoBehaviour
         rigid.velocity = new Vector2(RunSettings.RunMaxVelocity * dir, 0);
 
         // Fall
-        if (InputVertical < 0)
+        if (fallDown)
             Fall();
         else
             Jump();
