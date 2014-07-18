@@ -771,9 +771,8 @@ public class PlatformerPhysics : MonoBehaviour
         // - Walljump height based on upwards velocity
         // - Walljump same side only once (reset per dash, other side hit, grounded, grab and/or possibly a timer)
         // 
-        // default (jump): full left jump - no more cancel
 
-        bool fallDown = InputVertical < 0; // || (InputVertical == 0 && InputHorizontal == 0);
+        bool fallDown = InputVertical < 0 || (InputVertical == 0 && InputHorizontal == 0);
 
         // Only walljump if it did not jump on that same side already
         if (SameJumpSide() && !fallDown) //Cancel out if trying to jump up
