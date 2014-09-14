@@ -634,6 +634,11 @@ public class PlatformerPhysics : MonoBehaviour
         CheckFlipBy(dir);
     }
 
+    private void resetWallJump()
+    {
+        lastJumpSide = WallJumpState.Free;
+    }
+
     #endregion
 
     #region WallJump & Slide
@@ -712,12 +717,7 @@ public class PlatformerPhysics : MonoBehaviour
 
         #region Start a new slide (when x out of yd raycasts hit)
 
-        // When x raycast hit
-        bool canWallSlide = playerState != PlayerState.WallSliding && hits.Count >= WallSlideSettings.WallSlideRays - WallSlideSettings.WallSlideRaysDisconnectedFall;
-        // Only slide up when the player hasnt walljumped and landed on the same side
-        bool slideDownWhenSecondJump = SameJumpSide() ? rigid.velocity.y < 0 : true;
-
-        if (!Grounded && canWallSlide && slideDownWhenSecondJump)//Raycasts 
+        if (!Grounded && playerState != PlayerState.WallSliding && hits.Count >= WallSlideSettings.WallSlideRays -WallSlideSettings.WallSlideRaysDisconnectedFall)//Raycasts 
         {
             SetState(PlayerState.WallSliding);
             //float relPosSign = Mathf.Sign(col.transform.position.x - tr.position.x);
@@ -775,14 +775,13 @@ public class PlatformerPhysics : MonoBehaviour
         bool fallDown = InputVertical < 0 || (InputVertical == 0 && InputHorizontal == 0);
 
         // Only walljump if it did not jump on that same side already
-        if (SameJumpSide() && !fallDown) //Cancel out if trying to jump up
-            //return false; // Do nothing
-            fallDown = true;
+        WallJumpState jumpSideNow = facingRight ? WallJumpState.LastLeft : WallJumpState.LastRight;
+
+        if (jumpSideNow == lastJumpSide && !fallDown) //Cancel out if trying to jump up
+            return false;
 
         //Debug.Log(jumpSideNow + " " + lastJumpSide);
 
-        //if(!fallDown) // Dont register if its not a jump
-        WallJumpState jumpSideNow = facingRight ? WallJumpState.LastLeft : WallJumpState.LastRight;
         lastJumpSide = jumpSideNow;
 
         // If jumping is allowed:
@@ -820,17 +819,6 @@ public class PlatformerPhysics : MonoBehaviour
         CheckFlipByVelocity();
 
         return true;
-    }
-
-    private bool SameJumpSide()
-    {
-        WallJumpState jumpSideNow = facingRight ? WallJumpState.LastLeft : WallJumpState.LastRight;
-        return jumpSideNow == lastJumpSide;
-    }
-
-    private void resetWallJump()
-    {
-        lastJumpSide = WallJumpState.Free;
     }
 
     #endregion
